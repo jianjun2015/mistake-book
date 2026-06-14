@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "http://68ec515f.r8.cpolar.top/api/$1"
+    }
+  ]
+}

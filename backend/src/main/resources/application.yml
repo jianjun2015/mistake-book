@@ -1,0 +1,67 @@
+# Application Configuration
+spring:
+  application:
+    name: mistake-book
+  # 数据源配置
+  datasource:
+    url: jdbc:mysql://122.51.45.199:3306/mistakebook?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: "Admin@2026!Mysql"
+  jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
+  # Redis 配置
+  data:
+    redis:
+      host: 122.51.45.199
+      port: 6379
+      password: "123456"
+      database: 0
+      timeout: 3000
+    # MongoDB 配置
+    mongodb:
+      uri: mongodb://122.51.45.199:27017/mistakebook
+
+server:
+  port: 9999
+
+app:
+  storage:
+    upload-dir: ./uploads
+
+jwt:
+  secret: mistake-book-jwt-secret-key-must-be-at-least-32-characters-long-for-hs256
+  expiration: 604800000  # 7天 (毫秒)
+
+# PowerJob 配置
+powerjob:
+  worker:
+    enabled: true
+    app-name: mistake-book
+    server-address: 122.51.45.199:7700
+    protocol: http
+    port: 27777
+
+# 日志配置
+logging:
+  level:
+    com.mistakebook: DEBUG
+    org.springframework.web: INFO
+  file:
+    name: ./logs/mistake-book.log
+  logback:
+    rollingpolicy:
+      max-file-size: 100MB
+      max-history: 30
+      total-size-cap: 1GB
