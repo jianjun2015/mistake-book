@@ -1,0 +1,43 @@
+<!--pages/search/search.wxml-->
+<view class="container">
+  <view class="search-bar">
+    <input 
+      class="search-input" 
+      placeholder="搜索错题内容" 
+      value="{{keyword}}"
+      bindinput="onKeywordInput"
+      bindconfirm="handleSearch"
+    />
+    <button class="search-btn" bindtap="handleSearch" loading="{{loading}}">搜索</button>
+  </view>
+
+  <view class="result-list" wx:if="{{searched}}">
+    <view class="result-header" wx:if="{{mistakeList.length > 0}}">
+      <text>找到 {{total}} 条结果</text>
+    </view>
+
+    <view class="list" wx:if="{{mistakeList.length > 0}}">
+      <view class="card mistake-item" wx:for="{{mistakeList}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+        <view class="mistake-title">{{item.title || '（无标题）'}}</view>
+        <view class="mistake-meta">
+          <text class="tag" wx:if="{{item.subject}}">{{getSubjectName(item.subject)}}</text>
+          <text class="time">{{formatTime(item.createTime)}}</text>
+        </view>
+        <view class="mistake-content">{{item.content}}</view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:else>
+      <text wx:if="{{loading}}">搜索中...</text>
+      <view wx:else>
+        <text class="empty-icon">🔍</text>
+        <text class="empty-text">未找到相关错题</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="welcome" wx:else>
+    <text class="welcome-icon">🔍</text>
+    <text class="welcome-text">输入关键词搜索错题</text>
+  </view>
+</view>

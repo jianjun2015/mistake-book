@@ -1,0 +1,85 @@
+<!--pages/mistake-list/mistake-list.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">错题列表</text>
+    <text class="count">共 {{total}} 道</text>
+  </view>
+
+  <view class="list" wx:if="{{mistakeList.length > 0}}">
+    <view class="card mistake-item" wx:for="{{mistakeList}}" wx:key="id">
+      <view class="mistake-header">
+        <view class="mistake-title" bindtap="goDetail" data-id="{{item.id}}">
+          {{item.title || '（无标题）'}}
+        </view>
+        <view class="mistake-actions">
+          <text class="action-btn edit" bindtap="goEdit" data-id="{{item.id}}">编辑</text>
+          <text class="action-btn delete" bindtap="handleDelete" data-id="{{item.id}}">删除</text>
+        </view>
+      </view>
+
+      <view class="mistake-meta">
+        <text class="tag {{getSubjectClass(item.subject)}}" wx:if="{{item.subject}}">
+          {{getSubjectName(item.subject)}}
+        </text>
+        <text class="status-tag {{getStatusClass(item.status)}}">
+          {{getStatusName(item.status)}}
+        </text>
+        <text class="difficulty">
+          <text wx:for="{{5}}" wx:key="*this" wx:for-item="star">⭐</text>
+        </text>
+      </view>
+
+      <view class="mistake-content" bindtap="goDetail" data-id="{{item.id}}">
+        {{item.content}}
+      </view>
+
+      <view class="mistake-footer">
+        <text class="time">{{formatTime(item.createTime)}}</text>
+        <text class="images" wx:if="{{item.images && item.images.length > 0}}">
+          📷 {{item.images.length}}张
+        </text>
+      </view>
+
+      <view class="status-actions">
+        <text 
+          class="status-btn {{item.status === 0 ? 'active' : ''}}" 
+          bindtap="handleStatusChange" 
+          data-id="{{item.id}}" 
+          data-status="0"
+        >
+          未掌握
+        </text>
+        <text 
+          class="status-btn {{item.status === 1 ? 'active' : ''}}" 
+          bindtap="handleStatusChange" 
+          data-id="{{item.id}}" 
+          data-status="1"
+        >
+          半掌握
+        </text>
+        <text 
+          class="status-btn {{item.status === 2 ? 'active' : ''}}" 
+          bindtap="handleStatusChange" 
+          data-id="{{item.id}}" 
+          data-status="2"
+        >
+          已掌握
+        </text>
+      </view>
+    </view>
+
+    <view class="load-more" wx:if="{{hasMore}}">
+      <text wx:if="{{loading}}">加载中...</text>
+      <text wx:else bindtap="loadMore">加载更多</text>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:else>
+    <text wx:if="{{loading}}">加载中...</text>
+    <view wx:else>
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无错题</text>
+      <button class="btn-primary" bindtap="goAdd">添加错题</button>
+    </view>
+  </view>
+</view>

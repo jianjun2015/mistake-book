@@ -1,0 +1,45 @@
+<!--pages/login/login.wxml-->
+<view class="login-container">
+  <view class="login-header">
+    <text class="logo">📝</text>
+    <text class="title">错题本</text>
+    <text class="subtitle">学生智能学习助手</text>
+  </view>
+
+  <view class="login-form">
+    <view class="form-item">
+      <view class="form-label">用户名</view>
+      <input 
+        class="form-input" 
+        placeholder="请输入用户名" 
+        value="{{username}}"
+        bindinput="onUsernameInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">密码</view>
+      <input 
+        class="form-input" 
+        type="password" 
+        placeholder="请输入密码" 
+        value="{{password}}"
+        bindinput="onPasswordInput"
+      />
+    </view>
+
+    <button 
+      class="btn-primary login-btn" 
+      bindtap="handleLogin" 
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      登 录
+    </button>
+
+    <view class="register-link" bindtap="goRegister">
+      <text>还没有账号？</text>
+      <text class="link">立即注册</text>
+    </view>
+  </view>
+</view>

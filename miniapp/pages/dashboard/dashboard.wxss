@@ -1,0 +1,203 @@
+/* pages/dashboard/dashboard.wxss */
+.user-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.avatar {
+  width: 80rpx;
+  height: 80rpx;
+  background: #e6f7ff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+}
+
+.user-detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.username {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-grade {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.logout-btn {
+  font-size: 28rpx;
+  color: #ff4d4f;
+}
+
+.stats-card {
+  padding-bottom: 30rpx;
+}
+
+.stats-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.stats-grid {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 24rpx;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-num {
+  display: block;
+  font-size: 48rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.stat-num.mastered {
+  color: #52c41a;
+}
+
+.stat-num.half {
+  color: #faad14;
+}
+
+.stat-num.not-mastered {
+  color: #ff4d4f;
+}
+
+.stat-label {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.progress-bar {
+  height: 16rpx;
+  background: #f0f0f0;
+  border-radius: 8rpx;
+  display: flex;
+  overflow: hidden;
+}
+
+.progress {
+  height: 100%;
+}
+
+.progress.mastered {
+  background: #52c41a;
+}
+
+.progress.half {
+  background: #faad14;
+}
+
+.action-card {
+  display: flex;
+  gap: 20rpx;
+}
+
+.action-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24rpx;
+  background: #f5f5f5;
+  border-radius: 12rpx;
+}
+
+.action-icon {
+  font-size: 48rpx;
+  margin-bottom: 8rpx;
+}
+
+.action-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.recent-title {
+  font-size: 30rpx;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 16rpx;
+}
+
+.recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.recent-item:last-child {
+  border-bottom: none;
+}
+
+.recent-info {
+  flex: 1;
+}
+
+.recent-name {
+  display: block;
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 8rpx;
+}
+
+.recent-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  font-size: 24rpx;
+}
+
+.tag {
+  font-size: 22rpx;
+  padding: 2rpx 8rpx;
+  background: #e6f7ff;
+  color: #1890ff;
+  border-radius: 4rpx;
+}
+
+.status-0 {
+  color: #ff4d4f;
+}
+
+.status-1 {
+  color: #faad14;
+}
+
+.status-2 {
+  color: #52c41a;
+}
+
+.recent-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.empty-recent {
+  text-align: center;
+  padding: 40rpx;
+  color: #999;
+  font-size: 28rpx;
+}

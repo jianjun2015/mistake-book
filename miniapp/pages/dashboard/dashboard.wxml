@@ -1,0 +1,69 @@
+<!--pages/dashboard/dashboard.wxml-->
+<view class="container">
+  <view class="user-card card">
+    <view class="user-info">
+      <view class="avatar">👤</view>
+      <view class="user-detail">
+        <text class="username">{{userInfo.username || '用户'}}</text>
+        <text class="user-grade">{{userInfo.gradeName || ''}} · {{userInfo.genderName || ''}}</text>
+      </view>
+    </view>
+    <text class="logout-btn" bindtap="handleLogout">退出</text>
+  </view>
+
+  <view class="stats-card card">
+    <view class="stats-title">📊 学习概览</view>
+    <view class="stats-grid">
+      <view class="stat-item">
+        <text class="stat-num">{{stats.total}}</text>
+        <text class="stat-label">总错题</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num mastered">{{stats.mastered}}</text>
+        <text class="stat-label">已掌握</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num half">{{stats.halfMastered}}</text>
+        <text class="stat-label">半掌握</text>
+      </view>
+      <view class="stat-item">
+        <text class="stat-num not-mastered">{{stats.notMastered}}</text>
+        <text class="stat-label">未掌握</text>
+      </view>
+    </view>
+    <view class="progress-bar" wx:if="{{stats.total > 0}}">
+      <view class="progress mastered" style="width: {{stats.mastered / stats.total * 100}}%"></view>
+      <view class="progress half" style="width: {{stats.halfMastered / stats.total * 100}}%"></view>
+    </view>
+  </view>
+
+  <view class="action-card card">
+    <view class="action-btn" bindtap="goMistakeList">
+      <text class="action-icon">📝</text>
+      <text class="action-text">错题列表</text>
+    </view>
+    <view class="action-btn" bindtap="goAddMistake">
+      <text class="action-icon">➕</text>
+      <text class="action-text">添加错题</text>
+    </view>
+  </view>
+
+  <view class="recent-card card">
+    <view class="recent-title">🕐 最近添加</view>
+    <view class="recent-list" wx:if="{{recentMistakes.length > 0}}">
+      <view class="recent-item" wx:for="{{recentMistakes}}" wx:key="id" bindtap="goDetail" data-id="{{item.id}}">
+        <view class="recent-info">
+          <text class="recent-name">{{item.title || '（无标题）'}}</text>
+          <text class="recent-meta">
+            <text class="tag" wx:if="{{item.subject}}">{{getSubjectName(item.subject)}}</text>
+            <text class="status-{{item.status}}">{{getStatusName(item.status)}}</text>
+          </text>
+        </view>
+        <text class="recent-time">{{formatTime(item.createTime)}}</text>
+      </view>
+    </view>
+    <view class="empty-recent" wx:else>
+      <text>暂无错题，快去添加吧！</text>
+    </view>
+  </view>
+</view>

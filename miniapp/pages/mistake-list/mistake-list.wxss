@@ -1,0 +1,131 @@
+/* pages/mistake-list/mistake-list.wxss */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.count {
+  font-size: 28rpx;
+  color: #999;
+}
+
+.mistake-item {
+  margin-bottom: 20rpx;
+}
+
+.mistake-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.mistake-title {
+  font-size: 32rpx;
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+  margin-right: 16rpx;
+}
+
+.mistake-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.action-btn {
+  font-size: 24rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+}
+
+.action-btn.edit {
+  color: #1890ff;
+  background: #e6f7ff;
+}
+
+.action-btn.delete {
+  color: #ff4d4f;
+  background: #fff1f0;
+}
+
+.mistake-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+  flex-wrap: wrap;
+}
+
+.mistake-content {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 12rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.mistake-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 24rpx;
+  color: #999;
+  margin-bottom: 16rpx;
+}
+
+.status-actions {
+  display: flex;
+  gap: 16rpx;
+  border-top: 1rpx solid #f0f0f0;
+  padding-top: 16rpx;
+}
+
+.status-btn {
+  font-size: 24rpx;
+  padding: 8rpx 24rpx;
+  border-radius: 4rpx;
+  background: #f5f5f5;
+  color: #666;
+}
+
+.status-btn.active {
+  background: #1890ff;
+  color: #fff;
+}
+
+.load-more {
+  text-align: center;
+  padding: 30rpx;
+  color: #999;
+  font-size: 28rpx;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 100rpx 0;
+}
+
+.empty-icon {
+  font-size: 80rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+.empty-text {
+  display: block;
+  font-size: 28rpx;
+  color: #999;
+  margin-bottom: 30rpx;
+}

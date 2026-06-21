@@ -1,0 +1,102 @@
+<!--pages/mistake-form/mistake-form.wxml-->
+<view class="container" wx:if="{{!pageLoading}}">
+  <view class="card">
+    <view class="form-item">
+      <view class="form-label">题目摘要</view>
+      <input 
+        class="form-input" 
+        placeholder="例如：二次函数最值问题" 
+        value="{{title}}"
+        bindinput="onTitleInput"
+        maxlength="200"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">学科 *</view>
+      <picker mode="selector" range="{{subjectOptions}}" range-key="label" value="{{subjectIndex}}" bindchange="onSubjectChange">
+        <view class="form-input picker-input {{subjectIndex === -1 ? 'placeholder' : ''}}">
+          {{subjectIndex === -1 ? '请选择学科' : subjectOptions[subjectIndex].label}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">题目内容 *</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="输入题目内容" 
+        value="{{content}}"
+        bindinput="onContentInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">题目图片</view>
+      <view class="image-list">
+        <view class="image-item" wx:for="{{images}}" wx:key="id">
+          <image src="{{item.fullUrl}}" mode="aspectFill" class="preview-image" />
+          <view class="remove-btn" bindtap="removeImage" data-index="{{index}}">×</view>
+        </view>
+        <view class="add-image" bindtap="chooseImage" wx:if="{{images.length < 5}}">
+          <text class="add-icon">+</text>
+          <text class="add-text">添加图片</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">正确答案</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="输入正确答案" 
+        value="{{correctAnswer}}"
+        bindinput="onCorrectAnswerInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">错误分析</view>
+      <textarea 
+        class="form-textarea" 
+        placeholder="分析为什么做错" 
+        value="{{wrongReason}}"
+        bindinput="onWrongReasonInput"
+      />
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">难度</view>
+      <picker mode="selector" range="{{difficultyOptions}}" value="{{difficultyIndex}}" bindchange="onDifficultyChange">
+        <view class="form-input picker-input">
+          {{difficultyOptions[difficultyIndex]}}⭐
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <view class="form-label">标签</view>
+      <input 
+        class="form-input" 
+        placeholder="多个标签用逗号分隔" 
+        value="{{tags}}"
+        bindinput="onTagsInput"
+      />
+    </view>
+  </view>
+
+  <view class="submit-area">
+    <button 
+      class="btn-primary submit-btn" 
+      bindtap="handleSubmit" 
+      loading="{{loading}}"
+      disabled="{{loading}}"
+    >
+      {{isEdit ? '更新错题' : '保存错题'}}
+    </button>
+  </view>
+</view>
+
+<view class="loading" wx:else>
+  <text>加载中...</text>
+</view>

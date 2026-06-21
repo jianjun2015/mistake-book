@@ -1,0 +1,108 @@
+/* pages/mistake-form/mistake-form.wxss */
+.form-item {
+  margin-bottom: 30rpx;
+}
+
+.form-label {
+  font-size: 28rpx;
+  color: #333;
+  margin-bottom: 12rpx;
+  font-weight: 500;
+}
+
+.form-input {
+  width: 100%;
+  height: 88rpx;
+  border: 1rpx solid #d9d9d9;
+  border-radius: 8rpx;
+  padding: 0 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+  line-height: 88rpx;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 200rpx;
+  border: 1rpx solid #d9d9d9;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+.picker-input {
+  display: flex;
+  align-items: center;
+}
+
+.placeholder {
+  color: #999;
+}
+
+.image-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.image-item {
+  position: relative;
+  width: 160rpx;
+  height: 160rpx;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  border-radius: 8rpx;
+  background: #f5f5f5;
+}
+
+.remove-btn {
+  position: absolute;
+  top: -16rpx;
+  right: -16rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: #ff4d4f;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+}
+
+.add-image {
+  width: 160rpx;
+  height: 160rpx;
+  border: 2rpx dashed #d9d9d9;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-icon {
+  font-size: 48rpx;
+  color: #999;
+}
+
+.add-text {
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 8rpx;
+}
+
+.submit-area {
+  padding: 20rpx 0 40rpx;
+}
+
+.submit-btn {
+  width: 100%;
+  height: 88rpx;
+  line-height: 88rpx;
+  font-size: 32rpx;
+}

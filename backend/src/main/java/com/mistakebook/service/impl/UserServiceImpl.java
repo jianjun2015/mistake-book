@@ -5,6 +5,7 @@ import com.mistakebook.entity.User;
 import com.mistakebook.repository.UserRepository;
 import com.mistakebook.service.UserService;
 import com.mistakebook.util.JwtUtil;
+import com.mistakebook.util.PasswordUtil;
 import com.mistakebook.util.RedisService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,10 +44,14 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("用户名已存在");
         }
 
+        // 解密前端传来的密码
+        String rawPassword = PasswordUtil.decryptPassword(request.getPassword());
+        log.debug("密码解密完成: username={}", request.getUsername());
+
         // 创建用户
         User user = new User();
         user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(rawPassword));
         user.setGrade(request.getGrade());
         user.setGender(request.getGender());
 
@@ -67,8 +72,11 @@ public class UserServiceImpl implements UserService {
                     return new RuntimeException("用户名或密码错误");
                 });
 
+        // 解密前端传来的密码
+        String rawPassword = PasswordUtil.decryptPassword(request.getPassword());
+        
         // 验证密码
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
             log.warn("密码错误: username={}", request.getUsername());
             throw new RuntimeException("用户名或密码错误");
         }

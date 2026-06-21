@@ -1,28 +1,77 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Input, Select, Button, Upload, Space, message, Card, Divider } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Form, Input, Select, Button, Upload, Space, message, Card, Divider, Spin } from 'antd';
 import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons';
 import type { UploadFile, UploadProps } from 'antd';
 import MainLayout from '../components/layout/MainLayout';
-import { createMistake } from '../api/mistake';
+import { createMistake, updateMistake, getMistake } from '../api/mistake';
 import { useAuth } from '../context/AuthContext';
 import { SUBJECTS } from '../types';
-import type { MistakeForm } from '../types';
 
 const { TextArea } = Input;
 
 const MistakeFormPage: React.FC = () => {
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { token } = useAuth();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [pageLoading, setPageLoading] = useState(false);
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+
+  const isEdit = !!id;
+
+  // 编辑模式：加载错题数据
+  useEffect(() => {
+    if (isEdit) {
+      loadMistakeData();
+    }
+  }, [id]);
+
+  const loadMistakeData = async () => {
+    if (!id) return;
+    setPageLoading(true);
+    try {
+      const res = await getMistake(Number(id));
+      const mistake = res.data;
+
+      // 回显表单数据
+      form.setFieldsValue({
+        title: mistake.title,
+        content: mistake.content,
+        subject: mistake.subject,
+        difficulty: mistake.difficulty,
+        correctAnswer: mistake.correctAnswer,
+        wrongReason: mistake.wrongReason,
+        tags: mistake.tags?.join(','),
+      });
+
+      // 回显图片
+      if (mistake.images && mistake.images.length > 0) {
+        const existingImages = mistake.images.map((img: any) => img.imageUrl);
+        setUploadedImages(existingImages);
+
+        const existingFileList: UploadFile[] = mistake.images.map((img: any, index: number) => ({
+          uid: `-${index}`,
+          name: `图片${index + 1}`,
+          status: 'done',
+          url: img.imageUrl,
+          response: { code: 200, data: { imageUrl: img.imageUrl } },
+        }));
+        setFileList(existingFileList);
+      }
+    } catch (error) {
+      console.error('加载错题失败', error);
+      message.error('加载错题失败');
+    } finally {
+      setPageLoading(false);
+    }
+  };
 
   const handleChange: UploadProps['onChange'] = ({ file, fileList: newFileList }) => {
     setFileList(newFileList);
 
-    // 上传成功后收集图片URL
     if (file.status === 'done' && file.response) {
       const response = file.response as any;
       if (response.code === 200) {
@@ -34,18 +83,17 @@ const MistakeFormPage: React.FC = () => {
     }
   };
 
-  // 移除图片时，同时移除已上传的图片URL
   const handleRemove = (file: UploadFile) => {
-    if (file.response?.data?.imageUrl) {
-      setUploadedImages(prev => prev.filter(url => url !== file.response.data.imageUrl));
+    const imageUrl = file.response?.data?.imageUrl || file.url;
+    if (imageUrl) {
+      setUploadedImages(prev => prev.filter(url => url !== imageUrl));
     }
     return true;
   };
 
-  const handleSubmit = async (values: MistakeForm) => {
+  const handleSubmit = async (values: any) => {
     setLoading(true);
     try {
-      // 构建提交数据，包含图片URL
       const submitData = {
         title: values.title,
         content: values.content,
@@ -57,15 +105,30 @@ const MistakeFormPage: React.FC = () => {
         images: uploadedImages,
       };
 
-      await createMistake(submitData);
-      message.success('错题添加成功');
+      if (isEdit) {
+        await updateMistake(Number(id), submitData);
+        message.success('错题更新成功');
+      } else {
+        await createMistake(submitData);
+        message.success('错题添加成功');
+      }
       navigate('/mistakes');
     } catch (error) {
-      console.error('添加失败', error);
+      console.error(isEdit ? '更新失败' : '添加失败', error);
     } finally {
       setLoading(false);
     }
   };
+
+  if (pageLoading) {
+    return (
+      <MainLayout>
+        <div style={{ padding: 24, textAlign: 'center' }}>
+          <Spin size="large" tip="加载中..." />
+        </div>
+      </MainLayout>
+    );
+  }
 
   return (
     <MainLayout>
@@ -78,7 +141,7 @@ const MistakeFormPage: React.FC = () => {
           返回列表
         </Button>
 
-        <Card title="添加错题" bordered={false}>
+        <Card title={isEdit ? '编辑错题' : '添加错题'} bordered={false}>
           <Form
             form={form}
             layout="vertical"
@@ -168,7 +231,7 @@ const MistakeFormPage: React.FC = () => {
             <Form.Item>
               <Space>
                 <Button type="primary" htmlType="submit" loading={loading} size="large">
-                  保存错题
+                  {isEdit ? '更新错题' : '保存错题'}
                 </Button>
                 <Button size="large" onClick={() => navigate('/mistakes')}>
                   取消

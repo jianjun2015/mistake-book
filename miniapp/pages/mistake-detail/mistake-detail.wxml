@@ -1,0 +1,93 @@
+<!--pages/mistake-detail/mistake-detail.wxml-->
+<view class="container" wx:if="{{!loading}}">
+  <view class="card">
+    <view class="header">
+      <view class="title">{{mistake.title || '（无标题）'}}</view>
+      <view class="meta">
+        <text class="tag tag-{{mistake.subject | lowercase}}" wx:if="{{mistake.subject}}">
+          {{getSubjectName(mistake.subject)}}
+        </text>
+        <text class="status-tag status-{{mistake.status}}">
+          {{getStatusName(mistake.status)}}
+        </text>
+        <text class="difficulty">
+          <text wx:for="{{mistake.difficulty || 1}}" wx:key="*this">⭐</text>
+        </text>
+      </view>
+      <view class="info">
+        <text>创建时间: {{formatTime(mistake.createTime)}}</text>
+        <text>复习次数: {{mistake.reviewCount || 0}}</text>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">📝 题目内容</view>
+      <view class="section-content">{{mistake.content}}</view>
+    </view>
+
+    <view class="section" wx:if="{{mistake.images && mistake.images.length > 0}}">
+      <view class="section-title">📷 图片（{{mistake.images.length}}张）</view>
+      <view class="images">
+        <image 
+          wx:for="{{mistake.images}}" 
+          wx:key="id" 
+          src="{{item.fullUrl}}" 
+          mode="aspectFit" 
+          class="preview-image"
+          bindtap="previewImage"
+          data-url="{{item.fullUrl}}"
+        />
+      </view>
+    </view>
+
+    <view class="section" wx:if="{{mistake.correctAnswer}}">
+      <view class="section-title">✅ 正确答案</view>
+      <view class="section-content answer">{{mistake.correctAnswer}}</view>
+    </view>
+
+    <view class="section" wx:if="{{mistake.wrongReason}}">
+      <view class="section-title">💡 错误分析</view>
+      <view class="section-content reason">{{mistake.wrongReason}}</view>
+    </view>
+
+    <view class="tags" wx:if="{{mistake.tags && mistake.tags.length > 0}}">
+      <text class="tag-item" wx:for="{{mistake.tags}}" wx:key="*this">{{item}}</text>
+    </view>
+  </view>
+
+  <view class="actions">
+    <button 
+      class="btn-danger" 
+      bindtap="handleStatusChange" 
+      data-status="0"
+      disabled="{{mistake.status === 0}}"
+    >
+      未掌握
+    </button>
+    <button 
+      class="btn-default" 
+      bindtap="handleStatusChange" 
+      data-status="1"
+      disabled="{{mistake.status === 1}}"
+    >
+      半掌握
+    </button>
+    <button 
+      class="btn-success" 
+      bindtap="handleStatusChange" 
+      data-status="2"
+      disabled="{{mistake.status === 2}}"
+    >
+      已掌握
+    </button>
+  </view>
+
+  <view class="bottom-actions">
+    <button class="btn-primary" bindtap="goEdit">编辑</button>
+    <button class="btn-danger" bindtap="handleDelete">删除</button>
+  </view>
+</view>
+
+<view class="loading" wx:else>
+  <text>加载中...</text>
+</view>

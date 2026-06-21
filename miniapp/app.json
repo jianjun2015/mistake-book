@@ -1,0 +1,52 @@
+{
+  "pages": [
+    "pages/login/login",
+    "pages/register/register",
+    "pages/dashboard/dashboard",
+    "pages/mistake-list/mistake-list",
+    "pages/mistake-detail/mistake-detail",
+    "pages/mistake-form/mistake-form",
+    "pages/search/search"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#1890ff",
+    "navigationBarTitleText": "错题本",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#f5f5f5"
+  },
+  "tabBar": {
+    "color": "#999999",
+    "selectedColor": "#1890ff",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/dashboard/dashboard",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/mistake-list/mistake-list",
+        "text": "错题",
+        "iconPath": "images/list.png",
+        "selectedIconPath": "images/list-active.png"
+      },
+      {
+        "pagePath": "pages/search/search",
+        "text": "搜索",
+        "iconPath": "images/search.png",
+        "selectedIconPath": "images/search-active.png"
+      },
+      {
+        "pagePath": "pages/mistake-form/mistake-form",
+        "text": "添加",
+        "iconPath": "images/add.png",
+        "selectedIconPath": "images/add-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2"
+}
