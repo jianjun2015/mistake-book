@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Card, Button, Space, Tabs, Input } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Card, Button, Space, Tabs, Input, Empty } from 'antd';
 import { BookOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import { gradeConfigs } from './config';
@@ -23,6 +23,15 @@ const KnowledgeSummaryPage: React.FC = () => {
   const currentGrade = gradeConfigs.find(g => g.key === selectedGrade);
   const currentSemester = currentGrade?.semesters.find(s => s.key === selectedSemester);
 
+  // 加载疑难点内容
+  useEffect(() => {
+    if (selectedSubject && selectedSemester) {
+      const key = `doubt_${selectedSemester}_${selectedSubject.key}`;
+      const saved = localStorage.getItem(key) || '';
+      setDoubtContent(saved);
+    }
+  }, [selectedSubject, selectedSemester]);
+
   const handleSubjectClick = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
     setActiveTab('summary');
@@ -34,6 +43,14 @@ const KnowledgeSummaryPage: React.FC = () => {
 
   const getTabUrl = (file: string) => {
     return `/knowledge/${selectedSemester}/${file}`;
+  };
+
+  const handleSaveDoubt = () => {
+    if (selectedSubject && selectedSemester) {
+      const key = `doubt_${selectedSemester}_${selectedSubject.key}`;
+      localStorage.setItem(key, doubtContent);
+      alert('保存成功！');
+    }
   };
 
   const tabItems = selectedSubject ? [
@@ -55,11 +72,24 @@ const KnowledgeSummaryPage: React.FC = () => {
       label: '📋 试卷',
       children: (
         <div style={{ height: '70vh' }}>
-          <iframe
-            src={getTabUrl(selectedSubject.examFile)}
-            style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
-            title="试卷"
-          />
+          {selectedSubject.examFile ? (
+            <iframe
+              src={getTabUrl(selectedSubject.examFile)}
+              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
+              title="试卷"
+            />
+          ) : (
+            <div style={{ 
+              height: '100%', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              background: '#fafafa',
+              borderRadius: '8px'
+            }}>
+              <Empty description="暂无试卷" />
+            </div>
+          )}
         </div>
       ),
     },
@@ -68,21 +98,19 @@ const KnowledgeSummaryPage: React.FC = () => {
       label: '❓ 疑难点',
       children: (
         <div style={{ padding: '16px 0' }}>
-          <Card title="📝 记录疑难点" size="small">
+          <Card 
+            title={`${currentGrade?.name} ${currentSemester?.name} - ${selectedSubject.name} 疑难点`} 
+            size="small"
+          >
             <TextArea
               value={doubtContent}
               onChange={(e) => setDoubtContent(e.target.value)}
-              placeholder="在这里记录你的疑难点..."
+              placeholder={`记录${currentGrade?.name}${currentSemester?.name}${selectedSubject.name}的疑难点...`}
               rows={15}
               style={{ fontSize: '14px' }}
             />
             <div style={{ marginTop: 16, textAlign: 'right' }}>
-              <Button type="primary" onClick={() => {
-                // 保存到 localStorage
-                const key = `doubt_${selectedSemester}_${selectedSubject.key}`;
-                localStorage.setItem(key, doubtContent);
-                alert('保存成功！');
-              }}>
+              <Button type="primary" onClick={handleSaveDoubt}>
                 保存
               </Button>
             </div>
