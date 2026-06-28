@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>沪教版三年级英语 第二学期 期末考试卷</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-light: #dbeafe;
+    --accent: #f59e0b;
+    --accent-light: #fef3c7;
+    --success: #10b981;
+    --success-light: #d1fae5;
+    --danger: #ef4444;
+    --danger-light: #fee2e2;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --bg: #f8fafc;
+    --white: #ffffff;
+    --border: #e2e8f0;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.8; padding: 20px;
+  }
+  .container {
+    max-width: 900px; margin: 0 auto; background: var(--white);
+    border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #dc2626, #ea580c);
+    color: white; padding: 40px 48px; text-align: center;
+  }
+  .header h1 { font-size: 2rem; font-weight: 700; margin-bottom: 8px; }
+  .header .subtitle { font-size: 1.1rem; opacity: 0.9; }
+  .info-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 48px; background: #fff7ed; border-bottom: 2px solid #fed7aa;
+    font-size: 0.95rem;
+  }
+  .info-bar .label { color: var(--text-light); }
+  .info-bar .blank { display: inline-block; width: 120px; border-bottom: 1px solid #94a3b8; margin: 0 4px; }
+  .content { padding: 32px 48px 48px; }
+  h2 {
+    font-size: 1.4rem; color: #dc2626; margin: 36px 0 16px;
+    padding: 10px 16px; background: #fef2f2; border-left: 5px solid #dc2626;
+    border-radius: 0 8px 8px 0;
+  }
+  h2:first-of-type { margin-top: 0; }
+  .score-badge {
+    float: right; background: #dc2626; color: white; padding: 2px 12px;
+    border-radius: 20px; font-size: 0.85rem; font-weight: normal;
+  }
+  h3 {
+    font-size: 1.1rem; color: var(--text); margin: 20px 0 12px;
+    padding-left: 12px; border-left: 4px solid var(--accent);
+  }
+  .question-group {
+    background: #fafafa; border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px 24px; margin: 16px 0;
+  }
+  .question {
+    margin: 14px 0; padding: 10px 0; border-bottom: 1px dashed #e2e8f0;
+  }
+  .question:last-child { border-bottom: none; margin-bottom: 0; }
+  .q-num {
+    display: inline-block; background: var(--primary); color: white;
+    width: 28px; height: 28px; line-height: 28px; text-align: center;
+    border-radius: 50%; font-size: 0.85rem; font-weight: 600; margin-right: 8px;
+  }
+  .options {
+    margin: 10px 0 0 36px; display: flex; gap: 24px; flex-wrap: wrap;
+  }
+  .option {
+    padding: 6px 16px; border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .option:hover { background: var(--primary-light); border-color: var(--primary); }
+  .option .letter {
+    display: inline-block; background: #e2e8f0; color: var(--text);
+    width: 22px; height: 22px; line-height: 22px; text-align: center;
+    border-radius: 50%; font-size: 0.8rem; font-weight: 600; margin-right: 6px;
+  }
+  .blank-line {
+    display: inline-block; width: 100px; border-bottom: 1.5px solid #94a3b8;
+    margin: 0 4px; vertical-align: bottom;
+  }
+  .match-table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  .match-table th, .match-table td {
+    padding: 10px 16px; border: 1px solid var(--border); text-align: center;
+  }
+  .match-table th { background: var(--primary); color: white; font-weight: 600; }
+  .match-table td:hover { background: var(--primary-light); }
+  .passage {
+    background: #f0f9ff; border: 1px solid #93c5fd; border-radius: 12px;
+    padding: 20px 24px; margin: 16px 0; font-size: 1rem; line-height: 2;
+  }
+  .passage-title { font-weight: 700; color: var(--primary); margin-bottom: 10px; }
+  .tf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 24px; margin: 12px 0; }
+  .tf-item {
+    padding: 8px 12px; background: white; border: 1px solid var(--border);
+    border-radius: 8px; display: flex; align-items: center; gap: 8px;
+  }
+  .tf-box {
+    display: inline-flex; gap: 6px; margin-left: auto;
+  }
+  .tf-box span {
+    display: inline-block; width: 28px; height: 28px; line-height: 28px;
+    text-align: center; border: 1.5px solid #cbd5e1; border-radius: 6px;
+    font-weight: 600; font-size: 0.9rem;
+  }
+  .writing-area {
+    border: 2px dashed #cbd5e1; border-radius: 12px; min-height: 140px;
+    padding: 16px 20px; margin: 16px 0; background: #fffbeb;
+    background-image: repeating-linear-gradient(
+      transparent, transparent 31px, #e2e8f0 31px, #e2e8f0 32px
+    );
+    line-height: 32px;
+  }
+  .hint-words {
+    display: flex; gap: 10px; flex-wrap: wrap; margin: 8px 0;
+  }
+  .hint-tag {
+    background: var(--accent-light); border: 1px solid #fbbf24;
+    padding: 4px 12px; border-radius: 20px; font-size: 0.9rem; color: #92400e;
+  }
+  .answer-section {
+    background: #f0fdf4; border: 2px solid #86efac; border-radius: 16px;
+    padding: 24px; margin-top: 40px; display: none;
+  }
+  .answer-section.show { display: block; }
+  .answer-section h2 {
+    color: #15803d; background: #f0fdf4; border-left-color: #22c55e;
+  }
+  .answer-group { margin: 12px 0; }
+  .answer-group h4 { color: #15803d; margin-bottom: 8px; font-size: 1rem; }
+  .answer-item { margin: 4px 0; padding: 4px 0; font-size: 0.95rem; }
+  .answer-item .num {
+    display: inline-block; background: #dcfce7; color: #15803d;
+    width: 24px; height: 24px; line-height: 24px; text-align: center;
+    border-radius: 50%; font-size: 0.8rem; font-weight: 600; margin-right: 6px;
+  }
+  .answer-item .explain { color: var(--text-light); font-size: 0.88rem; }
+  .toggle-btn {
+    display: block; margin: 32px auto 0; padding: 12px 32px;
+    background: #22c55e; color: white; border: none; border-radius: 10px;
+    font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s;
+  }
+  .toggle-btn:hover { background: #16a34a; transform: translateY(-1px); }
+  @media print {
+    body { padding: 0; background: white; }
+    .container { box-shadow: none; }
+    .toggle-btn { display: none; }
+    .answer-section { display: block !important; }
+  }
+  @media (max-width: 640px) {
+    .content { padding: 20px; }
+    .header { padding: 28px 20px; }
+    .info-bar { flex-direction: column; gap: 8px; padding: 12px 20px; }
+    .options { flex-direction: column; gap: 8px; }
+    .tf-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>沪教版三年级英语 第二学期</h1>
+  <div class="subtitle">期 末 考 试 卷</div>
+</div>
+
+<div class="info-bar">
+  <span><span class="label">考试时间：</span>60分钟 &nbsp;&nbsp; <span class="label">满分：</span>100分</span>
+  <span>
+    姓名：<span class="blank"></span>
+    班级：<span class="blank"></span>
+    得分：<span class="blank"></span>
+  </span>
+</div>
+
+<div class="content">
+
+<!-- 一、语音辨析 -->
+<h2>一、语音辨析 <span class="score-badge">共10分</span></h2>
+<h3>找出画线部分发音不同的一项。（每题2分）</h3>
+
+<div class="question-group">
+  <div class="question">
+    <span class="q-num">1</span>
+    A. c<u>a</u>t &nbsp;&nbsp; B. b<u>a</u>g &nbsp;&nbsp; C. c<u>a</u>ke &nbsp;&nbsp; D. h<u>a</u>t
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">2</span>
+    A. d<u>o</u>g &nbsp;&nbsp; B. g<u>o</u> &nbsp;&nbsp; C. n<u>o</u> &nbsp;&nbsp; D. h<u>o</u>me
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">3</span>
+    A. b<u>i</u>g &nbsp;&nbsp; B. p<u>i</u>g &nbsp;&nbsp; C. r<u>i</u>ce &nbsp;&nbsp; D. s<u>i</u>t
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">4</span>
+    A. r<u>u</u>n &nbsp;&nbsp; B. b<u>u</u>s &nbsp;&nbsp; C. c<u>u</u>p &nbsp;&nbsp; D. r<u>u</u>ler
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">5</span>
+    A. h<u>e</u> &nbsp;&nbsp; B. sh<u>e</u> &nbsp;&nbsp; C. r<u>e</u>d &nbsp;&nbsp; D. m<u>e</u>
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 二、选出不同类的单词 -->
+<h2>二、选出不同类的单词 <span class="score-badge">共10分</span></h2>
+<h3>每题2分</h3>
+
+<div class="question-group">
+  <div class="question">
+    <span class="q-num">1</span>
+    A. apple &nbsp;&nbsp; B. banana &nbsp;&nbsp; C. bread &nbsp;&nbsp; D. orange
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">2</span>
+    A. red &nbsp;&nbsp; B. blue &nbsp;&nbsp; C. cat &nbsp;&nbsp; D. green
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">3</span>
+    A. run &nbsp;&nbsp; B. jump &nbsp;&nbsp; C. book &nbsp;&nbsp; D. swim
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">4</span>
+    A. mother &nbsp;&nbsp; B. teacher &nbsp;&nbsp; C. father &nbsp;&nbsp; D. brother
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">5</span>
+    A. Monday &nbsp;&nbsp; B. January &nbsp;&nbsp; C. Tuesday &nbsp;&nbsp; D. Friday
+    <div class="options">
+      <div class="option"><span class="letter">A</span></div>
+      <div class="option"><span class="letter">B</span></div>
+      <div class="option"><span class="letter">C</span></div>
+      <div class="option"><span class="letter">D</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 三、选择填空 -->
+<h2>三、选择填空 <span class="score-badge">共20分</span></h2>
+<h3>每题2分</h3>
+
+<div class="question-group">
+  <div class="question">
+    <span class="q-num">1</span> I <span class="blank-line"></span> a student.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> am</div>
+      <div class="option"><span class="letter">B</span> is</div>
+      <div class="option"><span class="letter">C</span> are</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">2</span> She <span class="blank-line"></span> big eyes.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> have</div>
+      <div class="option"><span class="letter">B</span> has</div>
+      <div class="option"><span class="letter">C</span> is</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">3</span> — Do you like apples? — <span class="blank-line"></span>
+    <div class="options">
+      <div class="option"><span class="letter">A</span> Yes, I am.</div>
+      <div class="option"><span class="letter">B</span> Yes, I do.</div>
+      <div class="option"><span class="letter">C</span> Yes, I can.</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">4</span> — What colour is the banana? — <span class="blank-line"></span>
+    <div class="options">
+      <div class="option"><span class="letter">A</span> It's a banana.</div>
+      <div class="option"><span class="letter">B</span> It's yellow.</div>
+      <div class="option"><span class="letter">C</span> It's big.</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">5</span> — <span class="blank-line"></span> is the cat? — It's under the table.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> What</div>
+      <div class="option"><span class="letter">B</span> Where</div>
+      <div class="option"><span class="letter">C</span> Who</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">6</span> There <span class="blank-line"></span> three books on the desk.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> is</div>
+      <div class="option"><span class="letter">B</span> am</div>
+      <div class="option"><span class="letter">C</span> are</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">7</span> — Can you swim? — No, I <span class="blank-line"></span>.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> am not</div>
+      <div class="option"><span class="letter">B</span> don't</div>
+      <div class="option"><span class="letter">C</span> can't</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">8</span> I have <span class="blank-line"></span> orange.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> a</div>
+      <div class="option"><span class="letter">B</span> an</div>
+      <div class="option"><span class="letter">C</span> the</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">9</span> The boys <span class="blank-line"></span> playing football now.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> is</div>
+      <div class="option"><span class="letter">B</span> am</div>
+      <div class="option"><span class="letter">C</span> are</div>
+    </div>
+  </div>
+  <div class="question">
+    <span class="q-num">10</span> — How many <span class="blank-line"></span> are there? — There are five.
+    <div class="options">
+      <div class="option"><span class="letter">A</span> a book</div>
+      <div class="option"><span class="letter">B</span> book</div>
+      <div class="option"><span class="letter">C</span> books</div>
+    </div>
+  </div>
+</div>
+
+<!-- 四、情景交际 -->
+<h2>四、情景交际 <span class="score-badge">共10分</span></h2>
+<h3>从B栏中选出A栏的正确应答。（每题2分）</h3>
+
+<div class="question-group">
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <div>
+      <p style="font-weight:700; color:var(--primary); margin-bottom:10px;">A栏</p>
+      <div class="question"><span class="q-num">1</span> Good morning!</div>
+      <div class="question"><span class="q-num">2</span> How old are you?</div>
+      <div class="question"><span class="q-num">3</span> What can you do?</div>
+      <div class="question"><span class="q-num">4</span> Here you are.</div>
+      <div class="question"><span class="q-num">5</span> How is the weather?</div>
+    </div>
+    <div>
+      <p style="font-weight:700; color:#dc2626; margin-bottom:10px;">B栏</p>
+      <div style="margin:10px 0;">A. Thank you.</div>
+      <div style="margin:10px 0;">B. I can sing and dance.</div>
+      <div style="margin:10px 0;">C. Good morning!</div>
+      <div style="margin:10px 0;">D. It's sunny.</div>
+      <div style="margin:10px 0;">E. I'm eight years old.</div>
+    </div>
+  </div>
+  <p style="margin-top:16px; color:var(--text-light);">
+    答案：1 → <span class="blank-line"></span> &nbsp; 2 → <span class="blank-line"></span> &nbsp; 3 → <span class="blank-line"></span> &nbsp; 4 → <span class="blank-line"></span> &nbsp; 5 → <span class="blank-line"></span>
+  </p>
+</div>
+
+<!-- 五、连线题 -->
+<h2>五、连线题 <span class="score-badge">共10分</span></h2>
+<h3>将英文与对应的中文连线。（每题2分）</h3>
+
+<div class="question-group">
+  <table class="match-table">
+    <thead>
+      <tr><th>英文</th><th>中文</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>1. butterfly</td><td>A. 草莓</td></tr>
+      <tr><td>2. strawberry</td><td>B. 瓢虫</td></tr>
+      <tr><td>3. sandwich</td><td>C. 蝴蝶</td></tr>
+      <tr><td>4. ladybird</td><td>D. 汉堡包</td></tr>
+      <tr><td>5. hamburger</td><td>E. 三明治</td></tr>
+    </tbody>
+  </table>
+  <p style="margin-top:12px; color:var(--text-light);">
+    答案：1 → <span class="blank-line"></span> &nbsp; 2 → <span class="blank-line"></span> &nbsp; 3 → <span class="blank-line"></span> &nbsp; 4 → <span class="blank-line"></span> &nbsp; 5 → <span class="blank-line"></span>
+  </p>
+</div>
+
+<!-- 六、阅读理解 -->
+<h2>六、阅读理解 <span class="score-badge">共15分</span></h2>
+<h3>读短文，判断正误。正确写 T，错误写 F。（每题3分）</h3>
+
+<div class="passage">
+  <div class="passage-title">My Friend Tom</div>
+  My name is Tom. I am nine years old. I am in Class Two, Grade Three. I like animals very much. I have a dog. Its name is Doudou. It is white and small. It has two big eyes and a short tail. I like to play with Doudou in the park. We are good friends.
+</div>
+
+<div class="question-group">
+  <div class="tf-grid">
+    <div class="tf-item">
+      <span class="q-num">1</span> Tom is ten years old.
+      <div class="tf-box"><span>T</span><span>F</span></div>
+    </div>
+    <div class="tf-item">
+      <span class="q-num">2</span> Tom is in Class Three, Grade Two.
+      <div class="tf-box"><span>T</span><span>F</span></div>
+    </div>
+    <div class="tf-item">
+      <span class="q-num">3</span> Tom likes animals.
+      <div class="tf-box"><span>T</span><span>F</span></div>
+    </div>
+    <div class="tf-item">
+      <span class="q-num">4</span> Doudou is a cat.
+      <div class="tf-box"><span>T</span><span>F</span></div>
+    </div>
+    <div class="tf-item">
+      <span class="q-num">5</span> Doudou has two big eyes.
+      <div class="tf-box"><span>T</span><span>F</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- 七、补全对话 -->
+<h2>七、补全对话 <span class="score-badge">共15分</span></h2>
+<h3>根据情景，选择合适的句子补全对话。（每题3分）</h3>
+
+<div class="question-group" style="background:#fffbeb;">
+  <div style="line-height:2.2; font-size:1.05rem;">
+    <p>A: Hello! <span class="q-num">1</span> <span class="blank-line"></span></p>
+    <p>B: My name is Lily.</p>
+    <p>A: <span class="q-num">2</span> <span class="blank-line"></span></p>
+    <p>B: I'm nine years old.</p>
+    <p>A: <span class="q-num">3</span> <span class="blank-line"></span></p>
+    <p>B: I like apples and bananas.</p>
+    <p>A: <span class="q-num">4</span> <span class="blank-line"></span></p>
+    <p>B: Yes, I can. I can dance very well.</p>
+    <p>A: <span class="q-num">5</span> <span class="blank-line"></span></p>
+    <p>B: Thank you!</p>
+  </div>
+  <div style="margin-top:16px; display:flex; gap:12px; flex-wrap:wrap;">
+    <span style="padding:6px 14px; border:1px solid var(--border); border-radius:8px;">A. How old are you?</span>
+    <span style="padding:6px 14px; border:1px solid var(--border); border-radius:8px;">B. What's your name?</span>
+    <span style="padding:6px 14px; border:1px solid var(--border); border-radius:8px;">C. What fruit do you like?</span>
+    <span style="padding:6px 14px; border:1px solid var(--border); border-radius:8px;">D. You dance so well!</span>
+    <span style="padding:6px 14px; border:1px solid var(--border); border-radius:8px;">E. Can you dance?</span>
+  </div>
+</div>
+
+<!-- 八、看图写话 -->
+<h2>八、看图写话 <span class="score-badge">共10分</span></h2>
+<h3>用 3-5 句话描述图片内容。</h3>
+
+<div class="question-group" style="background:#fffbeb;">
+  <div class="hint-words">
+    <span class="hint-tag">boy</span>
+    <span class="hint-tag">girl</span>
+    <span class="hint-tag">park</span>
+    <span class="hint-tag">play</span>
+    <span class="hint-tag">happy</span>
+  </div>
+  <div class="writing-area"></div>
+</div>
+
+<!-- 答案按钮 -->
+<button class="toggle-btn" onclick="document.querySelector('.answer-section').classList.toggle('show')">
+  📋 显示 / 隐藏参考答案
+</button>
+
+<!-- 参考答案 -->
+<div class="answer-section">
+  <h2>参考答案</h2>
+
+  <div class="answer-group">
+    <h4>一、语音辨析</h4>
+    <div class="answer-item"><span class="num">1</span> C — cake 中 a 发 /eɪ/，其余发 /æ/</div>
+    <div class="answer-item"><span class="num">2</span> A — dog 中 o 发 /ɒ/，其余发 /əʊ/</div>
+    <div class="answer-item"><span class="num">3</span> C — rice 中 i 发 /aɪ/，其余发 /ɪ/</div>
+    <div class="answer-item"><span class="num">4</span> D — ruler 中 u 发 /uː/，其余发 /ʌ/</div>
+    <div class="answer-item"><span class="num">5</span> C — red 中 e 发 /e/，其余发 /iː/</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>二、选出不同类的单词</h4>
+    <div class="answer-item"><span class="num">1</span> C — bread 是食物，其余是水果</div>
+    <div class="answer-item"><span class="num">2</span> C — cat 是动物，其余是颜色</div>
+    <div class="answer-item"><span class="num">3</span> C — book 是名词，其余是动词</div>
+    <div class="answer-item"><span class="num">4</span> B — teacher 是职业，其余是家庭成员</div>
+    <div class="answer-item"><span class="num">5</span> B — January 是月份，其余是星期</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>三、选择填空</h4>
+    <div class="answer-item"><span class="num">1</span> A — I am</div>
+    <div class="answer-item"><span class="num">2</span> B — 第三人称单数用 has</div>
+    <div class="answer-item"><span class="num">3</span> B — Do 问 do 答</div>
+    <div class="answer-item"><span class="num">4</span> B — 问颜色回答颜色</div>
+    <div class="answer-item"><span class="num">5</span> B — 问地点用 Where</div>
+    <div class="answer-item"><span class="num">6</span> C — three books 复数用 are</div>
+    <div class="answer-item"><span class="num">7</span> C — Can 问 can 答</div>
+    <div class="answer-item"><span class="num">8</span> B — orange 元音开头用 an</div>
+    <div class="answer-item"><span class="num">9</span> C — boys 复数用 are</div>
+    <div class="answer-item"><span class="num">10</span> C — How many 后接复数名词</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>四、情景交际</h4>
+    <div class="answer-item">1 → C &nbsp; 2 → E &nbsp; 3 → B &nbsp; 4 → A &nbsp; 5 → D</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>五、连线题</h4>
+    <div class="answer-item">1 → C (butterfly → 蝴蝶)</div>
+    <div class="answer-item">2 → A (strawberry → 草莓)</div>
+    <div class="answer-item">3 → E (sandwich → 三明治)</div>
+    <div class="answer-item">4 → B (ladybird → 瓢虫)</div>
+    <div class="answer-item">5 → D (hamburger → 汉堡包)</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>六、阅读理解</h4>
+    <div class="answer-item"><span class="num">1</span> F — Tom is nine years old.</div>
+    <div class="answer-item"><span class="num">2</span> F — Tom is in Class Two, Grade Three.</div>
+    <div class="answer-item"><span class="num">3</span> T</div>
+    <div class="answer-item"><span class="num">4</span> F — Doudou is a dog.</div>
+    <div class="answer-item"><span class="num">5</span> T</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>七、补全对话</h4>
+    <div class="answer-item">1 → B &nbsp; 2 → A &nbsp; 3 → C &nbsp; 4 → E &nbsp; 5 → D</div>
+  </div>
+
+  <div class="answer-group">
+    <h4>八、看图写话（参考范文）</h4>
+    <div class="answer-item" style="line-height:2;">
+      I can see a boy and a girl in the park.<br>
+      They are playing happily.<br>
+      The boy can fly a kite.<br>
+      The girl can draw pictures.<br>
+      They are very happy.
+    </div>
+  </div>
+</div>
+
+</div><!-- .content -->
+</div><!-- .container -->
+</body>
+</html>

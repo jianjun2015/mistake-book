@@ -16,7 +16,9 @@ export interface SubjectConfig {
   name: string;
   icon: string;
   color: string;
-  htmlFile: string;
+  summaryFile: string;  // 总结页面
+  examFile: string;     // 试卷页面
+  doubtFile: string;    // 疑难点页面
 }
 
 // 年级配置
@@ -29,20 +31,18 @@ export const gradeConfigs: GradeConfig[] = [
         key: 'grade1-up',
         name: '上学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       },
       {
         key: 'grade1-down',
         name: '下学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]
@@ -55,20 +55,18 @@ export const gradeConfigs: GradeConfig[] = [
         key: 'grade2-up',
         name: '上学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       },
       {
         key: 'grade2-down',
         name: '下学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]
@@ -81,20 +79,18 @@ export const gradeConfigs: GradeConfig[] = [
         key: 'grade3-up',
         name: '上学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       },
       {
         key: 'grade3-down',
         name: '下学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: '语文期末总结.html', examFile: '语文期末考试卷.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]
@@ -107,20 +103,18 @@ export const gradeConfigs: GradeConfig[] = [
         key: 'grade4-up',
         name: '上学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       },
       {
         key: 'grade4-down',
         name: '下学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]
@@ -133,20 +127,18 @@ export const gradeConfigs: GradeConfig[] = [
         key: 'grade5-up',
         name: '上学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       },
       {
         key: 'grade5-down',
         name: '下学期',
         subjects: [
-          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', htmlFile: 'chinese.html' },
-          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', htmlFile: 'math.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', htmlFile: 'english.html' },
-          { key: 'key', name: '重点', icon: '⭐', color: '#722ed1', htmlFile: 'key.html' },
+          { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: 'chinese.html', examFile: 'chinese-exam.html', doubtFile: 'chinese-doubt.html' },
+          { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: 'math-exam.html', doubtFile: 'math-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: 'english-exam.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]
