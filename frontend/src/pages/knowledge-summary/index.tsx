@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Space, Tabs, Input, Empty } from 'antd';
+import { Card, Button, Space, Tabs, Input, Empty, message } from 'antd';
 import { BookOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import { gradeConfigs } from './config';
 import type { SubjectConfig } from './config';
+import { getDoubt, saveDoubt } from '../../api/knowledge';
 
 const { TextArea } = Input;
 
@@ -19,6 +20,8 @@ const KnowledgeSummaryPage: React.FC = () => {
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
   const [activeTab, setActiveTab] = useState<string>('summary');
   const [doubtContent, setDoubtContent] = useState<string>('');
+  const [, setDoubtId] = useState<number | undefined>(undefined);
+  const [saving, setSaving] = useState(false);
 
   const currentGrade = gradeConfigs.find(g => g.key === selectedGrade);
   const currentSemester = currentGrade?.semesters.find(s => s.key === selectedSemester);
@@ -26,11 +29,25 @@ const KnowledgeSummaryPage: React.FC = () => {
   // 加载疑难点内容
   useEffect(() => {
     if (selectedSubject && selectedSemester) {
-      const key = `doubt_${selectedSemester}_${selectedSubject.key}`;
-      const saved = localStorage.getItem(key) || '';
-      setDoubtContent(saved);
+      loadDoubt();
     }
   }, [selectedSubject, selectedSemester]);
+
+  const loadDoubt = async () => {
+    if (!selectedSubject || !selectedSemester) return;
+    
+    try {
+      const res = await getDoubt(selectedSemester, selectedSubject.key);
+      if (res.data) {
+        setDoubtContent(res.data.content || '');
+        setDoubtId(res.data.id);
+      }
+    } catch (err) {
+      console.error('加载疑难点失败', err);
+      setDoubtContent('');
+      setDoubtId(undefined);
+    }
+  };
 
   const handleSubjectClick = (subject: SubjectConfig) => {
     setSelectedSubject(subject);
@@ -45,11 +62,22 @@ const KnowledgeSummaryPage: React.FC = () => {
     return `/knowledge/${selectedSemester}/${file}`;
   };
 
-  const handleSaveDoubt = () => {
-    if (selectedSubject && selectedSemester) {
-      const key = `doubt_${selectedSemester}_${selectedSubject.key}`;
-      localStorage.setItem(key, doubtContent);
-      alert('保存成功！');
+  const handleSaveDoubt = async () => {
+    if (!selectedSubject || !selectedSemester) return;
+    
+    setSaving(true);
+    try {
+      await saveDoubt({
+        semesterKey: selectedSemester,
+        subjectKey: selectedSubject.key,
+        content: doubtContent,
+      });
+      message.success('保存成功！');
+    } catch (err) {
+      console.error('保存疑难点失败', err);
+      message.error('保存失败');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -110,7 +138,7 @@ const KnowledgeSummaryPage: React.FC = () => {
               style={{ fontSize: '14px' }}
             />
             <div style={{ marginTop: 16, textAlign: 'right' }}>
-              <Button type="primary" onClick={handleSaveDoubt}>
+              <Button type="primary" loading={saving} onClick={handleSaveDoubt}>
                 保存
               </Button>
             </div>
