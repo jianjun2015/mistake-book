@@ -90,7 +90,7 @@ export const gradeConfigs: GradeConfig[] = [
         subjects: [
           { key: 'chinese', name: '语文', icon: '📖', color: '#eb2f96', summaryFile: '语文期末总结.html', examFile: '语文期末考试卷.html', doubtFile: 'chinese-doubt.html' },
           { key: 'math', name: '数学', icon: '🔢', color: '#ff4d4f', summaryFile: 'math.html', examFile: '', doubtFile: 'math-doubt.html' },
-          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: 'english.html', examFile: '', doubtFile: 'english-doubt.html' },
+          { key: 'english', name: '英语', icon: '🔤', color: '#faad14', summaryFile: '期末总结.html', examFile: '期末考试卷.html', doubtFile: 'english-doubt.html' },
         ]
       }
     ]

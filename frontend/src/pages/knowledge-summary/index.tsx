@@ -1,18 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Space, Tabs, Input, Empty, message } from 'antd';
-import { BookOutlined, CodeOutlined, GlobalOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import { gradeConfigs } from './config';
 import type { SubjectConfig } from './config';
 import { getDoubt, saveDoubt } from '../../api/knowledge';
 
 const { TextArea } = Input;
-
-const subjectIcons: Record<string, React.ReactNode> = {
-  chinese: <BookOutlined />,
-  math: <CodeOutlined />,
-  english: <GlobalOutlined />,
-};
 
 const KnowledgeSummaryPage: React.FC = () => {
   const [selectedGrade, setSelectedGrade] = useState<string>('grade3');
@@ -237,36 +230,6 @@ const KnowledgeSummaryPage: React.FC = () => {
             </div>
           </Card>
         )}
-
-        {/* 科目目录 */}
-        <Card title="📖 科目目录" style={{ marginTop: 16 }}>
-          {gradeConfigs.map(grade => (
-            <div key={grade.key} style={{ marginBottom: 24 }}>
-              <h3 style={{ marginBottom: 12 }}>{grade.name}</h3>
-              {grade.semesters.map(semester => (
-                <div key={semester.key} style={{ marginBottom: 16 }}>
-                  <h4 style={{ marginBottom: 8, color: '#666' }}>{semester.name}</h4>
-                  <Space wrap>
-                    {semester.subjects.map(subject => (
-                      <Button
-                        key={subject.key}
-                        icon={subjectIcons[subject.key]}
-                        style={{ color: subject.color, borderColor: subject.color }}
-                        onClick={() => {
-                          setSelectedGrade(grade.key);
-                          setSelectedSemester(semester.key);
-                          handleSubjectClick(subject);
-                        }}
-                      >
-                        {subject.name}
-                      </Button>
-                    ))}
-                  </Space>
-                </div>
-              ))}
-            </div>
-          ))}
-        </Card>
       </div>
     </MainLayout>
   );
