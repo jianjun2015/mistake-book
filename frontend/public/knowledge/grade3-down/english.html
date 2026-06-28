@@ -15,29 +15,23 @@
     .card h2 { font-size: 20px; color: #faad14; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0; }
     .card h3 { font-size: 16px; color: #333; margin: 20px 0 10px; }
     .card p { margin-bottom: 12px; }
-    .card ul, .card ol { margin-left: 24px; margin-bottom: 12px; }
+    .card ul { margin-left: 24px; margin-bottom: 12px; }
     .card li { margin-bottom: 8px; }
-    .tag { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; margin-right: 8px; margin-bottom: 8px; }
-    .tag-important { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
-    .tag-normal { background: #e6f7ff; color: #1890ff; border: 1px solid #91d5ff; }
-    .tag-easy { background: #f6ffed; color: #52c41a; border: 1px solid #b7eb8f; }
-    .back-btn { display: inline-block; padding: 8px 16px; background: #faad14; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; }
+    .back-btn { display: inline-block; padding: 8px 16px; background: #faad14; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; cursor: pointer; }
     .back-btn:hover { background: #d48806; }
     table { width: 100%; border-collapse: collapse; margin: 16px 0; }
     th, td { border: 1px solid #e8e8e8; padding: 12px; text-align: left; }
     th { background: #fafafa; font-weight: 500; }
-    .vocab-table td:first-child { font-weight: bold; color: #faad14; }
     .dialog { background: #f6ffed; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #52c41a; }
     .dialog .speaker { font-weight: bold; color: #52c41a; }
     .grammar { background: #e6f7ff; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #1890ff; }
     .grammar strong { color: #1890ff; }
     .highlight { background: #fff7e6; padding: 12px; border-radius: 6px; border-left: 4px solid #fa8c16; margin: 12px 0; }
-    .phonics { background: #f9f0ff; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #722ed1; }
   </style>
 </head>
 <body>
   <div class="container">
-    <a href="javascript:history.back()" class="back-btn">← 返回</a>
+    <span class="back-btn" onclick="history.back()">← 返回</span>
     
     <div class="header">
       <h1>🔤 三年级下学期 - 英语知识总结</h1>
@@ -48,37 +42,33 @@
     <div class="card">
       <h2>Module 1: Using my five senses</h2>
       
-      <h3>Unit 1: Colours</h3>
+      <h3>Unit 1: Seeing and hearing</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
-        <tr><td>red</td><td>/red/</td><td>adj.</td><td>红色的</td></tr>
-        <tr><td>blue</td><td>/bluː/</td><td>adj.</td><td>蓝色的</td></tr>
-        <tr><td>yellow</td><td>/ˈjeləʊ/</td><td>adj.</td><td>黄色的</td></tr>
-        <tr><td>green</td><td>/ɡriːn/</td><td>adj.</td><td>绿色的</td></tr>
-        <tr><td>orange</td><td>/ˈɒrɪndʒ/</td><td>adj.</td><td>橙色的</td></tr>
-        <tr><td>purple</td><td>/ˈpɜːpl/</td><td>adj.</td><td>紫色的</td></tr>
-        <tr><td>pink</td><td>/pɪŋk/</td><td>adj.</td><td>粉色的</td></tr>
-        <tr><td>black</td><td>/blæk/</td><td>adj.</td><td>黑色的</td></tr>
-        <tr><td>white</td><td>/waɪt/</td><td>adj.</td><td>白色的</td></tr>
-        <tr><td>brown</td><td>/braʊn/</td><td>adj.</td><td>棕色的</td></tr>
+        <tr><td>aeroplane</td><td>/ˈeərəpleɪn/</td><td>n.</td><td>飞机</td></tr>
+        <tr><td>bus</td><td>/bʌs/</td><td>n.</td><td>公共汽车</td></tr>
+        <tr><td>ship</td><td>/ʃɪp/</td><td>n.</td><td>轮船</td></tr>
+        <tr><td>car</td><td>/kɑː/</td><td>n.</td><td>小汽车</td></tr>
+        <tr><td>hear</td><td>/hɪə/</td><td>v.</td><td>听见</td></tr>
+        <tr><td>see</td><td>/siː/</td><td>v.</td><td>看见</td></tr>
       </table>
 
       <h4>核心句型</h4>
       <div class="dialog">
-        <p><span class="speaker">A:</span> What colour is it? (它是什么颜色？)</p>
-        <p><span class="speaker">B:</span> It's red. (它是红色的。)</p>
+        <p><span class="speaker">A:</span> What can you hear? (你能听到什么？)</p>
+        <p><span class="speaker">B:</span> I can hear a bus. (我能听到公共汽车声。)</p>
       </div>
       <div class="dialog">
-        <p><span class="speaker">A:</span> What colour are they? (它们是什么颜色？)</p>
-        <p><span class="speaker">B:</span> They are blue. (它们是蓝色的。)</p>
+        <p><span class="speaker">A:</span> What can you see? (你能看到什么？)</p>
+        <p><span class="speaker">B:</span> I can see an aeroplane. (我能看见一架飞机。)</p>
       </div>
 
       <h3>Unit 2: Touching and feeling</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>touch</td><td>/tʌtʃ/</td><td>v.</td><td>触摸</td></tr>
         <tr><td>feel</td><td>/fiːl/</td><td>v.</td><td>感觉</td></tr>
@@ -86,20 +76,18 @@
         <tr><td>hard</td><td>/hɑːd/</td><td>adj.</td><td>硬的</td></tr>
         <tr><td>rough</td><td>/rʌf/</td><td>adj.</td><td>粗糙的</td></tr>
         <tr><td>smooth</td><td>/smuːð/</td><td>adj.</td><td>光滑的</td></tr>
-        <tr><td>hot</td><td>/hɒt/</td><td>adj.</td><td>热的</td></tr>
-        <tr><td>cold</td><td>/kəʊld/</td><td>adj.</td><td>冷的</td></tr>
       </table>
 
       <h4>核心句型</h4>
       <div class="dialog">
         <p><span class="speaker">A:</span> Touch this. How does it feel? (摸摸这个。感觉怎么样？)</p>
-        <p><span class="speaker">B:</span> It's soft/rough/hot. (它很软/粗糙/热。)</p>
+        <p><span class="speaker">B:</span> It's soft/rough. (它很软/粗糙。)</p>
       </div>
 
       <h3>Unit 3: Tasting and smelling</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>taste</td><td>/teɪst/</td><td>v.</td><td>品尝</td></tr>
         <tr><td>smell</td><td>/smel/</td><td>v.</td><td>闻</td></tr>
@@ -107,17 +95,12 @@
         <tr><td>sour</td><td>/ˈsaʊə/</td><td>adj.</td><td>酸的</td></tr>
         <tr><td>salty</td><td>/ˈsɔːlti/</td><td>adj.</td><td>咸的</td></tr>
         <tr><td>bitter</td><td>/ˈbɪtə/</td><td>adj.</td><td>苦的</td></tr>
-        <tr><td>nice</td><td>/naɪs/</td><td>adj.</td><td>好的，美味的</td></tr>
       </table>
 
       <h4>核心句型</h4>
       <div class="dialog">
         <p><span class="speaker">A:</span> How does it taste? (味道怎么样？)</p>
         <p><span class="speaker">B:</span> It's sweet/sour. (它是甜的/酸的。)</p>
-      </div>
-      <div class="dialog">
-        <p><span class="speaker">A:</span> How does it smell? (闻起来怎么样？)</p>
-        <p><span class="speaker">B:</span> It's nice. (闻起来很香。)</p>
       </div>
     </div>
 
@@ -128,15 +111,13 @@
       <h3>Unit 1: Animals</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>cat</td><td>/kæt/</td><td>n.</td><td>猫</td></tr>
         <tr><td>dog</td><td>/dɒɡ/</td><td>n.</td><td>狗</td></tr>
         <tr><td>rabbit</td><td>/ˈræbɪt/</td><td>n.</td><td>兔子</td></tr>
-        <tr><td>hamster</td><td>/ˈhæmstə/</td><td>n.</td><td>仓鼠</td></tr>
         <tr><td>fish</td><td>/fɪʃ/</td><td>n.</td><td>鱼</td></tr>
         <tr><td>bird</td><td>/bɜːd/</td><td>n.</td><td>鸟</td></tr>
-        <tr><td>turtle</td><td>/ˈtɜːtl/</td><td>n.</td><td>乌龟</td></tr>
       </table>
 
       <h4>核心句型</h4>
@@ -148,14 +129,12 @@
       <h3>Unit 2: Toys</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
-        <tr><td>toy</td><td>/tɔɪ/</td><td>n.</td><td>玩具</td></tr>
         <tr><td>doll</td><td>/dɒl/</td><td>n.</td><td>洋娃娃</td></tr>
         <tr><td>ball</td><td>/bɔːl/</td><td>n.</td><td>球</td></tr>
         <tr><td>kite</td><td>/kaɪt/</td><td>n.</td><td>风筝</td></tr>
         <tr><td>robot</td><td>/ˈrəʊbɒt/</td><td>n.</td><td>机器人</td></tr>
-        <tr><td>puzzle</td><td>/ˈpʌzl/</td><td>n.</td><td>拼图</td></tr>
       </table>
 
       <h4>核心句型</h4>
@@ -167,14 +146,12 @@
       <h3>Unit 3: Clothes</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>shirt</td><td>/ʃɜːt/</td><td>n.</td><td>衬衫</td></tr>
         <tr><td>T-shirt</td><td>/ˈtiːʃɜːt/</td><td>n.</td><td>T恤</td></tr>
         <tr><td>dress</td><td>/dres/</td><td>n.</td><td>连衣裙</td></tr>
         <tr><td>skirt</td><td>/skɜːt/</td><td>n.</td><td>短裙</td></tr>
-        <tr><td>shorts</td><td>/ʃɔːts/</td><td>n.</td><td>短裤</td></tr>
-        <tr><td>trousers</td><td>/ˈtraʊzəz/</td><td>n.</td><td>裤子</td></tr>
         <tr><td>shoes</td><td>/ʃuːz/</td><td>n.</td><td>鞋子</td></tr>
       </table>
 
@@ -192,34 +169,29 @@
       <h3>Unit 1: Shapes</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>circle</td><td>/ˈsɜːkl/</td><td>n.</td><td>圆形</td></tr>
         <tr><td>square</td><td>/skweə/</td><td>n.</td><td>正方形</td></tr>
         <tr><td>triangle</td><td>/ˈtraɪæŋɡl/</td><td>n.</td><td>三角形</td></tr>
-        <tr><td>rectangle</td><td>/ˈrektæŋɡl/</td><td>n.</td><td>长方形</td></tr>
         <tr><td>star</td><td>/stɑː/</td><td>n.</td><td>星形</td></tr>
       </table>
 
       <h4>核心句型</h4>
       <div class="dialog">
         <p><span class="speaker">A:</span> What shape is it? (它是什么形状？)</p>
-        <p><span class="speaker">B:</span> It's a circle/square. (它是一个圆形/正方形。)</p>
+        <p><span class="speaker">B:</span> It's a circle. (它是一个圆形。)</p>
       </div>
 
       <h3>Unit 2: Seasons</h3>
       
       <h4>核心词汇</h4>
-      <table class="vocab-table">
+      <table>
         <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
         <tr><td>spring</td><td>/sprɪŋ/</td><td>n.</td><td>春天</td></tr>
         <tr><td>summer</td><td>/ˈsʌmə/</td><td>n.</td><td>夏天</td></tr>
         <tr><td>autumn</td><td>/ˈɔːtəm/</td><td>n.</td><td>秋天</td></tr>
         <tr><td>winter</td><td>/ˈwɪntə/</td><td>n.</td><td>冬天</td></tr>
-        <tr><td>warm</td><td>/wɔːm/</td><td>adj.</td><td>温暖的</td></tr>
-        <tr><td>hot</td><td>/hɒt/</td><td>adj.</td><td>炎热的</td></tr>
-        <tr><td>cool</td><td>/kuːl/</td><td>adj.</td><td>凉爽的</td></tr>
-        <tr><td>cold</td><td>/kəʊld/</td><td>adj.</td><td>寒冷的</td></tr>
       </table>
 
       <h4>核心句型</h4>
@@ -227,51 +199,29 @@
         <p><span class="speaker">A:</span> How is the weather in spring? (春天天气怎么样？)</p>
         <p><span class="speaker">B:</span> It's warm. (天气温暖。)</p>
       </div>
-
-      <h3>Unit 3: Weather</h3>
-      
-      <h4>核心词汇</h4>
-      <table class="vocab-table">
-        <tr><th>单词</th><th>音标</th><th>词性</th><th>中文</th></tr>
-        <tr><td>sunny</td><td>/ˈsʌni/</td><td>adj.</td><td>晴朗的</td></tr>
-        <tr><td>cloudy</td><td>/ˈklaʊdi/</td><td>adj.</td><td>多云的</td></tr>
-        <tr><td>rainy</td><td>/ˈreɪni/</td><td>adj.</td><td>下雨的</td></tr>
-        <tr><td>windy</td><td>/ˈwɪndi/</td><td>adj.</td><td>有风的</td></tr>
-        <tr><td>snowy</td><td>/ˈsnəʊi/</td><td>adj.</td><td>下雪的</td></tr>
-      </table>
-
-      <h4>核心句型</h4>
-      <div class="dialog">
-        <p><span class="speaker">A:</span> How is the weather today? (今天天气怎么样？)</p>
-        <p><span class="speaker">B:</span> It's sunny/cloudy/rainy. (天气晴朗/多云/下雨。)</p>
-      </div>
     </div>
 
     <!-- 语法总结 -->
     <div class="card">
       <h2>📝 语法总结</h2>
       
-      <h3>1. be动词的用法</h3>
+      <h3>1. can 的用法</h3>
       <div class="grammar">
-        <strong>am / is / are 的区别：</strong>
-        <ul>
-          <li>I am (I'm) — 我是</li>
-          <li>He/She/It is (He's/She's/It's) — 他/她/它是</li>
-          <li>You/We/They are (You're/We're/They're) — 你/我们/他们是</li>
-        </ul>
+        <strong>肯定句：</strong>I can hear a bus.<br>
+        <strong>否定句：</strong>I can't hear a bus.<br>
+        <strong>疑问句：</strong>Can you hear a bus?
       </div>
 
-      <h3>2. like的用法</h3>
+      <h3>2. like 的用法</h3>
       <div class="grammar">
-        <strong>肯定句：</strong>I like cats. (我喜欢猫。)<br>
-        <strong>否定句：</strong>I don't like cats. (我不喜欢猫。)<br>
-        <strong>疑问句：</strong>Do you like cats? (你喜欢猫吗？)
+        <strong>肯定句：</strong>I like cats.<br>
+        <strong>否定句：</strong>I don't like cats.<br>
+        <strong>疑问句：</strong>Do you like cats?
       </div>
 
       <h3>3. 特殊疑问句</h3>
       <div class="grammar">
-        <strong>What</strong> — 什么：What is this?<br>
-        <strong>What colour</strong> — 什么颜色：What colour is it?<br>
+        <strong>What</strong> — 什么：What can you see?<br>
         <strong>How</strong> — 怎么样：How does it feel?<br>
         <strong>Do</strong> — 做：Do you like it?
       </div>
@@ -279,30 +229,21 @@
 
     <!-- 重点总结 -->
     <div class="card">
-      <h2>📝 本学期重点总结</h2>
+      <h2>📝 本学期重点</h2>
       
-      <h3>1. 必背词汇</h3>
-      <span class="tag tag-important">颜色词汇10个</span>
-      <span class="tag tag-important">感官动词5个</span>
-      <span class="tag tag-normal">动物词汇7个</span>
-      <span class="tag tag-normal">玩具词汇6个</span>
-      <span class="tag tag-easy">服装词汇7个</span>
-      
-      <h3>2. 必背句型</h3>
-      <ul>
-        <li>What colour is it? — It's red.</li>
-        <li>How does it feel? — It's soft.</li>
-        <li>Do you like cats? — Yes, I do. / No, I don't.</li>
-        <li>What shape is it? — It's a circle.</li>
-        <li>How is the weather? — It's sunny.</li>
-      </ul>
+      <h3>必背单词</h3>
+      <p>感官动词：hear, see, touch, feel, taste, smell</p>
+      <p>形容词：soft, hard, rough, smooth, sweet, sour</p>
+      <p>动物：cat, dog, rabbit, fish, bird</p>
+      <p>服装：shirt, T-shirt, dress, skirt, shoes</p>
 
-      <h3>3. 易错点</h3>
+      <h3>必背句型</h3>
       <div class="highlight">
         <ul>
-          <li>单复数：What colour is it? vs What colour are they?</li>
-          <li>like后面名词复数：I like cats. (不是 I like cat.)</li>
-          <li>be动词搭配：I am (不是 I is)</li>
+          <li>What can you hear/see? — I can hear/see...</li>
+          <li>How does it feel/taste? — It's soft/sweet.</li>
+          <li>Do you like...? — Yes, I do. / No, I don't.</li>
+          <li>What shape is it? — It's a circle.</li>
         </ul>
       </div>
     </div>
