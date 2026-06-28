@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>三年级下学期 - 数学期末考试卷</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.8; }
+    .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #ff4d4f 0%, #cf1322 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; text-align: center; }
+    .header h1 { font-size: 28px; margin-bottom: 10px; }
+    .header p { opacity: 0.9; font-size: 14px; }
+    .info-bar { background: #fff; padding: 16px; border-radius: 8px; margin-bottom: 20px; display: flex; justify-content: space-between; border: 1px solid #e8e8e8; }
+    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card h2 { font-size: 18px; color: #ff4d4f; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0; }
+    .card h3 { font-size: 16px; color: #333; margin: 16px 0 10px; }
+    .question { margin-bottom: 20px; padding: 16px; background: #fafafa; border-radius: 8px; border-left: 4px solid #ff4d4f; }
+    .question-title { font-weight: bold; margin-bottom: 8px; }
+    .options { margin-left: 24px; }
+    .options div { margin: 4px 0; }
+    .blank-line { display: inline-block; width: 100px; border-bottom: 1px solid #333; margin: 0 8px; }
+    .calc-box { background: #f0f5ff; padding: 12px; border-radius: 6px; margin: 8px 0; font-family: monospace; }
+    .answer-area { min-height: 60px; border: 1px dashed #d9d9d9; border-radius: 6px; padding: 12px; margin: 8px 0; }
+    .score { float: right; color: #ff4d4f; font-weight: bold; }
+    .back-btn { display: inline-block; padding: 8px 16px; background: #ff4d4f; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; cursor: pointer; }
+    .back-btn:hover { background: #cf1322; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="back-btn" onclick="history.back()">← 返回</span>
+    
+    <div class="header">
+      <h1>三年级数学下册 期末考试卷</h1>
+      <p>上海教育出版社</p>
+    </div>
+
+    <div class="info-bar">
+      <span>姓名：_____________</span>
+      <span>班级：_____________</span>
+      <span>学号：_____________</span>
+      <span>得分：_____________</span>
+    </div>
+
+    <!-- 一、填空题 -->
+    <div class="card">
+      <h2>一、填空题（每空2分，共30分）</h2>
+      
+      <div class="question">
+        <div class="question-title">1. <span class="score">(4分)</span></div>
+        <p>24 × 3 = <span class="blank-line"></span>，验算：60 ÷ 5 = <span class="blank-line"></span></p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">2. <span class="score">(4分)</span></div>
+        <p>把一个蛋糕平均分成8份，小明吃了3份，吃了这个蛋糕的 <span class="blank-line"></span>，还剩 <span class="blank-line"></span></p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">3. <span class="score">(4分)</span></div>
+        <p>在括号里填上合适的数：</p>
+        <p>1平方米 = <span class="blank-line"></span> 平方分米</p>
+        <p>1平方分米 = <span class="blank-line"></span> 平方厘米</p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">4. <span class="score">(4分)</span></div>
+        <p>长方形的面积 = <span class="blank-line"></span> × <span class="blank-line"></span></p>
+        <p>正方形的周长 = <span class="blank-line"></span> × <span class="blank-line"></span></p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">5. <span class="score">(4分)</span></div>
+        <p>2024年是 <span class="blank-line"></span> 年（填"平"或"闰"），全年有 <span class="blank-line"></span> 天</p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">6. <span class="score">(4分)</span></div>
+        <p>下午3时用24时计时法表示是 <span class="blank-line"></span> 时，晚上9时是 <span class="blank-line"></span> 时</p>
+      </div>
+
+      <div class="question">
+        <div class="question-title">7. <span class="score">(6分)</span></div>
+        <p>比较大小（填 >、< 或 =）：</p>
+        <p>⅜ <span class="blank-line"></span> ⅝</p>
+        <p>½ <span class="blank-line"></span> ⅓</p>
+        <p>3.14 <span class="blank-line"></span> 3.2</p>
+      </div>
+    </div>
+
+    <!-- 二、选择题 -->
+    <div class="card">
+      <h2>二、选择题（每题3分，共15分）</h2>
+      
+      <div class="question">
+        <div class="question-title">1. <span class="score">(3分)</span></div>
+        <p>下面哪个月份是31天？</p>
+        <div class="options">
+          <div>A. 4月</div>
+          <div>B. 6月</div>
+          <div>C. 8月</div>
+          <div>D. 9月</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">2. <span class="score">(3分)</span></div>
+        <p>96 ÷ 4 = ?</p>
+        <div class="options">
+          <div>A. 22</div>
+          <div>B. 24</div>
+          <div>C. 26</div>
+          <div>D. 28</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">3. <span class="score">(3分)</span></div>
+        <p>下面哪个分数最大？</p>
+        <div class="options">
+          <div>A. ⅓</div>
+          <div>B. ½</div>
+          <div>C. ¼</div>
+          <div>D. ⅕</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">4. <span class="score">(3分)</span></div>
+        <p>一个长方形长8厘米，宽5厘米，面积是多少？</p>
+        <div class="options">
+          <div>A. 13平方厘米</div>
+          <div>B. 26平方厘米</div>
+          <div>C. 40平方厘米</div>
+          <div>D. 80平方厘米</div>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">5. <span class="score">(3分)</span></div>
+        <p>小明三次数学成绩分别是92分、88分、95分，平均每次多少分？</p>
+        <div class="options">
+          <div>A. 90分</div>
+          <div>B. 91分</div>
+          <div>C. 92分</div>
+          <div>D. 93分</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 三、计算题 -->
+    <div class="card">
+      <h2>三、计算题（共25分）</h2>
+      
+      <div class="question">
+        <div class="question-title">1. 竖式计算（每题3分，共12分）</div>
+        <div class="calc-box">
+          (1) 36 × 24 = <br><br>
+          (2) 156 ÷ 3 = <br><br>
+          (3) 58 × 17 = <br><br>
+          (4) 245 ÷ 5 =
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">2. 脱式计算（每题3分，共9分）</div>
+        <div class="calc-box">
+          (1) 36 + 24 ÷ 4 = <br><br>
+          (2) (36 + 24) ÷ 4 = <br><br>
+          (3) 45 × 2 - 18 ÷ 3 =
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">3. 分数计算（每题2分，共4分）</div>
+        <div class="calc-box">
+          (1) ⅖ + ⅖ = <br><br>
+          (2) ⅚ - ⅙ =
+        </div>
+      </div>
+    </div>
+
+    <!-- 四、操作题 -->
+    <div class="card">
+      <h2>四、操作题（共10分）</h2>
+      
+      <div class="question">
+        <div class="question-title">1. <span class="score">(5分)</span></div>
+        <p>画一个长6厘米、宽4厘米的长方形，并计算它的面积和周长。</p>
+        <div class="answer-area">
+          <p>面积 = _______________</p>
+          <p>周长 = _______________</p>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">2. <span class="score">(5分)</span></div>
+        <p>下面是三年级一班同学最喜欢的水果统计表，请回答问题：</p>
+        <table style="width:100%; border-collapse:collapse; margin:10px 0;">
+          <tr><th style="border:1px solid #333; padding:8px;">水果</th><th style="border:1px solid #333; padding:8px;">苹果</th><th style="border:1px solid #333; padding:8px;">香蕉</th><th style="border:1px solid #333; padding:8px;">橘子</th><th style="border:1px solid #333; padding:8px;">葡萄</th></tr>
+          <tr><td style="border:1px solid #333; padding:8px;">人数</td><td style="border:1px solid #333; padding:8px;">12</td><td style="border:1px solid #333; padding:8px;">8</td><td style="border:1px solid #333; padding:8px;">6</td><td style="border:1px solid #333; padding:8px;">10</td></tr>
+        </table>
+        <p>(1) 喜欢哪种水果的人最多？_______________</p>
+        <p>(2) 一共有多少人参与调查？_______________</p>
+      </div>
+    </div>
+
+    <!-- 五、解决问题 -->
+    <div class="card">
+      <h2>五、解决问题（每题5分，共20分）</h2>
+      
+      <div class="question">
+        <div class="question-title">1. <span class="score">(5分)</span></div>
+        <p>学校有72个篮球，平均分给6个班，每班分几个？</p>
+        <div class="answer-area">
+          <p>列式：_______________</p>
+          <p>答：_______________</p>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">2. <span class="score">(5分)</span></div>
+        <p>一块长方形菜地，长12米，宽8米。这块菜地的面积是多少平方米？</p>
+        <div class="answer-area">
+          <p>列式：_______________</p>
+          <p>答：_______________</p>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">3. <span class="score">(5分)</span></div>
+        <p>一箱苹果有24个，小明吃了⅜，小明吃了多少个？</p>
+        <div class="answer-area">
+          <p>列式：_______________</p>
+          <p>答：_______________</p>
+        </div>
+      </div>
+
+      <div class="question">
+        <div class="question-title">4. <span class="score">(5分)</span></div>
+        <p>三年级有4个班，每班有45人，一共要买多少本练习本？如果每本练习本2元，一共需要多少钱？</p>
+        <div class="answer-area">
+          <p>列式：_______________</p>
+          <p>答：_______________</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 参考答案 -->
+    <div class="card" style="background: #f6ffed; border: 1px solid #b7eb8f;">
+      <h2 style="color: #52c41a;">📝 参考答案</h2>
+      
+      <h3>一、填空题</h3>
+      <p>1. 72, 12</p>
+      <p>2. ⅜, ⅝</p>
+      <p>3. 100, 100</p>
+      <p>4. 长×宽, 边长×4</p>
+      <p>5. 闰, 366</p>
+      <p>6. 15, 21</p>
+      <p>7. <, >, <</p>
+
+      <h3>二、选择题</h3>
+      <p>1. C  2. B  3. B  4. C  5. B</p>
+
+      <h3>三、计算题</h3>
+      <p>1. (1) 864  (2) 52  (3) 986  (4) 49</p>
+      <p>2. (1) 42  (2) 15  (3) 84</p>
+      <p>3. (1) ⅗  (2) ⅔</p>
+
+      <h3>四、操作题</h3>
+      <p>1. 面积 = 24平方厘米，周长 = 20厘米</p>
+      <p>2. (1) 苹果  (2) 36人</p>
+
+      <h3>五、解决问题</h3>
+      <p>1. 72 ÷ 6 = 12（个）</p>
+      <p>2. 12 × 8 = 96（平方米）</p>
+      <p>3. 24 ÷ 8 × 3 = 9（个）</p>
+      <p>4. 4 × 45 = 180（本），180 × 2 = 360（元）</p>
+    </div>
+  </div>
+</body>
+</html>
