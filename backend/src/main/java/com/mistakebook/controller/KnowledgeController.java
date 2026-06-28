@@ -1,7 +1,6 @@
 package com.mistakebook.controller;
 
-import com.mistakebook.entity.KnowledgeDoubt;
-import com.mistakebook.repository.KnowledgeDoubtRepository;
+import com.mistakebook.util.RedisService;
 import com.mistakebook.util.Result;
 import com.mistakebook.util.UserContext;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,7 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Tag(name = "知识疑难点", description = "知识疑难点管理接口")
@@ -19,56 +20,55 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class KnowledgeController {
 
-    private final KnowledgeDoubtRepository knowledgeDoubtRepository;
+    private final RedisService redisService;
+
+    private static final String DOUBT_PREFIX = "knowledge:doubt:";
+    private static final long DOUBT_EXPIRE_DAYS = 365; // 保存一年
+
+    /**
+     * 生成 Redis key
+     */
+    private String buildKey(Long userId, String semesterKey, String subjectKey) {
+        return DOUBT_PREFIX + userId + ":" + semesterKey + ":" + subjectKey;
+    }
 
     @Operation(summary = "获取疑难点")
     @GetMapping("/doubt")
-    public Result<KnowledgeDoubt> getDoubt(
+    public Result<Map<String, Object>> getDoubt(
             @RequestParam String semesterKey,
             @RequestParam String subjectKey) {
         Long userId = UserContext.getCurrentUserId();
         log.info("获取疑难点: userId={}, semester={}, subject={}", userId, semesterKey, subjectKey);
 
-        Optional<KnowledgeDoubt> doubt = knowledgeDoubtRepository
-                .findByUserIdAndSemesterKeyAndSubjectKey(userId, semesterKey, subjectKey);
+        String key = buildKey(userId, semesterKey, subjectKey);
+        Object content = redisService.get(key);
 
-        if (doubt.isPresent()) {
-            return Result.success(doubt.get());
-        } else {
-            // 返回空对象
-            KnowledgeDoubt empty = new KnowledgeDoubt();
-            empty.setUserId(userId);
-            empty.setSemesterKey(semesterKey);
-            empty.setSubjectKey(subjectKey);
-            empty.setContent("");
-            return Result.success(empty);
-        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("semesterKey", semesterKey);
+        result.put("subjectKey", subjectKey);
+        result.put("content", content != null ? content.toString() : "");
+
+        return Result.success(result);
     }
 
     @Operation(summary = "保存疑难点")
     @PostMapping("/doubt")
-    public Result<KnowledgeDoubt> saveDoubt(@RequestBody SaveDoubtRequest request) {
+    public Result<Map<String, Object>> saveDoubt(@RequestBody SaveDoubtRequest request) {
         Long userId = UserContext.getCurrentUserId();
         log.info("保存疑难点: userId={}, semester={}, subject={}", userId, request.getSemesterKey(), request.getSubjectKey());
 
-        Optional<KnowledgeDoubt> existing = knowledgeDoubtRepository
-                .findByUserIdAndSemesterKeyAndSubjectKey(userId, request.getSemesterKey(), request.getSubjectKey());
+        String key = buildKey(userId, request.getSemesterKey(), request.getSubjectKey());
+        
+        // 保存到 Redis，过期时间 365 天
+        redisService.set(key, request.getContent(), DOUBT_EXPIRE_DAYS, TimeUnit.DAYS);
 
-        KnowledgeDoubt doubt;
-        if (existing.isPresent()) {
-            doubt = existing.get();
-            doubt.setContent(request.getContent());
-        } else {
-            doubt = new KnowledgeDoubt();
-            doubt.setUserId(userId);
-            doubt.setSemesterKey(request.getSemesterKey());
-            doubt.setSubjectKey(request.getSubjectKey());
-            doubt.setContent(request.getContent());
-        }
+        Map<String, Object> result = new HashMap<>();
+        result.put("semesterKey", request.getSemesterKey());
+        result.put("subjectKey", request.getSubjectKey());
+        result.put("content", request.getContent());
 
-        KnowledgeDoubt saved = knowledgeDoubtRepository.save(doubt);
-        log.info("疑难点保存成功: id={}", saved.getId());
-        return Result.success("保存成功", saved);
+        log.info("疑难点保存成功: key={}", key);
+        return Result.success("保存成功", result);
     }
 
     /**
