@@ -6,27 +6,35 @@
   <title>三年级下学期 - 重点知识总结</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.6; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; line-height: 1.8; }
     .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #722ed1 0%, #722ed1 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
+    .header { background: linear-gradient(135deg, #722ed1 0%, #531dab 100%); color: white; padding: 30px; border-radius: 12px; margin-bottom: 20px; }
     .header h1 { font-size: 28px; margin-bottom: 10px; }
-    .header p { opacity: 0.9; }
+    .header p { opacity: 0.9; font-size: 14px; }
     .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .card h2 { font-size: 20px; color: #722ed1; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid #f0f0f0; }
-    .card h3 { font-size: 16px; color: #333; margin: 16px 0 8px; }
+    .card h3 { font-size: 16px; color: #333; margin: 20px 0 10px; }
     .card p { margin-bottom: 12px; }
-    .card ul { margin-left: 20px; margin-bottom: 12px; }
+    .card ul, .card ol { margin-left: 24px; margin-bottom: 12px; }
     .card li { margin-bottom: 8px; }
     .tag { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; margin-right: 8px; margin-bottom: 8px; }
-    .tag-important { background: #fff1f0; color: #ff4d4f; }
-    .tag-normal { background: #e6f7ff; color: #1890ff; }
-    .tag-easy { background: #f6ffed; color: #52c41a; }
+    .tag-语文 { background: #fff0f6; color: #eb2f96; border: 1px solid #ffadd2; }
+    .tag-数学 { background: #fff1f0; color: #ff4d4f; border: 1px solid #ffa39e; }
+    .tag-英语 { background: #fff7e6; color: #faad14; border: 1px solid #ffd591; }
+    .tag-综合 { background: #f9f0ff; color: #722ed1; border: 1px solid #d3adf7; }
     .back-btn { display: inline-block; padding: 8px 16px; background: #722ed1; color: white; text-decoration: none; border-radius: 6px; margin-bottom: 20px; }
-    .back-btn:hover { opacity: 0.8; }
+    .back-btn:hover { background: #531dab; }
+    .exam-box { background: #fff7e6; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #fa8c16; }
+    .exam-box strong { color: #fa8c16; }
+    .tip-box { background: #f6ffed; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #52c41a; }
+    .tip-box strong { color: #52c41a; }
+    .warn-box { background: #fff1f0; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #ff4d4f; }
+    .warn-box strong { color: #ff4d4f; }
     table { width: 100%; border-collapse: collapse; margin: 16px 0; }
     th, td { border: 1px solid #e8e8e8; padding: 12px; text-align: left; }
     th { background: #fafafa; font-weight: 500; }
-    .example { background: #f9f0ff; padding: 16px; border-radius: 8px; margin: 12px 0; border-left: 4px solid #722ed1; }
+    .checklist li { list-style: none; position: relative; padding-left: 28px; }
+    .checklist li:before { content: "☐"; position: absolute; left: 0; color: #722ed1; }
   </style>
 </head>
 <body>
@@ -35,46 +43,216 @@
     
     <div class="header">
       <h1>⭐ 三年级下学期 - 重点知识总结</h1>
-      <p>本学期重点重点知识点汇总</p>
+      <p>语文（上海教育出版社）· 数学（上海教育出版社）· 英语（牛津上海版）</p>
     </div>
 
+    <!-- 语文重点 -->
     <div class="card">
-      <h2>一、基础知识</h2>
-      <p>本章节涵盖三年级下学期重点的基础知识点。</p>
-      <ul>
-        <li>知识点1：待补充</li>
-        <li>知识点2：待补充</li>
-        <li>知识点3：待补充</li>
-      </ul>
-    </div>
-
-    <div class="card">
-      <h2>二、重点难点</h2>
-      <span class="tag tag-important">重点</span>
-      <span class="tag tag-normal">常考</span>
-      <span class="tag tag-easy">基础</span>
+      <h2>📖 语文重点</h2>
       
-      <div class="example">
-        <strong>💡 学习要点：</strong>
+      <h3>一、必背古诗</h3>
+      <table>
+        <tr><th>古诗</th><th>作者</th><th>名句</th></tr>
+        <tr><td>《咏柳》</td><td>贺知章</td><td>不知细叶谁裁出，二月春风似剪刀。</td></tr>
+        <tr><td>《春日》</td><td>朱熹</td><td>等闲识得东风面，万紫千红总是春。</td></tr>
+        <tr><td>《乞巧》</td><td>林杰</td><td>家家乞巧望秋月，穿尽红丝几万条。</td></tr>
+        <tr><td>《嫦娥》</td><td>李商隐</td><td>嫦娥应悔偷灵药，碧海青天夜夜心。</td></tr>
+      </table>
+
+      <h3>二、易错字汇总</h3>
+      <div class="warn-box">
+        <strong>⚠️ 高频易错字：</strong>
         <ul>
-          <li>要点1：待补充</li>
-          <li>要点2：待补充</li>
+          <li>燕（上面是"廿"不是"艹"）</li>
+          <li>翠（上面是"羽"的变形）</li>
+          <li>聚（下面是"乑"不是"木"）</li>
+          <li>稻（右边是"舀"不是"爪"）</li>
+          <li>霞（下面是"叚"不是"段"）</li>
+        </ul>
+      </div>
+
+      <h3>三、句式练习</h3>
+      <div class="exam-box">
+        <strong>📝 常考题型：</strong>
+        <ul>
+          <li>比喻句仿写：注意本体和喻体的相似性</li>
+          <li>反问句改陈述句：去掉反问词，变否定为肯定</li>
+          <li>缩句：保留主干，去掉修饰成分</li>
+          <li>扩句：在主干基础上添加修饰成分</li>
         </ul>
       </div>
     </div>
 
+    <!-- 数学重点 -->
     <div class="card">
-      <h2>三、典型例题</h2>
-      <p>待补充典型例题和解题思路。</p>
+      <h2>🔢 数学重点</h2>
+      
+      <h3>一、必背公式</h3>
+      <table>
+        <tr><th>内容</th><th>公式</th></tr>
+        <tr><td>长方形面积</td><td>面积 = 长 × 宽</td></tr>
+        <tr><td>正方形面积</td><td>面积 = 边长 × 边长</td></tr>
+        <tr><td>长方形周长</td><td>周长 = (长+宽) × 2</td></tr>
+        <tr><td>正方形周长</td><td>周长 = 边长 × 4</td></tr>
+      </table>
+
+      <h3>二、重点概念</h3>
+      <div class="exam-box">
+        <strong>📝 高频考点：</strong>
+        <ul>
+          <li><strong>面积单位换算：</strong>1平方米=100平方分米，1平方分米=100平方厘米</li>
+          <li><strong>平年闰年：</strong>普通年÷4，整百年÷400</li>
+          <li><strong>大月小月：</strong>一三五七八十腊（31天），四六九冬（30天）</li>
+          <li><strong>方向：</strong>八个方向，相对方向相反</li>
+        </ul>
+      </div>
+
+      <h3>三、计算重点</h3>
+      <div class="tip-box">
+        <strong>✅ 计算技巧：</strong>
+        <ul>
+          <li>两位数乘两位数：先乘个位，再乘十位，最后相加</li>
+          <li>除法验算：商×除数+余数=被除数</li>
+          <li>小数加减法：小数点对齐</li>
+        </ul>
+      </div>
     </div>
 
+    <!-- 英语重点 -->
     <div class="card">
-      <h2>四、本学期重点</h2>
-      <div class="example">
-        <strong>⚠️ 常见易错点：</strong>
+      <h2>🔤 英语重点</h2>
+      
+      <h3>一、必背单词</h3>
+      <table>
+        <tr><th>分类</th><th>单词</th></tr>
+        <tr><td>颜色</td><td>red, blue, yellow, green, orange, purple, pink, black, white, brown</td></tr>
+        <tr><td>感官</td><td>soft, hard, rough, smooth, hot, cold, sweet, sour</td></tr>
+        <tr><td>动物</td><td>cat, dog, rabbit, hamster, fish, bird, turtle</td></tr>
+        <tr><td>服装</td><td>shirt, T-shirt, dress, skirt, shorts, trousers, shoes</td></tr>
+      </table>
+
+      <h3>二、必背句型</h3>
+      <div class="exam-box">
+        <strong>📝 常考对话：</strong>
         <ul>
-          <li>易错点1：待补充</li>
-          <li>易错点2：待补充</li>
+          <li>What colour is it? — It's red.</li>
+          <li>How does it feel? — It's soft.</li>
+          <li>Do you like cats? — Yes, I do. / No, I don't.</li>
+          <li>What shape is it? — It's a circle.</li>
+          <li>How is the weather? — It's sunny.</li>
+        </ul>
+      </div>
+
+      <h3>三、语法要点</h3>
+      <div class="tip-box">
+        <strong>✅ 必记语法：</strong>
+        <ul>
+          <li>be动词：I am, He/She/It is, You/We/They are</li>
+          <li>like用法：I like cats. (名词用复数)</li>
+          <li>单复数：What colour is it? vs What colour are they?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 综合复习计划 -->
+    <div class="card">
+      <h2>📅 复习计划建议</h2>
+      
+      <h3>第一周：基础巩固</h3>
+      <ul class="checklist">
+        <li>背诵4首古诗，默写无误</li>
+        <li>复习易错字，每个写3遍</li>
+        <li>背诵面积公式、周长公式</li>
+        <li>默写颜色、动物单词</li>
+      </ul>
+
+      <h3>第二周：专项突破</h3>
+      <ul class="checklist">
+        <li>练习比喻句、反问句改写</li>
+        <li>做面积、周长应用题</li>
+        <li>练习英语对话</li>
+        <li>复习平年闰年判断</li>
+      </ul>
+
+      <h3>第三周：综合练习</h3>
+      <ul class="checklist">
+        <li>做语文阅读理解练习</li>
+        <li>做数学综合练习题</li>
+        <li>做英语听力练习</li>
+        <li>整理错题本</li>
+      </ul>
+
+      <h3>第四周：考前冲刺</h3>
+      <ul class="checklist">
+        <li>复习错题本</li>
+        <li>做模拟试卷</li>
+        <li>查漏补缺</li>
+        <li>保持良好作息</li>
+      </ul>
+    </div>
+
+    <!-- 易错点汇总 -->
+    <div class="card">
+      <h2>⚠️ 易错点汇总</h2>
+      
+      <h3>语文易错</h3>
+      <div class="warn-box">
+        <ul>
+          <li>"燕"字的写法（上面是"廿"）</li>
+          <li>"翠"字的写法（上面是"羽"的变形）</li>
+          <li>比喻句和拟人句的区别</li>
+          <li>反问句改陈述句的方法</li>
+        </ul>
+      </div>
+
+      <h3>数学易错</h3>
+      <div class="warn-box">
+        <ul>
+          <li>面积和周长单位混淆（平方厘米 vs 厘米）</li>
+          <li>小数点位置写错</li>
+          <li>闰年判断：整百年要除以400</li>
+          <li>乘法竖式对位错误</li>
+        </ul>
+      </div>
+
+      <h3>英语易错</h3>
+      <div class="warn-box">
+        <ul>
+          <li>单复数：like后面名词用复数</li>
+          <li>be动词搭配：I am (不是 I is)</li>
+          <li>What colour is it? vs What colour are they?</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 学习方法 -->
+    <div class="card">
+      <h2>💡 学习方法建议</h2>
+      
+      <div class="tip-box">
+        <strong>语文学习：</strong>
+        <ul>
+          <li>每天坚持阅读30分钟</li>
+          <li>准备摘抄本，积累好词好句</li>
+          <li>多读多背，培养语感</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <strong>数学学习：</strong>
+        <ul>
+          <li>理解公式含义，不要死记硬背</li>
+          <li>多做练习题，熟练计算</li>
+          <li>画图帮助理解题意</li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <strong>英语学习：</strong>
+        <ul>
+          <li>每天听英语录音15分钟</li>
+          <li>大声朗读课文</li>
+          <li>用英语描述身边的事物</li>
         </ul>
       </div>
     </div>
