@@ -8,6 +8,7 @@ import MistakeList from './pages/MistakeList';
 import MistakeFormPage from './pages/MistakeForm';
 import MistakeDetail from './pages/MistakeDetail';
 import SearchPage from './pages/SearchPage';
+import KnowledgeSummaryPage from './pages/knowledge-summary';
 import { Spin } from 'antd';
 
 // 受保护的路由组件
@@ -137,6 +138,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <SearchPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/knowledge-summary"
+        element={
+          <ProtectedRoute>
+            <KnowledgeSummaryPage />
           </ProtectedRoute>
         }
       />

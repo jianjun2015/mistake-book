@@ -8,6 +8,7 @@ import {
   SearchOutlined,
   UserOutlined,
   LogoutOutlined,
+  BookOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -34,6 +35,11 @@ const menuItems: MenuProps['items'] = [
     key: '/search',
     icon: <SearchOutlined />,
     label: '搜索错题',
+  },
+  {
+    key: '/knowledge-summary',
+    icon: <BookOutlined />,
+    label: '知识总结',
   },
 ];
 
