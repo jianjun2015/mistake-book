@@ -9,6 +9,7 @@ import MistakeFormPage from './pages/MistakeForm';
 import MistakeDetail from './pages/MistakeDetail';
 import SearchPage from './pages/SearchPage';
 import KnowledgeSummaryPage from './pages/knowledge-summary';
+import PhoneticLearningPage from './pages/phonetic-learning';
 import { Spin } from 'antd';
 
 // 受保护的路由组件
@@ -146,6 +147,14 @@ const AppRoutes: React.FC = () => {
         element={
           <ProtectedRoute>
             <KnowledgeSummaryPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/phonetic-learning"
+        element={
+          <ProtectedRoute>
+            <PhoneticLearningPage />
           </ProtectedRoute>
         }
       />

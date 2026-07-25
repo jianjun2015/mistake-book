@@ -9,6 +9,7 @@ import {
   UserOutlined,
   LogoutOutlined,
   BookOutlined,
+  AudioOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -40,6 +41,11 @@ const menuItems: MenuProps['items'] = [
     key: '/knowledge-summary',
     icon: <BookOutlined />,
     label: '知识总结',
+  },
+  {
+    key: '/phonetic-learning',
+    icon: <AudioOutlined />,
+    label: '英标学习',
   },
 ];
 
