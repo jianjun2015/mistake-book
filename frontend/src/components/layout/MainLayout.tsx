@@ -10,6 +10,7 @@ import {
   LogoutOutlined,
   BookOutlined,
   AudioOutlined,
+  EditOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -45,7 +46,12 @@ const menuItems: MenuProps['items'] = [
   {
     key: '/phonetic-learning',
     icon: <AudioOutlined />,
-    label: '英标学习',
+    label: '音标学习',
+  },
+  {
+    key: '/phonetic-practice',
+    icon: <EditOutlined />,
+    label: '音标练习',
   },
 ];
 
@@ -139,10 +145,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         >
           <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
             <Space style={{ cursor: 'pointer' }}>
-              <Avatar
-                style={{ backgroundColor: '#1890ff' }}
-                icon={<UserOutlined />}
-              />
+              <Avatar style={{ backgroundColor: '#1890ff' }} icon={<UserOutlined />} />
               <span>{user?.username}</span>
               <Tag color="blue">{user?.gradeName}</Tag>
             </Space>

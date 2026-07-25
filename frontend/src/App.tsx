@@ -10,6 +10,7 @@ import MistakeDetail from './pages/MistakeDetail';
 import SearchPage from './pages/SearchPage';
 import KnowledgeSummaryPage from './pages/knowledge-summary';
 import PhoneticLearningPage from './pages/phonetic-learning';
+import PhoneticPracticePage from './pages/phonetic-practice';
 import { Spin } from 'antd';
 
 // 受保护的路由组件
@@ -18,14 +19,7 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
     );
@@ -38,20 +32,13 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
-// 已登录用户不能访问的页面（登录、注册）
+// 已登录用户不能访问的页面
 const GuestRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return (
-      <div
-        style={{
-          minHeight: '100vh',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Spin size="large" tip="加载中..." />
       </div>
     );
@@ -68,96 +55,20 @@ const AppRoutes: React.FC = () => {
   return (
     <Routes>
       {/* 公开路由 */}
-      <Route
-        path="/login"
-        element={
-          <GuestRoute>
-            <LoginPage />
-          </GuestRoute>
-        }
-      />
-      <Route
-        path="/register"
-        element={
-          <GuestRoute>
-            <RegisterPage />
-          </GuestRoute>
-        }
-      />
+      <Route path="/login" element={<GuestRoute><LoginPage /></GuestRoute>} />
+      <Route path="/register" element={<GuestRoute><RegisterPage /></GuestRoute>} />
 
       {/* 受保护的路由 */}
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute>
-            <Navigate to="/dashboard" replace />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mistakes"
-        element={
-          <ProtectedRoute>
-            <MistakeList />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mistakes/add"
-        element={
-          <ProtectedRoute>
-            <MistakeFormPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mistakes/edit/:id"
-        element={
-          <ProtectedRoute>
-            <MistakeFormPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/mistakes/:id"
-        element={
-          <ProtectedRoute>
-            <MistakeDetail />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/search"
-        element={
-          <ProtectedRoute>
-            <SearchPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/knowledge-summary"
-        element={
-          <ProtectedRoute>
-            <KnowledgeSummaryPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/phonetic-learning"
-        element={
-          <ProtectedRoute>
-            <PhoneticLearningPage />
-          </ProtectedRoute>
-        }
-      />
+      <Route path="/" element={<ProtectedRoute><Navigate to="/dashboard" replace /></ProtectedRoute>} />
+      <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/mistakes" element={<ProtectedRoute><MistakeList /></ProtectedRoute>} />
+      <Route path="/mistakes/add" element={<ProtectedRoute><MistakeFormPage /></ProtectedRoute>} />
+      <Route path="/mistakes/edit/:id" element={<ProtectedRoute><MistakeFormPage /></ProtectedRoute>} />
+      <Route path="/mistakes/:id" element={<ProtectedRoute><MistakeDetail /></ProtectedRoute>} />
+      <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+      <Route path="/knowledge-summary" element={<ProtectedRoute><KnowledgeSummaryPage /></ProtectedRoute>} />
+      <Route path="/phonetic-learning" element={<ProtectedRoute><PhoneticLearningPage /></ProtectedRoute>} />
+      <Route path="/phonetic-practice" element={<ProtectedRoute><PhoneticPracticePage /></ProtectedRoute>} />
 
       {/* 404 兜底 */}
       <Route path="*" element={<Navigate to="/dashboard" replace />} />
