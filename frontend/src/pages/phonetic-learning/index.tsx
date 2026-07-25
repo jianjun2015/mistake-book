@@ -1,77 +1,77 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Button, Space, Radio, message, Tag } from 'antd';
-import { SoundOutlined, CheckCircleOutlined, CloseCircleOutlined, PauseCircleOutlined, AudioOutlined } from '@ant-design/icons';
+import { SoundOutlined, CheckCircleOutlined, CloseCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 
 // 48个国际音标
-// sound: 音标对应的发音（用字母组合表示音标的读音）
+// sound: 用于发音的文本（使用能体现该音标的单词或音节）
 // word: 例词
 const phonetics = [
   // ============ 长元音（5个）============
-  { symbol: '/iː/', example: 'see, tea', type: '长元音', description: '舌尖抵下齿，舌前部向硬腭抬起，嘴唇扁平', word: 'see', sound: 'ee' },
-  { symbol: '/ɑː/', example: 'car, father', type: '长元音', description: '口张大，舌身平放后缩，舌尖离开下齿', word: 'car', sound: 'ah' },
-  { symbol: '/ɔː/', example: 'all, four', type: '长元音', description: '双唇收圆并突出，舌后部抬起', word: 'all', sound: 'aw' },
-  { symbol: '/uː/', example: 'too, blue', type: '长元音', description: '双唇收圆，突出，舌后部抬起', word: 'too', sound: 'oo' },
-  { symbol: '/ɜː/', example: 'bird, her', type: '长元音', description: '舌身平放，中部稍抬起，嘴唇扁平', word: 'bird', sound: 'er' },
+  { symbol: '/iː/', example: 'see, tea', type: '长元音', description: '舌尖抵下齿，舌前部向硬腭抬起，嘴唇扁平', word: 'see', sound: 'see' },
+  { symbol: '/ɑː/', example: 'car, father', type: '长元音', description: '口张大，舌身平放后缩，舌尖离开下齿', word: 'car', sound: 'father' },
+  { symbol: '/ɔː/', example: 'all, four', type: '长元音', description: '双唇收圆并突出，舌后部抬起', word: 'all', sound: 'all' },
+  { symbol: '/uː/', example: 'too, blue', type: '长元音', description: '双唇收圆，突出，舌后部抬起', word: 'too', sound: 'blue' },
+  { symbol: '/ɜː/', example: 'bird, her', type: '长元音', description: '舌身平放，中部稍抬起，嘴唇扁平', word: 'bird', sound: 'bird' },
   
   // ============ 短元音（7个）============
-  { symbol: '/ɪ/', example: 'sit, big', type: '短元音', description: '舌尖抵下齿，舌前部稍抬起，嘴唇微开', word: 'sit', sound: 'ih' },
-  { symbol: '/e/', example: 'bed, red', type: '短元音', description: '舌尖抵下齿，舌前部稍抬起，嘴型半开', word: 'bed', sound: 'eh' },
-  { symbol: '/æ/', example: 'cat, bad', type: '短元音', description: '舌尖抵下齿，舌前部最低，嘴巴张大', word: 'cat', sound: 'ae' },
-  { symbol: '/ɒ/', example: 'hot, dog', type: '短元音', description: '口张大，舌身后缩，双唇稍圆', word: 'hot', sound: 'oh' },
-  { symbol: '/ʊ/', example: 'put, good', type: '短元音', description: '双唇收圆，稍突出，舌后部稍抬起', word: 'put', sound: 'uu' },
-  { symbol: '/ʌ/', example: 'cup, bus', type: '短元音', description: '舌后部稍抬起，嘴唇半开', word: 'cup', sound: 'uh' },
-  { symbol: '/ə/', example: 'about, again', type: '短元音', description: '舌身平放，中部稍抬起，嘴唇自然', word: 'about', sound: 'uh' },
+  { symbol: '/ɪ/', example: 'sit, big', type: '短元音', description: '舌尖抵下齿，舌前部稍抬起，嘴唇微开', word: 'sit', sound: 'sit' },
+  { symbol: '/e/', example: 'bed, red', type: '短元音', description: '舌尖抵下齿，舌前部稍抬起，嘴型半开', word: 'bed', sound: 'bed' },
+  { symbol: '/æ/', example: 'cat, bad', type: '短元音', description: '舌尖抵下齿，舌前部最低，嘴巴张大', word: 'cat', sound: 'cat' },
+  { symbol: '/ɒ/', example: 'hot, dog', type: '短元音', description: '口张大，舌身后缩，双唇稍圆', word: 'hot', sound: 'hot' },
+  { symbol: '/ʊ/', example: 'put, good', type: '短元音', description: '双唇收圆，稍突出，舌后部稍抬起', word: 'put', sound: 'put' },
+  { symbol: '/ʌ/', example: 'cup, bus', type: '短元音', description: '舌后部稍抬起，嘴唇半开', word: 'cup', sound: 'cup' },
+  { symbol: '/ə/', example: 'about, again', type: '短元音', description: '舌身平放，中部稍抬起，嘴唇自然', word: 'about', sound: 'about' },
   
   // ============ 双元音（8个）============
-  { symbol: '/eɪ/', example: 'day, make', type: '双元音', description: '由 /e/ 滑向 /ɪ/，口型由半开到扁平', word: 'day', sound: 'ay' },
-  { symbol: '/aɪ/', example: 'my, time', type: '双元音', description: '由 /a/ 滑向 /ɪ/，口型由大到扁平', word: 'my', sound: 'eye' },
-  { symbol: '/ɔɪ/', example: 'boy, oil', type: '双元音', description: '由 /ɔ/ 滑向 /ɪ/，口型由圆到扁平', word: 'boy', sound: 'oy' },
-  { symbol: '/aʊ/', example: 'how, out', type: '双元音', description: '由 /a/ 滑向 /ʊ/，口型由大到圆', word: 'how', sound: 'ow' },
-  { symbol: '/əʊ/', example: 'go, home', type: '双元音', description: '由 /ə/ 滑向 /ʊ/，口型由自然到圆', word: 'go', sound: 'oh' },
-  { symbol: '/ɪə/', example: 'ear, near', type: '双元音', description: '由 /ɪ/ 滑向 /ə/，口型由微开到自然', word: 'ear', sound: 'eer' },
+  { symbol: '/eɪ/', example: 'day, make', type: '双元音', description: '由 /e/ 滑向 /ɪ/，口型由半开到扁平', word: 'day', sound: 'day' },
+  { symbol: '/aɪ/', example: 'my, time', type: '双元音', description: '由 /a/ 滑向 /ɪ/，口型由大到扁平', word: 'my', sound: 'my' },
+  { symbol: '/ɔɪ/', example: 'boy, oil', type: '双元音', description: '由 /ɔ/ 滑向 /ɪ/，口型由圆到扁平', word: 'boy', sound: 'boy' },
+  { symbol: '/aʊ/', example: 'how, out', type: '双元音', description: '由 /a/ 滑向 /ʊ/，口型由大到圆', word: 'how', sound: 'how' },
+  { symbol: '/əʊ/', example: 'go, home', type: '双元音', description: '由 /ə/ 滑向 /ʊ/，口型由自然到圆', word: 'go', sound: 'go' },
+  { symbol: '/ɪə/', example: 'ear, near', type: '双元音', description: '由 /ɪ/ 滑向 /ə/，口型由微开到自然', word: 'ear', sound: 'ear' },
   { symbol: '/eə/', example: 'air, care', type: '双元音', description: '由 /e/ 滑向 /ə/，口型由半开到自然', word: 'air', sound: 'air' },
-  { symbol: '/ʊə/', example: 'tour, poor', type: '双元音', description: '由 /ʊ/ 滑向 /ə/，口型由圆到自然', word: 'tour', sound: 'oor' },
+  { symbol: '/ʊə/', example: 'tour, poor', type: '双元音', description: '由 /ʊ/ 滑向 /ə/，口型由圆到自然', word: 'tour', sound: 'tour' },
   
   // ============ 爆破音（6个）============
-  { symbol: '/p/', example: 'pen, map', type: '爆破音', description: '双唇闭合，气流冲开，清辅音', word: 'pen', sound: 'p' },
-  { symbol: '/b/', example: 'bad, job', type: '爆破音', description: '双唇闭合，气流冲开，声带振动，浊辅音', word: 'bad', sound: 'b' },
-  { symbol: '/t/', example: 'tea, sit', type: '爆破音', description: '舌尖抵上齿龈，气流冲开，清辅音', word: 'tea', sound: 't' },
-  { symbol: '/d/', example: 'day, dog', type: '爆破音', description: '舌尖抵上齿龈，气流冲开，声带振动，浊辅音', word: 'day', sound: 'd' },
-  { symbol: '/k/', example: 'key, back', type: '爆破音', description: '舌后部抵软腭，气流冲开，清辅音', word: 'key', sound: 'k' },
-  { symbol: '/g/', example: 'go, bag', type: '爆破音', description: '舌后部抵软腭，气流冲开，声带振动，浊辅音', word: 'go', sound: 'g' },
+  { symbol: '/p/', example: 'pen, map', type: '爆破音', description: '双唇闭合，气流冲开，清辅音', word: 'pen', sound: 'pen' },
+  { symbol: '/b/', example: 'bad, job', type: '爆破音', description: '双唇闭合，气流冲开，声带振动，浊辅音', word: 'bad', sound: 'bad' },
+  { symbol: '/t/', example: 'tea, sit', type: '爆破音', description: '舌尖抵上齿龈，气流冲开，清辅音', word: 'tea', sound: 'tea' },
+  { symbol: '/d/', example: 'day, dog', type: '爆破音', description: '舌尖抵上齿龈，气流冲开，声带振动，浊辅音', word: 'day', sound: 'day' },
+  { symbol: '/k/', example: 'key, back', type: '爆破音', description: '舌后部抵软腭，气流冲开，清辅音', word: 'key', sound: 'key' },
+  { symbol: '/g/', example: 'go, bag', type: '爆破音', description: '舌后部抵软腭，气流冲开，声带振动，浊辅音', word: 'go', sound: 'go' },
   
   // ============ 摩擦音（10个）============
-  { symbol: '/f/', example: 'fat, off', type: '摩擦音', description: '上齿咬下唇，气流摩擦，清辅音', word: 'fat', sound: 'f' },
-  { symbol: '/v/', example: 'very, have', type: '摩擦音', description: '上齿咬下唇，气流摩擦，声带振动，浊辅音', word: 'very', sound: 'v' },
-  { symbol: '/θ/', example: 'think, bath', type: '摩擦音', description: '舌尖抵上齿，气流摩擦，清辅音', word: 'think', sound: 'th' },
-  { symbol: '/ð/', example: 'this, that', type: '摩擦音', description: '舌尖抵上齿，气流摩擦，声带振动，浊辅音', word: 'this', sound: 'th' },
-  { symbol: '/s/', example: 'see, miss', type: '摩擦音', description: '舌尖接近上齿龈，气流摩擦，清辅音', word: 'see', sound: 's' },
-  { symbol: '/z/', example: 'zoo, has', type: '摩擦音', description: '舌尖接近上齿龈，气流摩擦，声带振动，浊辅音', word: 'zoo', sound: 'z' },
-  { symbol: '/ʃ/', example: 'she, fish', type: '摩擦音', description: '舌前部接近硬腭，气流摩擦，清辅音', word: 'she', sound: 'sh' },
-  { symbol: '/ʒ/', example: 'measure', type: '摩擦音', description: '舌前部接近硬腭，气流摩擦，声带振动，浊辅音', word: 'measure', sound: 'zh' },
-  { symbol: '/h/', example: 'hat, hot', type: '摩擦音', description: '气流从声门摩擦而出，清辅音', word: 'hat', sound: 'h' },
-  { symbol: '/r/', example: 'red, car', type: '摩擦音', description: '舌尖向上齿龈后部卷起，浊辅音', word: 'red', sound: 'r' },
+  { symbol: '/f/', example: 'fat, off', type: '摩擦音', description: '上齿咬下唇，气流摩擦，清辅音', word: 'fat', sound: 'fat' },
+  { symbol: '/v/', example: 'very, have', type: '摩擦音', description: '上齿咬下唇，气流摩擦，声带振动，浊辅音', word: 'very', sound: 'very' },
+  { symbol: '/θ/', example: 'think, bath', type: '摩擦音', description: '舌尖抵上齿，气流摩擦，清辅音', word: 'think', sound: 'think' },
+  { symbol: '/ð/', example: 'this, that', type: '摩擦音', description: '舌尖抵上齿，气流摩擦，声带振动，浊辅音', word: 'this', sound: 'this' },
+  { symbol: '/s/', example: 'see, miss', type: '摩擦音', description: '舌尖接近上齿龈，气流摩擦，清辅音', word: 'see', sound: 'see' },
+  { symbol: '/z/', example: 'zoo, has', type: '摩擦音', description: '舌尖接近上齿龈，气流摩擦，声带振动，浊辅音', word: 'zoo', sound: 'zoo' },
+  { symbol: '/ʃ/', example: 'she, fish', type: '摩擦音', description: '舌前部接近硬腭，气流摩擦，清辅音', word: 'she', sound: 'she' },
+  { symbol: '/ʒ/', example: 'measure', type: '摩擦音', description: '舌前部接近硬腭，气流摩擦，声带振动，浊辅音', word: 'measure', sound: 'measure' },
+  { symbol: '/h/', example: 'hat, hot', type: '摩擦音', description: '气流从声门摩擦而出，清辅音', word: 'hat', sound: 'hat' },
+  { symbol: '/r/', example: 'red, car', type: '摩擦音', description: '舌尖向上齿龈后部卷起，浊辅音', word: 'red', sound: 'red' },
   
   // ============ 破擦音（6个）============
-  { symbol: '/tʃ/', example: 'cheese, catch', type: '破擦音', description: '舌尖抵上齿龈后部，气流冲开摩擦，清辅音', word: 'cheese', sound: 'ch' },
-  { symbol: '/dʒ/', example: 'job, juice', type: '破擦音', description: '舌尖抵上齿龈后部，气流冲开摩擦，声带振动，浊辅音', word: 'job', sound: 'j' },
-  { symbol: '/tr/', example: 'tree, try', type: '破擦音', description: '舌尖抵上齿龈后部卷起，气流冲开，清辅音', word: 'tree', sound: 'tr' },
-  { symbol: '/dr/', example: 'drink, drive', type: '破擦音', description: '舌尖抵上齿龈后部卷起，气流冲开，声带振动，浊辅音', word: 'drink', sound: 'dr' },
-  { symbol: '/ts/', example: 'cats, hats', type: '破擦音', description: '舌尖抵上齿龈，气流冲开摩擦，清辅音', word: 'cats', sound: 'ts' },
-  { symbol: '/dz/', example: 'beds, hands', type: '破擦音', description: '舌尖抵上齿龈，气流冲开摩擦，声带振动，浊辅音', word: 'beds', sound: 'dz' },
+  { symbol: '/tʃ/', example: 'cheese, catch', type: '破擦音', description: '舌尖抵上齿龈后部，气流冲开摩擦，清辅音', word: 'cheese', sound: 'cheese' },
+  { symbol: '/dʒ/', example: 'job, juice', type: '破擦音', description: '舌尖抵上齿龈后部，气流冲开摩擦，声带振动，浊辅音', word: 'job', sound: 'job' },
+  { symbol: '/tr/', example: 'tree, try', type: '破擦音', description: '舌尖抵上齿龈后部卷起，气流冲开，清辅音', word: 'tree', sound: 'tree' },
+  { symbol: '/dr/', example: 'drink, drive', type: '破擦音', description: '舌尖抵上齿龈后部卷起，气流冲开，声带振动，浊辅音', word: 'drink', sound: 'drink' },
+  { symbol: '/ts/', example: 'cats, hats', type: '破擦音', description: '舌尖抵上齿龈，气流冲开摩擦，清辅音', word: 'cats', sound: 'cats' },
+  { symbol: '/dz/', example: 'beds, hands', type: '破擦音', description: '舌尖抵上齿龈，气流冲开摩擦，声带振动，浊辅音', word: 'beds', sound: 'beds' },
   
   // ============ 鼻音（3个）============
-  { symbol: '/m/', example: 'man, map', type: '鼻音', description: '双唇闭合，气流从鼻腔出，浊辅音', word: 'man', sound: 'm' },
-  { symbol: '/n/', example: 'no, ten', type: '鼻音', description: '舌尖抵上齿龈，气流从鼻腔出，浊辅音', word: 'no', sound: 'n' },
-  { symbol: '/ŋ/', example: 'sing, long', type: '鼻音', description: '舌后部抵软腭，气流从鼻腔出，浊辅音', word: 'sing', sound: 'ng' },
+  { symbol: '/m/', example: 'man, map', type: '鼻音', description: '双唇闭合，气流从鼻腔出，浊辅音', word: 'man', sound: 'man' },
+  { symbol: '/n/', example: 'no, ten', type: '鼻音', description: '舌尖抵上齿龈，气流从鼻腔出，浊辅音', word: 'no', sound: 'no' },
+  { symbol: '/ŋ/', example: 'sing, long', type: '鼻音', description: '舌后部抵软腭，气流从鼻腔出，浊辅音', word: 'sing', sound: 'sing' },
   
   // ============ 边音（1个）============
-  { symbol: '/l/', example: 'let, all', type: '边音', description: '舌尖抵上齿龈，气流从舌侧出，浊辅音', word: 'let', sound: 'l' },
+  { symbol: '/l/', example: 'let, all', type: '边音', description: '舌尖抵上齿龈，气流从舌侧出，浊辅音', word: 'let', sound: 'let' },
   
   // ============ 半元音（2个）============
-  { symbol: '/w/', example: 'wet, how', type: '半元音', description: '双唇收圆，突出，舌后部抬起，浊辅音', word: 'wet', sound: 'w' },
-  { symbol: '/j/', example: 'yes, you', type: '半元音', description: '舌前部向硬腭抬起，浊辅音', word: 'yes', sound: 'y' },
+  { symbol: '/w/', example: 'wet, how', type: '半元音', description: '双唇收圆，突出，舌后部抬起，浊辅音', word: 'wet', sound: 'wet' },
+  { symbol: '/j/', example: 'yes, you', type: '半元音', description: '舌前部向硬腭抬起，浊辅音', word: 'yes', sound: 'yes' },
 ];
 
 // 音标分类统计
@@ -207,7 +207,6 @@ const PhoneticLearningPage: React.FC = () => {
         {filteredPhonetics.map((phonetic, index) => {
           const typeInfo = phoneticTypes.find(pt => pt.type === phonetic.type);
           const soundId = `sound-${index}`;
-          const wordId = `word-${index}`;
           return (
             <Card key={index} size="small" hoverable>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
@@ -222,30 +221,16 @@ const PhoneticLearningPage: React.FC = () => {
                   <div style={{ marginTop: 4, color: '#666', fontSize: 13 }}>
                     {phonetic.description}
                   </div>
-                  <div style={{ marginTop: 4, color: '#999', fontSize: 12 }}>
-                    发音: <strong>{phonetic.sound}</strong>
-                  </div>
                 </div>
-                <Space direction="vertical" size="small">
-                  <Button 
-                    type={playingId === soundId ? 'primary' : 'default'}
-                    icon={<AudioOutlined />}
-                    onClick={() => handlePlay(phonetic.sound, soundId)}
-                    style={{ minWidth: 60 }}
-                    title={`音标发音: ${phonetic.sound}`}
-                  >
-                    音标
-                  </Button>
-                  <Button 
-                    type={playingId === wordId ? 'primary' : 'default'}
-                    icon={playingId === wordId ? <PauseCircleOutlined /> : <SoundOutlined />} 
-                    onClick={() => handlePlay(phonetic.word, wordId)}
-                    style={{ minWidth: 60 }}
-                    title={`例词发音: ${phonetic.word}`}
-                  >
-                    例词
-                  </Button>
-                </Space>
+                <Button 
+                  type={playingId === soundId ? 'primary' : 'default'}
+                  icon={playingId === soundId ? <PauseCircleOutlined /> : <SoundOutlined />} 
+                  onClick={() => handlePlay(phonetic.sound, soundId)}
+                  style={{ minWidth: 60 }}
+                  title={`点击听发音: ${phonetic.sound}`}
+                >
+                  发音
+                </Button>
               </div>
             </Card>
           );
