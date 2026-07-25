@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Tabs, Button, Space, Radio, message, Tag, Slider } from 'antd';
 import { SoundOutlined, CheckCircleOutlined, CloseCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 
-// 英标数据（每个音标对应一个单词用于发音）
+// 英标数据
 const phonetics = [
   // 元音
   { symbol: '/iː/', example: 'see, tea', type: '元音', description: '长元音，舌尖抵下齿，舌前部向硬腭抬起', word: 'see' },
@@ -66,6 +66,29 @@ const practiceQuestions = [
   { question: '/ʊə/ 对应的单词是？', options: ['ear', 'air', 'tour', 'day'], answer: 2 },
 ];
 
+// 选择最佳英文语音
+const getBestEnglishVoice = (): SpeechSynthesisVoice | null => {
+  const voices = window.speechSynthesis.getVoices();
+  
+  // 优先选择 Google English 系列
+  const googleEn = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'));
+  if (googleEn) return googleEn;
+  
+  // 其次选择 Microsoft English 系列
+  const msEn = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('en'));
+  if (msEn) return msEn;
+  
+  // 再选择任何美式英语
+  const usEn = voices.find(v => v.lang === 'en-US');
+  if (usEn) return usEn;
+  
+  // 最后选择任何英语
+  const anyEn = voices.find(v => v.lang.startsWith('en'));
+  if (anyEn) return anyEn;
+  
+  return null;
+};
+
 const PhoneticLearningPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('learn');
   const [selectedType, setSelectedType] = useState<string>('all');
@@ -75,80 +98,71 @@ const PhoneticLearningPage: React.FC = () => {
   const [score, setScore] = useState(0);
   const [playingWord, setPlayingWord] = useState<string | null>(null);
   const [playbackRate, setPlaybackRate] = useState<number>(0.8);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [voicesLoaded, setVoicesLoaded] = useState(false);
+
+  // 加载语音列表
+  useEffect(() => {
+    const loadVoices = () => {
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        setVoicesLoaded(true);
+      }
+    };
+    
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
+  }, []);
 
   // 过滤英标
   const filteredPhonetics = selectedType === 'all' 
     ? phonetics 
     : phonetics.filter(p => p.type === selectedType);
 
-  // 使用 Google TTS 播放发音
+  // 播放发音
   const playSound = (word: string) => {
     // 停止当前播放
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-
+    window.speechSynthesis.cancel();
+    
     setPlayingWord(word);
 
-    // 使用 Google Translate TTS API
-    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(word)}&tl=en&client=tw-ob`;
+    const utterance = new SpeechSynthesisUtterance(word);
     
-    const audio = new Audio(url);
-    audio.playbackRate = playbackRate;
-    audioRef.current = audio;
+    // 设置语音
+    const voice = getBestEnglishVoice();
+    if (voice) {
+      utterance.voice = voice;
+    }
+    
+    utterance.lang = 'en-US';
+    utterance.rate = playbackRate;
+    utterance.pitch = 1;
+    utterance.volume = 1;
 
-    audio.onended = () => {
+    utterance.onend = () => {
       setPlayingWord(null);
     };
 
-    audio.onerror = () => {
-      // 如果 Google TTS 失败，回退到 Web Speech API
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-US';
-        utterance.rate = playbackRate;
-        window.speechSynthesis.speak(utterance);
-      }
+    utterance.onerror = () => {
       setPlayingWord(null);
     };
 
-    audio.play().catch(() => {
-      // 如果播放失败，回退到 Web Speech API
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(word);
-        utterance.lang = 'en-US';
-        utterance.rate = playbackRate;
-        window.speechSynthesis.speak(utterance);
-      }
-      setPlayingWord(null);
-    });
+    window.speechSynthesis.speak(utterance);
   };
 
   // 停止播放
   const stopSound = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current = null;
-    }
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
+    window.speechSynthesis.cancel();
     setPlayingWord(null);
   };
 
   // 组件卸载时停止播放
   useEffect(() => {
     return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-      }
+      window.speechSynthesis.cancel();
     };
   }, []);
 
@@ -238,7 +252,7 @@ const PhoneticLearningPage: React.FC = () => {
                 icon={playingWord === phonetic.word ? <PauseCircleOutlined /> : <SoundOutlined />} 
                 onClick={() => playingWord === phonetic.word ? stopSound() : playSound(phonetic.word)}
                 style={{ minWidth: 40 }}
-                title={playingWord === phonetic.word ? '停止' : '播放发音'}
+                title={playingWord === phonetic.word ? '停止' : `播放: ${phonetic.word}`}
               />
             </div>
           </Card>
@@ -356,6 +370,12 @@ const PhoneticLearningPage: React.FC = () => {
     <MainLayout>
       <div style={{ padding: 24 }}>
         <h2 style={{ marginBottom: 24 }}>🔤 英标学习</h2>
+        
+        {!voicesLoaded && (
+          <div style={{ marginBottom: 16, padding: 8, background: '#fff7e6', borderRadius: 4, border: '1px solid #ffd591' }}>
+            ⚠️ 正在加载语音引擎，请稍候...
+          </div>
+        )}
         
         <Tabs
           activeKey={activeTab}
