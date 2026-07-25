@@ -47,8 +47,8 @@ const generateQuestions = (grade: number) => {
   const vocabulary = gradeVocabulary[grade] || gradeVocabulary[3];
   const questions: { question: string; options: string[]; answer: number }[] = [];
   
-  // 题型1：根据音标选单词
-  for (let i = 0; i < 5; i++) {
+  // 题型1：根据音标选单词（3题）
+  for (let i = 0; i < 3; i++) {
     const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
     const wrongOptions = vocabulary
       .filter(v => v.word !== correct.word)
@@ -66,8 +66,8 @@ const generateQuestions = (grade: number) => {
     });
   }
   
-  // 题型2：根据单词选音标
-  for (let i = 0; i < 5; i++) {
+  // 题型2：根据单词选音标（2题）
+  for (let i = 0; i < 2; i++) {
     const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
     const wrongOptions = vocabulary
       .filter(v => v.phonetic !== correct.phonetic)
@@ -85,21 +85,70 @@ const generateQuestions = (grade: number) => {
     });
   }
   
-  // 题型3：找出划线部分发音不同的单词
+  // 题型3：选择正确的音标（5题）
+  for (let i = 0; i < 5; i++) {
+    const correct = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+    const wrongPhonetic = vocabulary
+      .filter(v => v.phonetic !== correct.phonetic)
+      .sort(() => Math.random() - 0.5)[0]?.phonetic || '/xxx/';
+    
+    const options = [correct.phonetic, wrongPhonetic].sort(() => Math.random() - 0.5);
+    const answer = options.indexOf(correct.phonetic);
+    
+    questions.push({
+      question: `${correct.word} 的正确音标是？`,
+      options,
+      answer,
+    });
+  }
+  
+  // 题型4：找出划线部分发音不同的单词（5题）
   const vowelPatterns = [
-    { pattern: 'a', words: ['cat', 'hat', 'car', 'map'], different: 2 },
-    { pattern: 'e', words: ['bed', 'red', 'he', 'pen'], different: 2 },
-    { pattern: 'i', words: ['sit', 'big', 'like', 'hit'], different: 2 },
-    { pattern: 'o', words: ['hot', 'dog', 'go', 'not'], different: 2 },
-    { pattern: 'u', words: ['cup', 'bus', 'use', 'but'], different: 2 },
+    { pattern: 'a', words: ['cat', 'hat', 'car', 'map'], different: 2, phonetics: ['/æ/', '/æ/', '/ɑː/', '/æ/'] },
+    { pattern: 'e', words: ['bed', 'red', 'he', 'pen'], different: 2, phonetics: ['/e/', '/e/', '/iː/', '/e/'] },
+    { pattern: 'i', words: ['sit', 'big', 'like', 'hit'], different: 2, phonetics: ['/ɪ/', '/ɪ/', '/aɪ/', '/ɪ/'] },
+    { pattern: 'o', words: ['hot', 'dog', 'go', 'not'], different: 2, phonetics: ['/ɒ/', '/ɒ/', '/əʊ/', '/ɒ/'] },
+    { pattern: 'u', words: ['cup', 'bus', 'use', 'but'], different: 2, phonetics: ['/ʌ/', '/ʌ/', '/juː/', '/ʌ/'] },
+    { pattern: 'ow', words: ['how', 'now', 'go', 'cow'], different: 2, phonetics: ['/aʊ/', '/aʊ/', '/əʊ/', '/aʊ/'] },
+    { pattern: 'ea', words: ['tea', 'read', 'bread', 'eat'], different: 2, phonetics: ['/iː/', '/iː/', '/e/', '/iː/'] },
+    { pattern: 'oo', words: ['food', 'moon', 'book', 'too'], different: 2, phonetics: ['/uː/', '/uː/', '/ʊ/', '/uː/'] },
+    { pattern: 'th', words: ['think', 'this', 'three', 'thank'], different: 1, phonetics: ['/θ/', '/ð/', '/θ/', '/θ/'] },
+    { pattern: 's', words: ['see', 'sit', 'she', 'sun'], different: 2, phonetics: ['/s/', '/s/', '/ʃ/', '/s/'] },
   ];
   
   for (let i = 0; i < 5; i++) {
     const pattern = vowelPatterns[i % vowelPatterns.length];
     questions.push({
-      question: `找出划线部分发音不同的单词（划线：${pattern.pattern}）`,
-      options: pattern.words,
+      question: `找出划线部分发音不同的单词（划线字母：${pattern.pattern}）`,
+      options: pattern.words.map((w, idx) => `${w} (${pattern.phonetics[idx]})`),
       answer: pattern.different,
+    });
+  }
+  
+  // 题型5：判断发音是否相同（5题）
+  const sameSoundPairs = [
+    { word1: 'cat', word2: 'hat', same: true, sound: '/æ/' },
+    { word1: 'dog', word2: 'hot', same: true, sound: '/ɒ/' },
+    { word1: 'see', word2: 'tea', same: true, sound: '/iː/' },
+    { word1: 'my', word2: 'time', same: true, sound: '/aɪ/' },
+    { word1: 'go', word2: 'home', same: true, sound: '/əʊ/' },
+  ];
+  
+  const diffSoundPairs = [
+    { word1: 'cat', word2: 'car', same: false, sound1: '/æ/', sound2: '/ɑː/' },
+    { word1: 'bed', word2: 'he', same: false, sound1: '/e/', sound2: '/iː/' },
+    { word1: 'sit', word2: 'like', same: false, sound1: '/ɪ/', sound2: '/aɪ/' },
+    { word1: 'hot', word2: 'go', same: false, sound1: '/ɒ/', sound2: '/əʊ/' },
+    { word1: 'cup', word2: 'use', same: false, sound1: '/ʌ/', sound2: '/juː/' },
+  ];
+  
+  const allPairs = [...sameSoundPairs, ...diffSoundPairs].sort(() => Math.random() - 0.5).slice(0, 5);
+  
+  for (const pair of allPairs) {
+    questions.push({
+      question: `"${pair.word1}" 和 "${pair.word2}" 中划线部分发音相同吗？`,
+      options: ['相同', '不同'],
+      answer: pair.same ? 0 : 1,
     });
   }
   
@@ -112,6 +161,34 @@ const generateExamPaper = (grade: number) => {
   const gradeNames: Record<number, string> = {
     1: '一年级', 2: '二年级', 3: '三年级', 4: '四年级', 5: '五年级',
   };
+  
+  // 找出划线部分发音不同的单词题目
+  const differentSoundQuestions = [
+    { words: ['c<u>a</u>t', 'h<u>a</u>t', 'c<u>a</u>r', 'm<u>a</u>p'], answer: 'c' },
+    { words: ['b<u>e</u>d', 'r<u>e</u>d', 'h<u>e</u>', 'p<u>e</u>n'], answer: 'c' },
+    { words: ['s<u>i</u>t', 'b<u>i</u>g', 'l<u>i</u>ke', 'h<u>i</u>t'], answer: 'c' },
+    { words: ['h<u>o</u>t', 'd<u>o</u>g', 'g<u>o</u>', 'n<u>o</u>t'], answer: 'c' },
+    { words: ['c<u>u</u>p', 'b<u>u</u>s', '<u>u</u>se', 'b<u>u</u>t'], answer: 'c' },
+    { words: ['h<u>ow</u>', 'n<u>ow</u>', 'g<u>o</u>', 'c<u>ow</u>'], answer: 'c' },
+    { words: ['t<u>ea</u>', 'r<u>ea</u>d', 'br<u>ea</u>d', 'e<u>ea</u>t'], answer: 'c' },
+    { words: ['f<u>oo</u>d', 'm<u>oo</u>n', 'b<u>oo</u>k', 't<u>oo</u>'], answer: 'c' },
+    { words: ['<u>th</u>ink', '<u>th</u>is', '<u>th</u>ree', '<u>th</u>ank'], answer: 'b' },
+    { words: ['<u>s</u>ee', '<u>s</u>it', '<u>sh</u>e', '<u>s</u>un'], answer: 'c' },
+  ];
+  
+  // 判断发音是否相同
+  const sameSoundQuestions = [
+    { word1: 'cat', word2: 'hat', answer: 'T' },
+    { word1: 'dog', word2: 'hot', answer: 'T' },
+    { word1: 'see', word2: 'tea', answer: 'T' },
+    { word1: 'my', word2: 'time', answer: 'T' },
+    { word1: 'go', word2: 'home', answer: 'T' },
+    { word1: 'cat', word2: 'car', answer: 'F' },
+    { word1: 'bed', word2: 'he', answer: 'F' },
+    { word1: 'sit', word2: 'like', answer: 'F' },
+    { word1: 'hot', word2: 'go', answer: 'F' },
+    { word1: 'cup', word2: 'use', answer: 'F' },
+  ];
   
   return `
 <!DOCTYPE html>
@@ -131,6 +208,8 @@ const generateExamPaper = (grade: number) => {
     table { width: 100%; border-collapse: collapse; margin: 10px 0; }
     th, td { border: 1px solid #333; padding: 8px; text-align: center; }
     .answer-section { margin-top: 50px; border-top: 2px solid #333; padding-top: 20px; page-break-before: always; }
+    .two-col { display: flex; gap: 40px; }
+    .two-col > div { flex: 1; }
   </style>
 </head>
 <body>
@@ -148,12 +227,7 @@ const generateExamPaper = (grade: number) => {
   </div>
   
   <div class="section">
-    <h2>二、看单词，写音标（每题2分，共20分）</h2>
-    ${vocabulary.slice(0, 10).map((v, i) => `<div class="question">${i + 1}. ${v.word} = <span class="blank"></span></div>`).join('\n    ')}
-  </div>
-  
-  <div class="section">
-    <h2>三、选择正确的音标（每题2分，共20分）</h2>
+    <h2>二、选择正确的音标（每题2分，共20分）</h2>
     ${vocabulary.slice(0, 10).map((v, i) => {
       const wrongPhonetic = vocabulary.filter(w => w.phonetic !== v.phonetic)[i % (vocabulary.length - 1)]?.phonetic || '/xxx/';
       const options = [v.phonetic, wrongPhonetic].sort(() => Math.random() - 0.5);
@@ -164,34 +238,48 @@ const generateExamPaper = (grade: number) => {
   </div>
   
   <div class="section">
-    <h2>四、连线题（每题2分，共20分）</h2>
-    <table>
-      <tr><th>单词</th><th>音标</th></tr>
-      ${vocabulary.slice(0, 5).map(v => `<tr><td>${v.word}</td><td>${v.phonetic}</td></tr>`).join('\n      ')}
-    </table>
+    <h2>三、找出划线部分发音不同的单词（每题2分，共20分）</h2>
+    ${differentSoundQuestions.map((q, i) => `<div class="question">${i + 1}. ${q.words.map((w, idx) => `${String.fromCharCode(97 + idx)}. ${w}`).join(' &nbsp; ')} ( )</div>`).join('\n    ')}
+  </div>
+  
+  <div class="section">
+    <h2>四、判断下列单词划线部分发音是否相同（每题2分，共20分）</h2>
+    <p>相同写 T，不同写 F</p>
+    ${sameSoundQuestions.map((q, i) => `<div class="question">${i + 1}. ${q.word1} 和 ${q.word2} ( )</div>`).join('\n    ')}
   </div>
   
   <div class="section">
     <h2>五、找出划线部分发音不同的单词（每题2分，共20分）</h2>
-    <div class="question">1. a. c<u>a</u>t &nbsp; b. h<u>a</u>t &nbsp; c. c<u>a</u>r &nbsp; d. m<u>a</u>p ( )</div>
-    <div class="question">2. a. b<u>e</u>d &nbsp; b. r<u>e</u>d &nbsp; c. h<u>e</u> &nbsp; d. p<u>e</u>n ( )</div>
-    <div class="question">3. a. s<u>i</u>t &nbsp; b. b<u>i</u>g &nbsp; c. l<u>i</u>ke &nbsp; d. h<u>i</u>t ( )</div>
-    <div class="question">4. a. h<u>o</u>t &nbsp; b. d<u>o</u>g &nbsp; c. g<u>o</u> &nbsp; d. n<u>o</u>t ( )</div>
-    <div class="question">5. a. c<u>u</u>p &nbsp; b. b<u>u</u>s &nbsp; c. <u>u</u>se &nbsp; d. b<u>u</u>t ( )</div>
+    <div class="two-col">
+      <div>
+        <div class="question">1. a. c<u>a</u>t &nbsp; b. h<u>a</u>t &nbsp; c. c<u>a</u>r &nbsp; d. m<u>a</u>p ( )</div>
+        <div class="question">2. a. b<u>e</u>d &nbsp; b. r<u>e</u>d &nbsp; c. h<u>e</u> &nbsp; d. p<u>e</u>n ( )</div>
+        <div class="question">3. a. s<u>i</u>t &nbsp; b. b<u>i</u>g &nbsp; c. l<u>i</u>ke &nbsp; d. h<u>i</u>t ( )</div>
+        <div class="question">4. a. h<u>o</u>t &nbsp; b. d<u>o</u>g &nbsp; c. g<u>o</u> &nbsp; d. n<u>o</u>t ( )</div>
+        <div class="question">5. a. c<u>u</u>p &nbsp; b. b<u>u</u>s &nbsp; c. <u>u</u>se &nbsp; d. b<u>u</u>t ( )</div>
+      </div>
+      <div>
+        <div class="question">6. a. h<u>ow</u> &nbsp; b. n<u>ow</u> &nbsp; c. g<u>o</u> &nbsp; d. c<u>ow</u> ( )</div>
+        <div class="question">7. a. t<u>ea</u> &nbsp; b. r<u>ea</u>d &nbsp; c. br<u>ea</u>d &nbsp; d. e<u>ea</u>t ( )</div>
+        <div class="question">8. a. f<u>oo</u>d &nbsp; b. m<u>oo</u>n &nbsp; c. b<u>oo</u>k &nbsp; d. t<u>oo</u> ( )</div>
+        <div class="question">9. a. <u>th</u>ink &nbsp; b. <u>th</u>is &nbsp; c. <u>th</u>ree &nbsp; d. <u>th</u>ank ( )</div>
+        <div class="question">10. a. <u>s</u>ee &nbsp; b. <u>s</u>it &nbsp; c. <u>sh</u>e &nbsp; d. <u>s</u>un ( )</div>
+      </div>
+    </div>
   </div>
   
   <div class="answer-section">
     <h2>参考答案</h2>
     <p><strong>一、看音标，写单词</strong></p>
     ${vocabulary.slice(0, 10).map((v, i) => `<p>${i + 1}. ${v.word}</p>`).join('\n    ')}
-    <p><strong>二、看单词，写音标</strong></p>
-    ${vocabulary.slice(0, 10).map((v, i) => `<p>${i + 1}. ${v.phonetic}</p>`).join('\n    ')}
-    <p><strong>三、选择正确的音标</strong></p>
+    <p><strong>二、选择正确的音标</strong></p>
     <p>根据单词选择对应的音标即可</p>
-    <p><strong>四、连线题</strong></p>
-    <p>将单词与对应音标连线</p>
+    <p><strong>三、找出划线部分发音不同的单词</strong></p>
+    ${differentSoundQuestions.map((q, i) => `<p>${i + 1}. ${q.answer}</p>`).join('\n    ')}
+    <p><strong>四、判断发音是否相同</strong></p>
+    ${sameSoundQuestions.map((q, i) => `<p>${i + 1}. ${q.answer}</p>`).join('\n    ')}
     <p><strong>五、找出划线部分发音不同的单词</strong></p>
-    <p>1. c  2. c  3. c  4. c  5. c</p>
+    <p>1. c  2. c  3. c  4. c  5. c  6. c  7. c  8. c  9. b  10. c</p>
   </div>
 </body>
 </html>`;
@@ -228,7 +316,6 @@ const PhoneticPracticePage: React.FC = () => {
 
   // 下载 PDF
   const handleDownloadPdf = () => {
-    // 创建新窗口打印为 PDF
     const printWindow = window.open('', '_blank');
     if (printWindow) {
       printWindow.document.write(examHtml);
@@ -374,7 +461,8 @@ const PhoneticPracticePage: React.FC = () => {
                       icon={<SoundOutlined />} 
                       onClick={(e) => {
                         e.stopPropagation();
-                        playSound(option.replace(/[\/\-ː]/g, ''));
+                        const cleanWord = option.replace(/[^a-zA-Z]/g, '');
+                        if (cleanWord) playSound(cleanWord);
                       }}
                       style={{ marginLeft: 8 }}
                     />
@@ -420,9 +508,16 @@ const PhoneticPracticePage: React.FC = () => {
           
           <div>
             <p style={{ color: '#666', marginBottom: 16 }}>
-              试卷内容包含：看音标写单词、看单词写音标、选择正确音标、连线题、发音辨别
+              试卷内容包含：
             </p>
-            <p style={{ color: '#999', fontSize: 12 }}>
+            <ul style={{ color: '#666', marginLeft: 20 }}>
+              <li>看音标写单词（20分）</li>
+              <li>选择正确的音标（20分）</li>
+              <li>找出划线部分发音不同的单词（20分）</li>
+              <li>判断发音是否相同（20分）</li>
+              <li>找出划线部分发音不同的单词 - 加强版（20分）</li>
+            </ul>
+            <p style={{ color: '#999', fontSize: 12, marginTop: 8 }}>
               词汇范围：限定为该年级教材词汇，不会超纲
             </p>
           </div>
