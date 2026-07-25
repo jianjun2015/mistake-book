@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tabs, Button, Space, Radio, message, Tag, Slider } from 'antd';
+import { Card, Tabs, Button, Space, Radio, message, Tag } from 'antd';
 import { SoundOutlined, CheckCircleOutlined, CloseCircleOutlined, PauseCircleOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 
@@ -66,27 +66,47 @@ const practiceQuestions = [
   { question: '/ʊə/ 对应的单词是？', options: ['ear', 'air', 'tour', 'day'], answer: 2 },
 ];
 
-// 选择最佳英文语音
-const getBestEnglishVoice = (): SpeechSynthesisVoice | null => {
-  const voices = window.speechSynthesis.getVoices();
-  
-  // 优先选择 Google English 系列
-  const googleEn = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en'));
-  if (googleEn) return googleEn;
-  
-  // 其次选择 Microsoft English 系列
-  const msEn = voices.find(v => v.name.includes('Microsoft') && v.lang.startsWith('en'));
-  if (msEn) return msEn;
-  
-  // 再选择任何美式英语
-  const usEn = voices.find(v => v.lang === 'en-US');
-  if (usEn) return usEn;
-  
-  // 最后选择任何英语
-  const anyEn = voices.find(v => v.lang.startsWith('en'));
-  if (anyEn) return anyEn;
-  
-  return null;
+// 全局音频对象，避免重复创建
+let currentAudio: HTMLAudioElement | null = null;
+
+// 使用有道 TTS API 播放发音
+const playSound = (word: string, onEnd?: () => void) => {
+  // 停止当前播放
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
+
+  // 创建音频
+  const audio = new Audio();
+  audio.src = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(word)}&type=1`;
+  currentAudio = audio;
+
+  audio.onended = () => {
+    currentAudio = null;
+    onEnd?.();
+  };
+
+  audio.onerror = () => {
+    currentAudio = null;
+    onEnd?.();
+    message.error('发音加载失败');
+  };
+
+  audio.play().catch(() => {
+    currentAudio = null;
+    onEnd?.();
+  });
+};
+
+// 停止播放
+const stopSound = () => {
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio.src = '';
+    currentAudio = null;
+  }
 };
 
 const PhoneticLearningPage: React.FC = () => {
@@ -97,25 +117,6 @@ const PhoneticLearningPage: React.FC = () => {
   const [showResult, setShowResult] = useState(false);
   const [score, setScore] = useState(0);
   const [playingWord, setPlayingWord] = useState<string | null>(null);
-  const [playbackRate, setPlaybackRate] = useState<number>(0.8);
-  const [voicesLoaded, setVoicesLoaded] = useState(false);
-
-  // 加载语音列表
-  useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        setVoicesLoaded(true);
-      }
-    };
-    
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-    
-    return () => {
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-  }, []);
 
   // 过滤英标
   const filteredPhonetics = selectedType === 'all' 
@@ -123,46 +124,20 @@ const PhoneticLearningPage: React.FC = () => {
     : phonetics.filter(p => p.type === selectedType);
 
   // 播放发音
-  const playSound = (word: string) => {
-    // 停止当前播放
-    window.speechSynthesis.cancel();
-    
-    setPlayingWord(word);
-
-    const utterance = new SpeechSynthesisUtterance(word);
-    
-    // 设置语音
-    const voice = getBestEnglishVoice();
-    if (voice) {
-      utterance.voice = voice;
+  const handlePlay = (word: string) => {
+    if (playingWord === word) {
+      stopSound();
+      setPlayingWord(null);
+    } else {
+      setPlayingWord(word);
+      playSound(word, () => setPlayingWord(null));
     }
-    
-    utterance.lang = 'en-US';
-    utterance.rate = playbackRate;
-    utterance.pitch = 1;
-    utterance.volume = 1;
-
-    utterance.onend = () => {
-      setPlayingWord(null);
-    };
-
-    utterance.onerror = () => {
-      setPlayingWord(null);
-    };
-
-    window.speechSynthesis.speak(utterance);
-  };
-
-  // 停止播放
-  const stopSound = () => {
-    window.speechSynthesis.cancel();
-    setPlayingWord(null);
   };
 
   // 组件卸载时停止播放
   useEffect(() => {
     return () => {
-      window.speechSynthesis.cancel();
+      stopSound();
     };
   }, []);
 
@@ -205,24 +180,12 @@ const PhoneticLearningPage: React.FC = () => {
   // 认识英标 Tab
   const learnTab = (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ marginBottom: 16 }}>
         <Space>
           <Button type={selectedType === 'all' ? 'primary' : 'default'} onClick={() => setSelectedType('all')}>全部</Button>
           <Button type={selectedType === '元音' ? 'primary' : 'default'} onClick={() => setSelectedType('元音')}>元音</Button>
           <Button type={selectedType === '双元音' ? 'primary' : 'default'} onClick={() => setSelectedType('双元音')}>双元音</Button>
           <Button type={selectedType === '辅音' ? 'primary' : 'default'} onClick={() => setSelectedType('辅音')}>辅音</Button>
-        </Space>
-        <Space>
-          <span>语速:</span>
-          <Slider
-            min={0.5}
-            max={1.5}
-            step={0.1}
-            value={playbackRate}
-            onChange={setPlaybackRate}
-            style={{ width: 120 }}
-          />
-          <span>{playbackRate}x</span>
         </Space>
       </div>
 
@@ -250,7 +213,7 @@ const PhoneticLearningPage: React.FC = () => {
               <Button 
                 type={playingWord === phonetic.word ? 'primary' : 'default'}
                 icon={playingWord === phonetic.word ? <PauseCircleOutlined /> : <SoundOutlined />} 
-                onClick={() => playingWord === phonetic.word ? stopSound() : playSound(phonetic.word)}
+                onClick={() => handlePlay(phonetic.word)}
                 style={{ minWidth: 40 }}
                 title={playingWord === phonetic.word ? '停止' : `播放: ${phonetic.word}`}
               />
@@ -327,7 +290,7 @@ const PhoneticLearningPage: React.FC = () => {
                       icon={<SoundOutlined />} 
                       onClick={(e) => {
                         e.stopPropagation();
-                        playSound(option);
+                        handlePlay(option);
                       }}
                       style={{ marginLeft: 8 }}
                     />
@@ -370,12 +333,6 @@ const PhoneticLearningPage: React.FC = () => {
     <MainLayout>
       <div style={{ padding: 24 }}>
         <h2 style={{ marginBottom: 24 }}>🔤 英标学习</h2>
-        
-        {!voicesLoaded && (
-          <div style={{ marginBottom: 16, padding: 8, background: '#fff7e6', borderRadius: 4, border: '1px solid #ffd591' }}>
-            ⚠️ 正在加载语音引擎，请稍候...
-          </div>
-        )}
         
         <Tabs
           activeKey={activeTab}
