@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Space, Tabs, Input, Empty, message } from 'antd';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import { gradeConfigs } from './config';
 import type { SubjectConfig } from './config';
@@ -94,11 +95,24 @@ const KnowledgeSummaryPage: React.FC = () => {
       children: (
         <div style={{ height: '70vh' }}>
           {selectedSubject.examFile ? (
-            <iframe
-              src={getTabUrl(selectedSubject.examFile)}
-              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
-              title="试卷"
-            />
+            <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+              <div style={{ marginBottom: 8, display: 'flex', justifyContent: 'flex-end' }}>
+                <Button 
+                  size="small"
+                  onClick={() => {
+                    const url = getTabUrl(selectedSubject.examFile!);
+                    window.open(url, '_blank');
+                  }}
+                >
+                  新窗口打开
+                </Button>
+              </div>
+              <iframe
+                src={getTabUrl(selectedSubject.examFile)}
+                style={{ flex: 1, width: '100%', border: 'none', borderRadius: '8px' }}
+                title="试卷"
+              />
+            </div>
           ) : (
             <div style={{ 
               height: '100%', 
@@ -147,7 +161,7 @@ const KnowledgeSummaryPage: React.FC = () => {
       <MainLayout>
         <div style={{ padding: 24 }}>
           <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Button onClick={handleBack}>← 返回</Button>
+            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
             <h2 style={{ margin: 0 }}>
               {selectedSubject.icon} {currentGrade?.name} {currentSemester?.name} - {selectedSubject.name}
             </h2>
