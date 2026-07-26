@@ -72,7 +72,6 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
       category: '工程问题',
       problems: [
         { title: '合作完成', content: '甲单独做需10天，乙单独做需15天，合作几天完成？', answer: '1÷(1/10+1/15)=6天' },
-        { title: '分段合作', content: '甲乙合作3天后，甲离开，乙单独做2天完成。甲需10天，乙需15天，共几天？', answer: '验证：(1/10+1/15)×3+1/15×2=1/2+1/5+2/15=1 ✓' },
       ]
     },
     {
@@ -206,6 +205,31 @@ const calculationProblems: Record<number, { category: string; problems: string[]
   ],
 };
 
+// 应用题库
+const applicationProblems: Record<number, { title: string; content: string; answer: string }[]> = {
+  3: [
+    { title: '购物问题', content: '小明买了3支铅笔，每支2元，又买了一个笔记本15元，一共花了多少钱？', answer: '3×2+15=6+15=21元' },
+    { title: '路程问题', content: '小红从家到学校要走15分钟，每分钟走60米，她家到学校有多远？', answer: '15×60=900米' },
+    { title: '倍数问题', content: '果园里有苹果树24棵，梨树是苹果树的3倍，果园一共有多少棵树？', answer: '24+24×3=24+72=96棵' },
+    { title: '平均数问题', content: '小明三次数学成绩分别是85分、92分、88分，平均每次考多少分？', answer: '(85+92+88)÷3=265÷3≈88.3分' },
+    { title: '剩余问题', content: '图书馆有故事书350本，借出128本，又还回来45本，现在有多少本？', answer: '350-128+45=267本' },
+  ],
+  4: [
+    { title: '购物问题', content: '书店促销，每本书原价25元，买4本送1本。小明要买5本书，最少花多少钱？', answer: '买4本送1本，4×25=100元' },
+    { title: '路程问题', content: '甲乙两地相距480千米，一辆汽车从甲地出发，每小时行80千米，几小时到达乙地？', answer: '480÷80=6小时' },
+    { title: '工程问题', content: '修一条路，甲队每天修120米，乙队每天修150米，两队合修8天，共修多少米？', answer: '(120+150)×8=270×8=2160米' },
+    { title: '面积问题', content: '一块长方形菜地，长25米，宽16米，如果每平方米收白菜8千克，共收多少千克？', answer: '25×16×8=400×8=3200千克' },
+    { title: '倍数问题', content: '学校图书馆有科技书480本，故事书是科技书的2倍多50本，故事书有多少本？', answer: '480×2+50=960+50=1010本' },
+  ],
+  5: [
+    { title: '购物问题', content: '商场打折，一件衣服原价350元，先打8折，再用优惠券减30元，最终多少钱？', answer: '350×0.8-30=280-30=250元' },
+    { title: '路程问题', content: '甲乙两车从相距360千米的两地同时出发相向而行，甲车每小时60千米，乙车每小时40千米，几小时相遇？', answer: '360÷(60+40)=360÷100=3.6小时' },
+    { title: '工程问题', content: '一项工程，甲单独做10天完成，乙单独做15天完成，两人合作几天完成？', answer: '1÷(1/10+1/15)=1÷(1/6)=6天' },
+    { title: '浓度问题', content: '有含盐20%的盐水300克，要变成含盐15%的盐水，需要加多少克水？', answer: '盐=300×20%=60克，新总量=60÷15%=400克，加水=400-300=100克' },
+    { title: '利润问题', content: '一件商品成本价120元，标价200元，打8折出售，利润率是多少？', answer: '售价=200×0.8=160元，利润率=(160-120)÷120×100%≈33.3%' },
+  ],
+};
+
 // 知识点概念
 const knowledgePoints: Record<number, { category: string; points: { title: string; content: string }[] }[]> = {
   3: [
@@ -274,8 +298,8 @@ const knowledgePoints: Record<number, { category: string; points: { title: strin
 const generateExamPaper = (grade: number) => {
   const gradeNames: Record<number, string> = { 3: '三年级', 4: '四年级', 5: '五年级' };
   const calcs = calculationProblems[grade] || [];
+  const apps = applicationProblems[grade] || [];
   const thinkings = thinkingProblems[grade] || [];
-  // knowledge points loaded inline
 
   return `
 <!DOCTYPE html>
@@ -305,23 +329,28 @@ const generateExamPaper = (grade: number) => {
   </div>
   
   <div class="section">
-    <h2>一、四则混合运算（每题5分，共40分）</h2>
-    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+    <h2>一、四则混合运算（每题3分，共24分）</h2>
+    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('\n    ') || ''}
   </div>
   
   <div class="section">
-    <h2>二、竖式计算（每题5分，共30分）</h2>
-    ${calcs[1]?.problems.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+    <h2>二、竖式计算（每题4分，共24分）</h2>
+    ${calcs[1]?.problems.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('\n    ') || ''}
   </div>
   
   <div class="section">
-    <h2>三、巧算（每题5分，共20分）</h2>
-    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+    <h2>三、巧算（每题4分，共16分）</h2>
+    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('\n    ') || ''}
   </div>
   
   <div class="section">
-    <h2>四、思维题（每题5分，共10分）</h2>
-    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+    <h2>四、应用题（每题6分，共30分）</h2>
+    ${apps.slice(0, 5).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || ''}
+  </div>
+  
+  <div class="section">
+    <h2>五、思维挑战（每题3分，共6分）</h2>
+    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || ''}
   </div>
   
   <div class="answer-section">
@@ -332,7 +361,9 @@ const generateExamPaper = (grade: number) => {
     <p>请自行验算</p>
     <p><strong>三、巧算</strong></p>
     ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<p>${i + 1}. ${p}</p>`).join('\n    ') || ''}
-    <p><strong>四、思维题</strong></p>
+    <p><strong>四、应用题</strong></p>
+    ${apps.slice(0, 5).map((p, i) => `<p>${i + 1}. ${p.answer}</p>`).join('\n    ') || ''}
+    <p><strong>五、思维挑战</strong></p>
     ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<p>${i + 1}. ${p.answer}</p>`).join('\n    ') || ''}
   </div>
 </body>
@@ -347,13 +378,11 @@ const MathSpecialPage: React.FC = () => {
   const [showExamModal, setShowExamModal] = useState(false);
   const [examHtml, setExamHtml] = useState('');
 
-  // 生成试卷
   const handleGenerateExam = () => {
     setExamHtml(generateExamPaper(grade));
     setShowExamModal(true);
   };
 
-  // 下载 PDF
   const handleDownloadPdf = () => {
     const printWindow = window.open('', '_blank');
     if (printWindow) {
@@ -376,7 +405,6 @@ const MathSpecialPage: React.FC = () => {
           </Select>
         </Space>
       </Card>
-
       <Collapse defaultActiveKey={['0']}>
         {(thinkingProblems[grade] || []).map((category, idx) => (
           <Panel header={`${category.category}（${category.problems.length}题）`} key={idx}>
@@ -384,9 +412,7 @@ const MathSpecialPage: React.FC = () => {
               <Card key={pIdx} size="small" style={{ marginBottom: 8 }}>
                 <h4>{problem.title}</h4>
                 <p style={{ color: '#333', margin: '8px 0' }}>{problem.content}</p>
-                <p style={{ color: '#52c41a', fontSize: 13 }}>
-                  <strong>答案：</strong>{problem.answer}
-                </p>
+                <p style={{ color: '#52c41a', fontSize: 13 }}><strong>答案：</strong>{problem.answer}</p>
               </Card>
             ))}
           </Panel>
@@ -408,7 +434,6 @@ const MathSpecialPage: React.FC = () => {
           </Select>
         </Space>
       </Card>
-
       {(calculationProblems[grade] || []).map((category, idx) => (
         <Card key={idx} title={category.category} style={{ marginBottom: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
@@ -436,7 +461,6 @@ const MathSpecialPage: React.FC = () => {
           </Select>
         </Space>
       </Card>
-
       {(knowledgePoints[grade] || []).map((category, idx) => (
         <Card key={idx} title={category.category} style={{ marginBottom: 16 }}>
           {category.points.map((point, pIdx) => (
@@ -467,10 +491,11 @@ const MathSpecialPage: React.FC = () => {
           <div>
             <p style={{ color: '#666', marginBottom: 16 }}>试卷内容包含：</p>
             <ul style={{ color: '#666', marginLeft: 20 }}>
-              <li>四则混合运算（40分）</li>
-              <li>竖式计算（30分）</li>
-              <li>巧算（20分）</li>
-              <li>思维题（10分）</li>
+              <li>四则混合运算（24分）</li>
+              <li>竖式计算（24分）</li>
+              <li>巧算（16分）</li>
+              <li>应用题（30分）</li>
+              <li>思维挑战（6分）</li>
             </ul>
           </div>
           <Space>
