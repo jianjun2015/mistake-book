@@ -151,16 +151,16 @@ const generateCalculationProblems = (grade: number) => {
   }
   problems.push({ category: '四则混合运算', items: shuffle(mixProblems) });
 
-  // 竖式计算 - 12题
+  // 竖式计算 - 12题（乘除都是两位数）
   const verticalProblems: string[] = [];
   for (let i = 0; i < 12; i++) {
     const type = randInt(1, 3);
     if (grade === 3) {
-      if (type === 1) verticalProblems.push(`${randInt(10, 99)} × ${randInt(2, 9)} =`);
-      else if (type === 2) verticalProblems.push(`${randInt(100, 999)} ÷ ${randInt(2, 9)} =`);
+      if (type === 1) verticalProblems.push(`${randInt(10, 99)} × ${randInt(10, 99)} =`);
+      else if (type === 2) verticalProblems.push(`${randInt(100, 999)} ÷ ${randInt(10, 99)} =`);
       else verticalProblems.push(`${randInt(100, 999)} + ${randInt(100, 999)} =`);
     } else if (grade === 4) {
-      if (type === 1) verticalProblems.push(`${randInt(1000, 9999)} × ${randInt(10, 99)} =`);
+      if (type === 1) verticalProblems.push(`${randInt(100, 999)} × ${randInt(10, 99)} =`);
       else if (type === 2) verticalProblems.push(`${randInt(1000, 9999)} ÷ ${randInt(10, 99)} =`);
       else verticalProblems.push(`${randInt(1000, 9999)} + ${randInt(1000, 9999)} =`);
     } else {
