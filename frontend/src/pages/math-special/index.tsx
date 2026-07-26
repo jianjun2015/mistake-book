@@ -15,22 +15,22 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
         { title: '图形规律', content: '○△□○△□○__□，空格应填什么？', answer: '△' },
         { title: '数字规律', content: '1, 4, 9, 16, __, __', answer: '25, 36（平方数）' },
         { title: '递增规律', content: '1, 2, 4, 7, 11, __', answer: '16（差值递增：1,2,3,4,5）' },
-        { title: '交替规律', content: '2, 5, 3, 6, 4, 7, __, __', answer: '5, 8（奇数位+1，偶数位+1）' },
+        { title: '交替规律', content: '2, 5, 3, 6, 4, 7, __, __', answer: '5, 8' },
       ]
     },
     {
       category: '和差问题',
       problems: [
         { title: '基本和差', content: '两数之和是20，差是4，求这两个数。', answer: '大数=(20+4)÷2=12，小数=(20-4)÷2=8' },
-        { title: '应用题', content: '小明和小红共有45元，小明比小红多5元，各有多少元？', answer: '小明=(45+5)÷2=25元，小红=(45-5)÷2=20元' },
-        { title: '三人和差', content: '甲乙丙三人共有60元，甲比乙多5元，乙比丙多5元，各有多少元？', answer: '乙=60÷3=20元，甲=25元，丙=15元' },
+        { title: '应用题', content: '小明和小红共有45元，小明比小红多5元，各有多少元？', answer: '小明=25元，小红=20元' },
+        { title: '三人和差', content: '甲乙丙三人共有60元，甲比乙多5元，乙比丙多5元，各有多少元？', answer: '乙=20元，甲=25元，丙=15元' },
       ]
     },
     {
       category: '年龄问题',
       problems: [
         { title: '年龄差不变', content: '哥哥今年15岁，弟弟今年10岁，几年后两人年龄之和是45岁？', answer: '(45-15-10)÷2=10年后' },
-        { title: '年龄倍数', content: '爸爸今年40岁，儿子今年10岁，几年前爸爸是儿子的5倍？', answer: '(40-10)÷(5-1)=7.5，40-7.5=32.5，约7年前' },
+        { title: '年龄倍数', content: '爸爸今年40岁，儿子今年10岁，几年前爸爸是儿子的5倍？', answer: '约7年前' },
       ]
     },
     {
@@ -44,8 +44,8 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
     {
       category: '等量代换',
       problems: [
-        { title: '图形代换', content: '○+○+△=25，○+△=15，求○和△各是多少？', answer: '○=25-15=10，△=15-10=5' },
-        { title: '动物代换', content: '2只鸡=1只兔，3只兔=1只羊，1只羊=几只鸡？', answer: '1只羊=3只兔=3×2=6只鸡' },
+        { title: '图形代换', content: '○+○+△=25，○+△=15，求○和△各是多少？', answer: '○=10，△=5' },
+        { title: '动物代换', content: '2只鸡=1只兔，3只兔=1只羊，1只羊=几只鸡？', answer: '1只羊=3只兔=6只鸡' },
       ]
     },
     {
@@ -55,43 +55,71 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
         { title: '从前往后', content: '小红从前往后数第6个，从后往前数第8个，共有几人？', answer: '6+8-1=13人' },
       ]
     },
+    {
+      category: '图形计数',
+      problems: [
+        { title: '线段计数', content: '一条线段上有3个点（不含端点），共有多少条线段？', answer: '5+4+3+2+1=15条' },
+        { title: '三角形计数', content: '一个三角形内部有2条从顶点出发的线，共形成多少个三角形？', answer: '3个' },
+      ]
+    },
+    {
+      category: '时间问题',
+      problems: [
+        { title: '钟表问题', content: '3点整时，时针和分针的夹角是多少度？', answer: '90度' },
+        { title: '经过时间', content: '从上午8:30到下午2:15，经过了多长时间？', answer: '5小时45分钟' },
+      ]
+    },
   ],
   4: [
     {
       category: '鸡兔同笼',
       problems: [
-        { title: '基本鸡兔同笼', content: '鸡和兔共20只，脚共56只，鸡兔各几只？', answer: '兔=(56-20×2)÷(4-2)=8只，鸡=20-8=12只' },
-        { title: '变式题', content: '5元和10元的纸币共8张，共60元，各几张？', answer: '10元=(60-5×8)÷(10-5)=4张，5元=8-4=4张' },
-        { title: '三轮车', content: '三轮车和轿车共10辆，轮子共34个，各有几辆？', answer: '轿车=(34-10×3)÷(4-3)=4辆，三轮车=10-4=6辆' },
+        { title: '基本鸡兔同笼', content: '鸡和兔共20只，脚共56只，鸡兔各几只？', answer: '兔=8只，鸡=12只' },
+        { title: '变式题', content: '5元和10元的纸币共8张，共60元，各几张？', answer: '10元=4张，5元=4张' },
+        { title: '三轮车', content: '三轮车和轿车共10辆，轮子共34个，各有几辆？', answer: '轿车=4辆，三轮车=6辆' },
       ]
     },
     {
       category: '盈亏问题',
       problems: [
-        { title: '一盈一亏', content: '小朋友分苹果，每人分5个剩3个，每人分6个少2个，几个小朋友？几个苹果？', answer: '人数=(3+2)÷(6-5)=5人，苹果=5×5+3=28个' },
-        { title: '双盈', content: '小朋友分糖，每人分8颗剩10颗，每人分10颗剩2颗，几人？几颗糖？', answer: '人数=(10-2)÷(10-8)=4人，糖=4×8+10=42颗' },
+        { title: '一盈一亏', content: '小朋友分苹果，每人分5个剩3个，每人分6个少2个，几个小朋友？', answer: '人数=5人，苹果=28个' },
+        { title: '双盈', content: '小朋友分糖，每人分8颗剩10颗，每人分10颗剩2颗，几人？', answer: '人数=4人，糖=42颗' },
       ]
     },
     {
       category: '行程问题',
       problems: [
-        { title: '相遇问题', content: '甲乙两地相距240km，甲车每小时60km，乙车每小时40km，相向而行，几小时相遇？', answer: '240÷(60+40)=2.4小时' },
-        { title: '追及问题', content: '甲每小时走5km，乙每小时走3km，乙先走2小时，甲几小时追上乙？', answer: '3×2÷(5-3)=3小时' },
-        { title: '往返问题', content: '去时每小时60km，回来每小时40km，求平均速度。', answer: '2÷(1/60+1/40)=48km/h' },
+        { title: '相遇问题', content: '甲乙两地相距240km，甲车每小时60km，乙车每小时40km，几小时相遇？', answer: '2.4小时' },
+        { title: '追及问题', content: '甲每小时走5km，乙每小时走3km，乙先走2小时，甲几小时追上？', answer: '3小时' },
+        { title: '往返问题', content: '去时每小时60km，回来每小时40km，求平均速度。', answer: '48km/h' },
       ]
     },
     {
       category: '周期问题',
       problems: [
-        { title: '星期问题', content: '今天是星期三，100天后是星期几？', answer: '100÷7=14...2，星期三+2=星期五' },
-        { title: '彩旗问题', content: '按红黄蓝绿顺序排列，第50面是什么颜色？', answer: '50÷4=12...2，第2面是黄色' },
+        { title: '星期问题', content: '今天是星期三，100天后是星期几？', answer: '星期五' },
+        { title: '彩旗问题', content: '按红黄蓝绿顺序排列，第50面是什么颜色？', answer: '黄色' },
       ]
     },
     {
       category: '逻辑推理',
       problems: [
-        { title: '真假判断', content: '甲说："乙在说谎"，乙说："丙在说谎"，丙说："甲和乙都在说谎"。谁在说真话？', answer: '乙说真话。假设乙说真话→丙说谎→甲和乙不都说谎→甲说谎→乙说真话 ✓' },
-        { title: '排名问题', content: '甲比乙高，丙比丁矮，乙比丙高，丁比甲高。谁最高？', answer: '丁最高（丁>甲>乙>丙）' },
+        { title: '真假判断', content: '甲说乙在说谎，乙说丙在说谎，丙说甲和乙都在说谎。谁说真话？', answer: '乙说真话' },
+        { title: '排名问题', content: '甲比乙高，丙比丁矮，乙比丙高，丁比甲高。谁最高？', answer: '丁最高' },
+      ]
+    },
+    {
+      category: '数阵图',
+      problems: [
+        { title: '三阶幻方', content: '将1-9填入3×3方格，使每行每列对角线之和相等，和是多少？', answer: '15' },
+        { title: '数字填空', content: '在○中填入1-6，使每条线上三个数之和相等。', answer: '每条线和为12' },
+      ]
+    },
+    {
+      category: '枚举法',
+      problems: [
+        { title: '搭配问题', content: '3件上衣，4条裤子，有几种搭配方式？', answer: '3×4=12种' },
+        { title: '路线问题', content: '从A到B有3条路，从B到C有2条路，从A经B到C有几种走法？', answer: '3×2=6种' },
       ]
     },
   ],
@@ -99,38 +127,52 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
     {
       category: '工程问题',
       problems: [
-        { title: '合作完成', content: '甲单独做需10天，乙单独做需15天，合作几天完成？', answer: '1÷(1/10+1/15)=6天' },
-        { title: '分段合作', content: '甲乙合作3天后甲离开，乙单独做2天完成。甲需10天，乙需15天，验证。', answer: '(1/10+1/15)×3+1/15×2=1/2+1/5+2/15=1 ✓' },
+        { title: '合作完成', content: '甲单独做需10天，乙单独做需15天，合作几天完成？', answer: '6天' },
+        { title: '分段合作', content: '甲乙合作3天后甲离开，乙单独做2天完成。验证。', answer: '(1/10+1/15)×3+1/15×2=1 ✓' },
       ]
     },
     {
       category: '浓度问题',
       problems: [
-        { title: '稀释问题', content: '200克含盐10%的盐水，加入多少水后变成含盐5%？', answer: '盐=200×10%=20克，新总量=20÷5%=400克，加水=200克' },
-        { title: '混合问题', content: '20%盐水100克和10%盐水200克混合，浓度多少？', answer: '盐=100×20%+200×10%=40克，浓度=40÷300≈13.3%' },
+        { title: '稀释问题', content: '200克含盐10%的盐水，加多少水后变成5%？', answer: '加水200克' },
+        { title: '混合问题', content: '20%盐水100克和10%盐水200克混合，浓度多少？', answer: '约13.3%' },
       ]
     },
     {
       category: '利润问题',
       problems: [
-        { title: '基本利润', content: '成本100元，售价150元，利润率是多少？', answer: '(150-100)÷100×100%=50%' },
-        { title: '打折问题', content: '商品标价200元，打8折后再打9折，最终价格？', answer: '200×0.8×0.9=144元' },
-        { title: '亏本问题', content: '商品打7折出售亏24元，打9折赚16元，成本多少？', answer: '标价=(24+16)÷(0.9-0.7)=200元，成本=200×0.7+24=164元' },
+        { title: '基本利润', content: '成本100元，售价150元，利润率是多少？', answer: '50%' },
+        { title: '打折问题', content: '商品标价200元，打8折后再打9折，最终价格？', answer: '144元' },
+        { title: '亏本问题', content: '打7折亏24元，打9折赚16元，成本多少？', answer: '成本=164元' },
       ]
     },
     {
       category: '几何面积',
       problems: [
-        { title: '组合图形', content: '正方形边长10cm，内部有一个最大的圆，圆的面积是多少？', answer: '半径=10÷2=5cm，面积=π×5²=78.5cm²' },
-        { title: '阴影面积', content: '长方形长8cm宽6cm，内部有一个最大半圆，半圆面积？', answer: '半径=6÷2=3cm，面积=π×3²÷2=14.13cm²' },
+        { title: '组合图形', content: '正方形边长10cm，内部最大圆的面积？', answer: '78.5cm²' },
+        { title: '阴影面积', content: '长方形长8cm宽6cm，内部最大半圆面积？', answer: '14.13cm²' },
       ]
     },
     {
       category: '数论问题',
       problems: [
-        { title: '最大公因数', content: '求48和36的最大公因数。', answer: '48=2⁴×3，36=2²×3²，最大公因数=2²×3=12' },
-        { title: '最小公倍数', content: '求6和8的最小公倍数。', answer: '6=2×3，8=2³，最小公倍数=2³×3=24' },
-        { title: '奇偶性', content: '1+2+3+...+100的和是奇数还是偶数？', answer: '(1+100)×100÷2=5050，是偶数' },
+        { title: '最大公因数', content: '求48和36的最大公因数。', answer: '12' },
+        { title: '最小公倍数', content: '求6和8的最小公倍数。', answer: '24' },
+        { title: '奇偶性', content: '1+2+3+...+100的和是奇数还是偶数？', answer: '偶数（5050）' },
+      ]
+    },
+    {
+      category: '比例问题',
+      problems: [
+        { title: '比例分配', content: '甲乙丙按2:3:5分配150元，各得多少？', answer: '甲=30，乙=45，丙=75' },
+        { title: '正反比例', content: '速度一定，路程和时间成什么比例？', answer: '正比例' },
+      ]
+    },
+    {
+      category: '优化问题',
+      problems: [
+        { title: '烙饼问题', content: '锅里每次最多烙2张饼，每面3分钟，烙3张饼最少几分钟？', answer: '9分钟' },
+        { title: '排队问题', content: '甲乙丙三人打水，用时分别为1、3、5分钟，怎样安排等待时间最短？', answer: '甲→乙→丙，总等待=1×3+3×2+5×1=14分钟' },
       ]
     },
   ],
@@ -139,70 +181,19 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
 // ==================== 计算题库 ====================
 const calculationProblems: Record<number, { category: string; problems: string[] }[]> = {
   3: [
-    {
-      category: '四则混合运算',
-      problems: [
-        '125 + 375 × 2 =', '(240 - 180) ÷ 4 =', '36 × 5 + 120 ÷ 4 =', '1000 - 365 - 235 =',
-        '25 × 4 × 8 =', '720 ÷ 8 ÷ 9 =', '45 + 55 × 3 =', '(100 - 64) × 15 =',
-      ]
-    },
-    {
-      category: '竖式计算',
-      problems: ['345 × 6 =', '1568 ÷ 4 =', '456 + 789 =', '1000 - 456 =', '234 × 12 =', '567 ÷ 3 =']
-    },
-    {
-      category: '巧算',
-      problems: [
-        '99 × 7 = (100-1)×7 = 700-7 = 693',
-        '25 × 36 = 25 × 4 × 9 = 100 × 9 = 900',
-        '125 × 8 = 1000',
-        '37 × 3 × 9 = 37 × 27 = 999',
-      ]
-    },
+    { category: '四则混合运算', problems: ['125 + 375 × 2 =', '(240 - 180) ÷ 4 =', '36 × 5 + 120 ÷ 4 =', '1000 - 365 - 235 =', '25 × 4 × 8 =', '720 ÷ 8 ÷ 9 =', '45 + 55 × 3 =', '(100 - 64) × 15 ='] },
+    { category: '竖式计算', problems: ['345 × 6 =', '1568 ÷ 4 =', '456 + 789 =', '1000 - 456 =', '234 × 12 =', '567 ÷ 3 ='] },
+    { category: '巧算', problems: ['99 × 7 = (100-1)×7 = 693', '25 × 36 = 25 × 4 × 9 = 900', '125 × 8 = 1000', '37 × 3 × 9 = 999'] },
   ],
   4: [
-    {
-      category: '四则混合运算',
-      problems: [
-        '1200 - (350 + 150) × 2 =', '48 × 25 + 52 × 25 =', '(125 + 75) × 8 =', '1000 ÷ 125 × 8 =',
-        '360 ÷ (12 + 6) × 5 =', '25 × 17 × 4 =', '810 ÷ 45 + 190 ÷ 19 =', '(500 - 375) × (200 - 165) =',
-      ]
-    },
-    {
-      category: '竖式计算',
-      problems: ['4567 × 23 =', '9876 ÷ 34 =', '5678 + 4321 =', '10000 - 6789 =', '1234 × 56 =', '8765 ÷ 45 =']
-    },
-    {
-      category: '巧算',
-      problems: [
-        '999 × 6 = (1000-1)×6 = 6000-6 = 5994',
-        '25 × 44 = 25 × 4 × 11 = 100 × 11 = 1100',
-        '125 × 32 = 125 × 8 × 4 = 1000 × 4 = 4000',
-        '99 × 99 = (100-1)×99 = 9900-99 = 9801',
-      ]
-    },
+    { category: '四则混合运算', problems: ['1200 - (350 + 150) × 2 =', '48 × 25 + 52 × 25 =', '(125 + 75) × 8 =', '1000 ÷ 125 × 8 =', '360 ÷ (12 + 6) × 5 =', '25 × 17 × 4 =', '810 ÷ 45 + 190 ÷ 19 =', '(500 - 375) × (200 - 165) ='] },
+    { category: '竖式计算', problems: ['4567 × 23 =', '9876 ÷ 34 =', '5678 + 4321 =', '10000 - 6789 =', '1234 × 56 =', '8765 ÷ 45 ='] },
+    { category: '巧算', problems: ['999 × 6 = 5994', '25 × 44 = 1100', '125 × 32 = 4000', '99 × 99 = 9801'] },
   ],
   5: [
-    {
-      category: '四则混合运算',
-      problems: [
-        '(3.5 + 2.5) × (7.2 - 4.8) =', '15.6 ÷ 0.3 - 2.5 × 4 =', '(1 - 0.8) × (2.5 + 1.5) =', '0.75 × 4 + 0.25 × 4 =',
-        '3.2 × 2.5 + 6.8 × 2.5 =', '(8.4 - 2.8) ÷ 0.7 =', '1.25 × 3.2 × 0.25 =', '7.8 × 101 - 7.8 =',
-      ]
-    },
-    {
-      category: '竖式计算',
-      problems: ['3.14 × 2.5 =', '12.56 ÷ 3.14 =', '45.6 + 78.9 =', '100 - 45.67 =', '2.5 × 4.8 =', '78.5 ÷ 3.14 =']
-    },
-    {
-      category: '巧算',
-      problems: [
-        '9.9 × 7 = (10-0.1)×7 = 70-0.7 = 69.3',
-        '2.5 × 4.4 = 2.5 × 4 × 1.1 = 10 × 1.1 = 11',
-        '12.5 × 32 = 12.5 × 8 × 4 = 100 × 4 = 400',
-        '0.99 × 101 = (1-0.01)×101 = 101-1.01 = 99.99',
-      ]
-    },
+    { category: '四则混合运算', problems: ['(3.5 + 2.5) × (7.2 - 4.8) =', '15.6 ÷ 0.3 - 2.5 × 4 =', '(1 - 0.8) × (2.5 + 1.5) =', '0.75 × 4 + 0.25 × 4 =', '3.2 × 2.5 + 6.8 × 2.5 =', '(8.4 - 2.8) ÷ 0.7 =', '1.25 × 3.2 × 0.25 =', '7.8 × 101 - 7.8 ='] },
+    { category: '竖式计算', problems: ['3.14 × 2.5 =', '12.56 ÷ 3.14 =', '45.6 + 78.9 =', '100 - 45.67 =', '2.5 × 4.8 =', '78.5 ÷ 3.14 ='] },
+    { category: '巧算', problems: ['9.9 × 7 = 69.3', '2.5 × 4.4 = 11', '12.5 × 32 = 400', '0.99 × 101 = 99.99'] },
   ],
 };
 
@@ -216,18 +207,18 @@ const applicationProblems: Record<number, { title: string; content: string; answ
     { title: '剩余问题', content: '图书馆有故事书350本，借出128本，又还回来45本，现在有多少本？', answer: '350-128+45=267本' },
   ],
   4: [
-    { title: '购物问题', content: '书店促销，每本书原价25元，买4本送1本。小明要买5本书，最少花多少钱？', answer: '买4本送1本，4×25=100元' },
-    { title: '路程问题', content: '甲乙两地相距480千米，一辆汽车从甲地出发，每小时行80千米，几小时到达乙地？', answer: '480÷80=6小时' },
+    { title: '购物问题', content: '书店促销，每本书原价25元，买4本送1本。小明要买5本书，最少花多少钱？', answer: '4×25=100元' },
+    { title: '路程问题', content: '甲乙两地相距480千米，一辆汽车每小时行80千米，几小时到达？', answer: '480÷80=6小时' },
     { title: '工程问题', content: '修一条路，甲队每天修120米，乙队每天修150米，两队合修8天，共修多少米？', answer: '(120+150)×8=2160米' },
-    { title: '面积问题', content: '一块长方形菜地，长25米，宽16米，如果每平方米收白菜8千克，共收多少千克？', answer: '25×16×8=3200千克' },
+    { title: '面积问题', content: '一块长方形菜地，长25米，宽16米，每平方米收白菜8千克，共收多少千克？', answer: '25×16×8=3200千克' },
     { title: '倍数问题', content: '学校图书馆有科技书480本，故事书是科技书的2倍多50本，故事书有多少本？', answer: '480×2+50=1010本' },
   ],
   5: [
     { title: '购物问题', content: '商场打折，一件衣服原价350元，先打8折，再用优惠券减30元，最终多少钱？', answer: '350×0.8-30=250元' },
-    { title: '路程问题', content: '甲乙两车从相距360千米的两地同时出发相向而行，甲车每小时60千米，乙车每小时40千米，几小时相遇？', answer: '360÷(60+40)=3.6小时' },
+    { title: '路程问题', content: '甲乙两车从相距360千米的两地同时出发相向而行，甲车60km/h，乙车40km/h，几小时相遇？', answer: '360÷(60+40)=3.6小时' },
     { title: '工程问题', content: '一项工程，甲单独做10天完成，乙单独做15天完成，两人合作几天完成？', answer: '1÷(1/10+1/15)=6天' },
-    { title: '浓度问题', content: '有含盐20%的盐水300克，要变成含盐15%的盐水，需要加多少克水？', answer: '盐=300×20%=60克，新总量=60÷15%=400克，加水=100克' },
-    { title: '利润问题', content: '一件商品成本价120元，标价200元，打8折出售，利润率是多少？', answer: '售价=160元，利润率=(160-120)÷120×100%≈33.3%' },
+    { title: '浓度问题', content: '有含盐20%的盐水300克，要变成含盐15%的盐水，需要加多少克水？', answer: '盐=60克，新总量=400克，加水=100克' },
+    { title: '利润问题', content: '一件商品成本价120元，标价200元，打8折出售，利润率是多少？', answer: '售价=160元，利润率≈33.3%' },
   ],
 };
 
@@ -235,37 +226,33 @@ const applicationProblems: Record<number, { title: string; content: string; answ
 const knowledgePoints: Record<number, { category: string; points: { title: string; content: string }[] }[]> = {
   3: [
     { category: '数与代数', points: [
-      { title: '万以内数的认识', content: '认识万以内的数，理解数位顺序：个位、十位、百位、千位、万位' },
-      { title: '两位数乘一位数', content: '从个位乘起，满十进一。如 24×3=72' },
-      { title: '两位数除以一位数', content: '从高位除起，余数比除数小。如 96÷4=24' },
-      { title: '分数的初步认识', content: '把一个整体平均分成若干份，取其中一份或几份' },
+      { title: '万以内数的认识', content: '认识万以内的数，理解数位顺序' },
+      { title: '两位数乘一位数', content: '从个位乘起，满十进一' },
+      { title: '两位数除以一位数', content: '从高位除起，余数比除数小' },
+      { title: '分数的初步认识', content: '把一个整体平均分成若干份' },
     ]},
     { category: '图形与几何', points: [
       { title: '长方形和正方形', content: '长方形面积=长×宽，正方形面积=边长×边长' },
-      { title: '周长与面积', content: '周长是围成图形的线段总长度，面积是图形的大小' },
-    ]},
-    { category: '统计与概率', points: [
-      { title: '统计表', content: '能看懂简单的统计表，理解表头、数据的含义' },
-      { title: '平均数', content: '平均数 = 总数量 ÷ 总份数' },
+      { title: '周长与面积', content: '周长是线段总长度，面积是图形大小' },
     ]},
   ],
   4: [
     { category: '数与代数', points: [
-      { title: '大数的认识', content: '认识亿以内的数，掌握数位顺序表' },
+      { title: '大数的认识', content: '认识亿以内的数' },
       { title: '三位数乘两位数', content: '先乘个位，再乘十位，最后相加' },
-      { title: '小数的初步认识', content: '小数是十进制分数的另一种表示形式，如0.5=1/2' },
-      { title: '运算律', content: '加法交换律：a+b=b+a；乘法交换律：a×b=b×a' },
+      { title: '小数的初步认识', content: '小数是十进制分数的另一种表示形式' },
+      { title: '运算律', content: '加法交换律、乘法交换律' },
     ]},
     { category: '图形与几何', points: [
-      { title: '角的度量', content: '认识锐角、直角、钝角、平角、周角' },
+      { title: '角的度量', content: '锐角、直角、钝角、平角、周角' },
       { title: '平行与垂直', content: '平行线永不相交，垂直线相交成90°' },
     ]},
   ],
   5: [
     { category: '数与代数', points: [
-      { title: '小数乘除法', content: '小数乘法：先按整数算，再点小数点；小数除法：移动小数点变成整数再除' },
-      { title: '分数加减法', content: '同分母：分母不变，分子相加减；异分母：先通分再计算' },
-      { title: '方程', content: '含有未知数的等式叫方程，如 2x+3=7' },
+      { title: '小数乘除法', content: '先按整数算，再点小数点' },
+      { title: '分数加减法', content: '同分母：分母不变；异分母：先通分' },
+      { title: '方程', content: '含有未知数的等式叫方程' },
     ]},
     { category: '图形与几何', points: [
       { title: '多边形面积', content: '三角形面积=底×高÷2；梯形面积=(上底+下底)×高÷2' },
@@ -281,72 +268,36 @@ const generateExamPaper = (grade: number) => {
   const apps = applicationProblems[grade] || [];
   const thinkings = thinkingProblems[grade] || [];
 
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>${gradeNames[grade]}数学专项试卷</title>
-  <style>
-    body { font-family: 'SimSun', serif; padding: 40px; line-height: 2; }
-    h1 { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
-    .info { display: flex; justify-content: space-between; margin: 20px 0; }
-    .section { margin: 30px 0; }
-    .section h2 { border-bottom: 1px solid #666; padding-bottom: 5px; }
-    .question { margin: 15px 0; }
-    .blank { display: inline-block; width: 150px; border-bottom: 1px solid #333; }
-    .answer-area { min-height: 80px; border: 1px dashed #ccc; padding: 10px; margin: 10px 0; }
-    .answer-section { margin-top: 50px; border-top: 2px solid #333; padding-top: 20px; page-break-before: always; }
-  </style>
-</head>
-<body>
-  <h1>${gradeNames[grade]}数学专项试卷</h1>
-  <div class="info">
-    <span>姓名：_____________</span>
-    <span>班级：_____________</span>
-    <span>日期：_____________</span>
-    <span>得分：_____________</span>
-  </div>
-  
-  <div class="section">
-    <h2>一、四则混合运算（每题3分，共24分）</h2>
-    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('\n    ') || ''}
-  </div>
-  
-  <div class="section">
-    <h2>二、竖式计算（每题4分，共24分）</h2>
-    ${calcs[1]?.problems.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('\n    ') || ''}
-  </div>
-  
-  <div class="section">
-    <h2>三、巧算（每题4分，共16分）</h2>
-    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('\n    ') || ''}
-  </div>
-  
-  <div class="section">
-    <h2>四、应用题（每题6分，共30分）</h2>
-    ${apps.slice(0, 5).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || ''}
-  </div>
-  
-  <div class="section">
-    <h2>五、思维挑战（每题3分，共6分）</h2>
-    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || ''}
-  </div>
-  
-  <div class="answer-section">
-    <h2>参考答案</h2>
-    <p><strong>一、四则混合运算</strong></p>
-    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<p>${i + 1}. ${p.includes('=') ? p.split('=')[1]?.trim() : ''}</p>`).join('')}
-    <p><strong>二、竖式计算</strong></p><p>请自行验算</p>
-    <p><strong>三、巧算</strong></p>
-    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<p>${i + 1}. ${p}</p>`).join('')}
-    <p><strong>四、应用题</strong></p>
-    ${apps.slice(0, 5).map((p, i) => `<p>${i + 1}. ${p.answer}</p>`).join('')}
-    <p><strong>五、思维挑战</strong></p>
-    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<p>${i + 1}. ${p.answer}</p>`).join('')}
-  </div>
-</body>
-</html>`;
+  return `<!DOCTYPE html>
+<html><head><meta charset="UTF-8"><title>${gradeNames[grade]}数学专项试卷</title>
+<style>
+body{font-family:'SimSun',serif;padding:40px;line-height:2}
+h1{text-align:center;border-bottom:2px solid #333;padding-bottom:10px}
+.info{display:flex;justify-content:space-between;margin:20px 0}
+.section{margin:30px 0}.section h2{border-bottom:1px solid #666;padding-bottom:5px}
+.question{margin:15px 0}.blank{display:inline-block;width:150px;border-bottom:1px solid #333}
+.answer-area{min-height:80px;border:1px dashed #ccc;padding:10px;margin:10px 0}
+.answer-section{margin-top:50px;border-top:2px solid #333;padding-top:20px;page-break-before:always}
+</style></head><body>
+<h1>${gradeNames[grade]}数学专项试卷</h1>
+<div class="info"><span>姓名：_____________</span><span>班级：_____________</span><span>日期：_____________</span><span>得分：_____________</span></div>
+<div class="section"><h2>一、四则混合运算（每题3分，共24分）</h2>
+${calcs[0]?.problems.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('') || ''}</div>
+<div class="section"><h2>二、竖式计算（每题4分，共24分）</h2>
+${calcs[1]?.problems.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('') || ''}</div>
+<div class="section"><h2>三、巧算（每题4分，共16分）</h2>
+${calcs[2]?.problems.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('') || ''}</div>
+<div class="section"><h2>四、应用题（每题6分，共30分）</h2>
+${apps.slice(0, 5).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('') || ''}</div>
+<div class="section"><h2>五、思维挑战（每题3分，共6分）</h2>
+${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('') || ''}</div>
+<div class="answer-section"><h2>参考答案</h2>
+<p><strong>一、</strong>${calcs[0]?.problems.slice(0, 8).map((p, i) => `${i+1}.${p.includes('=')?p.split('=')[1]?.trim():''}`).join('，')}</p>
+<p><strong>二、</strong>请自行验算</p>
+<p><strong>三、</strong>${calcs[2]?.problems.slice(0, 4).map((p, i) => `${i+1}.${p}`).join('；')}</p>
+<p><strong>四、</strong>${apps.slice(0, 5).map((p, i) => `${i+1}.${p.answer}`).join('；')}</p>
+<p><strong>五、</strong>${thinkings[0]?.problems.slice(0, 2).map((p, i) => `${i+1}.${p.answer}`).join('；')}</p>
+</div></body></html>`;
 };
 
 // ==================== 页面组件 ====================
@@ -378,6 +329,7 @@ const MathSpecialPage: React.FC = () => {
   const thinkingTab = (
     <div>
       {gradeSelector}
+      <p style={{ color: '#999', marginBottom: 16 }}>共 {thinkingProblems[grade]?.reduce((sum, c) => sum + c.problems.length, 0) || 0} 道思维题，{thinkingProblems[grade]?.length || 0} 个分类</p>
       <Collapse defaultActiveKey={thinkingProblems[grade]?.map((_, i) => String(i))}>
         {(thinkingProblems[grade] || []).map((category, idx) => (
           <Panel header={`${category.category}（${category.problems.length}题）`} key={idx}>
