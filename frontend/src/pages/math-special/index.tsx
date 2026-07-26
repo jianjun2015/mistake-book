@@ -1,0 +1,516 @@
+import React, { useState } from 'react';
+import { Card, Tabs, Button, Space, Select, Modal, Tag, Collapse } from 'antd';
+import { DownloadOutlined, EyeOutlined, CalculatorOutlined, BulbOutlined, BookOutlined } from '@ant-design/icons';
+import MainLayout from '../../components/layout/MainLayout';
+
+const { Panel } = Collapse;
+
+// ==================== 数据定义 ====================
+
+// 思维题数据
+const thinkingProblems: Record<number, { category: string; problems: { title: string; content: string; answer: string }[] }[]> = {
+  3: [
+    {
+      category: '找规律',
+      problems: [
+        { title: '数列规律', content: '找出规律：2, 5, 8, 11, __, __', answer: '14, 17（每次加3）' },
+        { title: '图形规律', content: '○△□○△□○__□，空格应填什么？', answer: '△' },
+        { title: '数字规律', content: '1, 4, 9, 16, __, __', answer: '25, 36（平方数：1², 2², 3², 4², 5², 6²）' },
+      ]
+    },
+    {
+      category: '和差问题',
+      problems: [
+        { title: '基本和差', content: '两数之和是20，差是4，求这两个数。', answer: '大数=(20+4)÷2=12，小数=(20-4)÷2=8' },
+        { title: '应用题', content: '小明和小红共有45元，小明比小红多5元，各有多少元？', answer: '小明=(45+5)÷2=25元，小红=(45-5)÷2=20元' },
+      ]
+    },
+    {
+      category: '年龄问题',
+      problems: [
+        { title: '年龄差不变', content: '哥哥今年15岁，弟弟今年10岁，几年后两人年龄之和是45岁？', answer: '(45-15-10)÷2=10年后' },
+      ]
+    },
+    {
+      category: '植树问题',
+      problems: [
+        { title: '两端都种', content: '一条路长100米，每隔5米种一棵树，两端都种，共需多少棵树？', answer: '100÷5+1=21棵' },
+        { title: '两端不种', content: '一条路长100米，每隔5米种一棵树，两端不种，共需多少棵树？', answer: '100÷5-1=19棵' },
+      ]
+    },
+  ],
+  4: [
+    {
+      category: '鸡兔同笼',
+      problems: [
+        { title: '基本鸡兔同笼', content: '鸡和兔共20只，脚共56只，鸡兔各几只？', answer: '兔=(56-20×2)÷(4-2)=8只，鸡=20-8=12只' },
+        { title: '变式题', content: '5元和10元的纸币共8张，共60元，各几张？', answer: '10元=(60-5×8)÷(10-5)=4张，5元=8-4=4张' },
+      ]
+    },
+    {
+      category: '盈亏问题',
+      problems: [
+        { title: '一盈一亏', content: '小朋友分苹果，每人分5个剩3个，每人分6个少2个，几个小朋友？几个苹果？', answer: '人数=(3+2)÷(6-5)=5人，苹果=5×5+3=28个' },
+      ]
+    },
+    {
+      category: '行程问题',
+      problems: [
+        { title: '相遇问题', content: '甲乙两地相距240km，甲车每小时60km，乙车每小时40km，相向而行，几小时相遇？', answer: '240÷(60+40)=2.4小时' },
+        { title: '追及问题', content: '甲每小时走5km，乙每小时走3km，乙先走2小时，甲几小时追上乙？', answer: '3×2÷(5-3)=3小时' },
+      ]
+    },
+    {
+      category: '周期问题',
+      problems: [
+        { title: '星期问题', content: '今天是星期三，100天后是星期几？', answer: '100÷7=14...2，星期三+2=星期五' },
+      ]
+    },
+  ],
+  5: [
+    {
+      category: '工程问题',
+      problems: [
+        { title: '合作完成', content: '甲单独做需10天，乙单独做需15天，合作几天完成？', answer: '1÷(1/10+1/15)=6天' },
+        { title: '分段合作', content: '甲乙合作3天后，甲离开，乙单独做2天完成。甲需10天，乙需15天，共几天？', answer: '验证：(1/10+1/15)×3+1/15×2=1/2+1/5+2/15=1 ✓' },
+      ]
+    },
+    {
+      category: '浓度问题',
+      problems: [
+        { title: '稀释问题', content: '200克含盐10%的盐水，加入多少水后变成含盐5%？', answer: '盐=200×10%=20克，新总量=20÷5%=400克，加水=400-200=200克' },
+      ]
+    },
+    {
+      category: '利润问题',
+      problems: [
+        { title: '基本利润', content: '成本100元，售价150元，利润率是多少？', answer: '(150-100)÷100×100%=50%' },
+        { title: '打折问题', content: '商品标价200元，打8折后再打9折，最终价格？', answer: '200×0.8×0.9=144元' },
+      ]
+    },
+    {
+      category: '几何面积',
+      problems: [
+        { title: '组合图形', content: '正方形边长10cm，内部有一个最大的圆，圆的面积是多少？', answer: '半径=10÷2=5cm，面积=π×5²=78.5cm²' },
+      ]
+    },
+  ],
+};
+
+// 计算题库
+const calculationProblems: Record<number, { category: string; problems: string[] }[]> = {
+  3: [
+    {
+      category: '四则混合运算',
+      problems: [
+        '125 + 375 × 2 =',
+        '(240 - 180) ÷ 4 =',
+        '36 × 5 + 120 ÷ 4 =',
+        '1000 - 365 - 235 =',
+        '25 × 4 × 8 =',
+        '720 ÷ 8 ÷ 9 =',
+        '45 + 55 × 3 =',
+        '(100 - 64) × 15 =',
+      ]
+    },
+    {
+      category: '竖式计算',
+      problems: [
+        '345 × 6 =',
+        '1568 ÷ 4 =',
+        '456 + 789 =',
+        '1000 - 456 =',
+        '234 × 12 =',
+        '567 ÷ 3 =',
+      ]
+    },
+    {
+      category: '巧算',
+      problems: [
+        '99 × 7 = (100-1)×7 = 700-7 = 693',
+        '25 × 36 = 25 × 4 × 9 = 100 × 9 = 900',
+        '125 × 8 = 1000',
+        '37 × 3 × 9 = 37 × 27 = 999',
+      ]
+    },
+  ],
+  4: [
+    {
+      category: '四则混合运算',
+      problems: [
+        '1200 - (350 + 150) × 2 =',
+        '48 × 25 + 52 × 25 =',
+        '(125 + 75) × 8 =',
+        '1000 ÷ 125 × 8 =',
+        '360 ÷ (12 + 6) × 5 =',
+        '25 × 17 × 4 =',
+        '810 ÷ 45 + 190 ÷ 19 =',
+        '(500 - 375) × (200 - 165) =',
+      ]
+    },
+    {
+      category: '竖式计算',
+      problems: [
+        '4567 × 23 =',
+        '9876 ÷ 34 =',
+        '5678 + 4321 =',
+        '10000 - 6789 =',
+        '1234 × 56 =',
+        '8765 ÷ 45 =',
+      ]
+    },
+    {
+      category: '巧算',
+      problems: [
+        '999 × 6 = (1000-1)×6 = 6000-6 = 5994',
+        '25 × 44 = 25 × 4 × 11 = 100 × 11 = 1100',
+        '125 × 32 = 125 × 8 × 4 = 1000 × 4 = 4000',
+        '99 × 99 = (100-1)×99 = 9900-99 = 9801',
+      ]
+    },
+  ],
+  5: [
+    {
+      category: '四则混合运算',
+      problems: [
+        '(3.5 + 2.5) × (7.2 - 4.8) =',
+        '15.6 ÷ 0.3 - 2.5 × 4 =',
+        '(1 - 0.8) × (2.5 + 1.5) =',
+        '0.75 × 4 + 0.25 × 4 =',
+        '3.2 × 2.5 + 6.8 × 2.5 =',
+        '(8.4 - 2.8) ÷ 0.7 =',
+        '1.25 × 3.2 × 0.25 =',
+        '7.8 × 101 - 7.8 =',
+      ]
+    },
+    {
+      category: '竖式计算',
+      problems: [
+        '3.14 × 2.5 =',
+        '12.56 ÷ 3.14 =',
+        '45.6 + 78.9 =',
+        '100 - 45.67 =',
+        '2.5 × 4.8 =',
+        '78.5 ÷ 3.14 =',
+      ]
+    },
+    {
+      category: '巧算',
+      problems: [
+        '9.9 × 7 = (10-0.1)×7 = 70-0.7 = 69.3',
+        '2.5 × 4.4 = 2.5 × 4 × 1.1 = 10 × 1.1 = 11',
+        '12.5 × 32 = 12.5 × 8 × 4 = 100 × 4 = 400',
+        '0.99 × 101 = (1-0.01)×101 = 101-1.01 = 99.99',
+      ]
+    },
+  ],
+};
+
+// 知识点概念
+const knowledgePoints: Record<number, { category: string; points: { title: string; content: string }[] }[]> = {
+  3: [
+    {
+      category: '数与代数',
+      points: [
+        { title: '万以内数的认识', content: '认识万以内的数，理解数位顺序：个位、十位、百位、千位、万位' },
+        { title: '两位数乘一位数', content: '从个位乘起，满十进一。如 24×3=72' },
+        { title: '两位数除以一位数', content: '从高位除起，余数比除数小。如 96÷4=24' },
+        { title: '分数的初步认识', content: '把一个整体平均分成若干份，取其中一份或几份' },
+      ]
+    },
+    {
+      category: '图形与几何',
+      points: [
+        { title: '长方形和正方形', content: '长方形面积=长×宽，正方形面积=边长×边长' },
+        { title: '周长与面积', content: '周长是围成图形的线段总长度，面积是图形的大小' },
+      ]
+    },
+    {
+      category: '统计与概率',
+      points: [
+        { title: '统计表', content: '能看懂简单的统计表，理解表头、数据的含义' },
+        { title: '平均数', content: '平均数 = 总数量 ÷ 总份数' },
+      ]
+    },
+  ],
+  4: [
+    {
+      category: '数与代数',
+      points: [
+        { title: '大数的认识', content: '认识亿以内的数，掌握数位顺序表' },
+        { title: '三位数乘两位数', content: '先乘个位，再乘十位，最后相加' },
+        { title: '小数的初步认识', content: '小数是十进制分数的另一种表示形式，如0.5=1/2' },
+        { title: '运算律', content: '加法交换律：a+b=b+a；乘法交换律：a×b=b×a' },
+      ]
+    },
+    {
+      category: '图形与几何',
+      points: [
+        { title: '角的度量', content: '认识锐角、直角、钝角、平角、周角' },
+        { title: '平行与垂直', content: '平行线永不相交，垂直线相交成90°' },
+      ]
+    },
+  ],
+  5: [
+    {
+      category: '数与代数',
+      points: [
+        { title: '小数乘除法', content: '小数乘法：先按整数算，再点小数点；小数除法：移动小数点变成整数再除' },
+        { title: '分数加减法', content: '同分母：分母不变，分子相加减；异分母：先通分再计算' },
+        { title: '方程', content: '含有未知数的等式叫方程，如 2x+3=7' },
+      ]
+    },
+    {
+      category: '图形与几何',
+      points: [
+        { title: '多边形面积', content: '三角形面积=底×高÷2；梯形面积=(上底+下底)×高÷2' },
+        { title: '体积', content: '长方体体积=长×宽×高；正方体体积=边长³' },
+      ]
+    },
+  ],
+};
+
+// 试卷生成
+const generateExamPaper = (grade: number) => {
+  const gradeNames: Record<number, string> = { 3: '三年级', 4: '四年级', 5: '五年级' };
+  const calcs = calculationProblems[grade] || [];
+  const thinkings = thinkingProblems[grade] || [];
+  // knowledge points loaded inline
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>${gradeNames[grade]}数学专项试卷</title>
+  <style>
+    body { font-family: 'SimSun', serif; padding: 40px; line-height: 2; }
+    h1 { text-align: center; border-bottom: 2px solid #333; padding-bottom: 10px; }
+    .info { display: flex; justify-content: space-between; margin: 20px 0; }
+    .section { margin: 30px 0; }
+    .section h2 { border-bottom: 1px solid #666; padding-bottom: 5px; }
+    .question { margin: 15px 0; }
+    .blank { display: inline-block; width: 150px; border-bottom: 1px solid #333; }
+    .answer-area { min-height: 80px; border: 1px dashed #ccc; padding: 10px; margin: 10px 0; }
+    .answer-section { margin-top: 50px; border-top: 2px solid #333; padding-top: 20px; page-break-before: always; }
+  </style>
+</head>
+<body>
+  <h1>${gradeNames[grade]}数学专项试卷</h1>
+  <div class="info">
+    <span>姓名：_____________</span>
+    <span>班级：_____________</span>
+    <span>日期：_____________</span>
+    <span>得分：_____________</span>
+  </div>
+  
+  <div class="section">
+    <h2>一、四则混合运算（每题5分，共40分）</h2>
+    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+  </div>
+  
+  <div class="section">
+    <h2>二、竖式计算（每题5分，共30分）</h2>
+    ${calcs[1]?.problems.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+  </div>
+  
+  <div class="section">
+    <h2>三、巧算（每题5分，共20分）</h2>
+    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+  </div>
+  
+  <div class="section">
+    <h2>四、思维题（每题5分，共10分）</h2>
+    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('\n    ') || '<div class="question">暂无题目</div>'}
+  </div>
+  
+  <div class="answer-section">
+    <h2>参考答案</h2>
+    <p><strong>一、四则混合运算</strong></p>
+    ${calcs[0]?.problems.slice(0, 8).map((p, i) => `<p>${i + 1}. ${p.includes('=') ? p.split('=')[1]?.trim() : '见题目'}</p>`).join('\n    ') || ''}
+    <p><strong>二、竖式计算</strong></p>
+    <p>请自行验算</p>
+    <p><strong>三、巧算</strong></p>
+    ${calcs[2]?.problems.slice(0, 4).map((p, i) => `<p>${i + 1}. ${p}</p>`).join('\n    ') || ''}
+    <p><strong>四、思维题</strong></p>
+    ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<p>${i + 1}. ${p.answer}</p>`).join('\n    ') || ''}
+  </div>
+</body>
+</html>`;
+};
+
+// ==================== 页面组件 ====================
+
+const MathSpecialPage: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('thinking');
+  const [grade, setGrade] = useState<number>(3);
+  const [showExamModal, setShowExamModal] = useState(false);
+  const [examHtml, setExamHtml] = useState('');
+
+  // 生成试卷
+  const handleGenerateExam = () => {
+    setExamHtml(generateExamPaper(grade));
+    setShowExamModal(true);
+  };
+
+  // 下载 PDF
+  const handleDownloadPdf = () => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(examHtml);
+      printWindow.document.close();
+      printWindow.onload = () => printWindow.print();
+    }
+  };
+
+  // 思维题 Tab
+  const thinkingTab = (
+    <div>
+      <Card style={{ marginBottom: 16 }}>
+        <Space>
+          <span>选择年级：</span>
+          <Select value={grade} onChange={setGrade} style={{ width: 120 }}>
+            <Select.Option value={3}>三年级</Select.Option>
+            <Select.Option value={4}>四年级</Select.Option>
+            <Select.Option value={5}>五年级</Select.Option>
+          </Select>
+        </Space>
+      </Card>
+
+      <Collapse defaultActiveKey={['0']}>
+        {(thinkingProblems[grade] || []).map((category, idx) => (
+          <Panel header={`${category.category}（${category.problems.length}题）`} key={idx}>
+            {category.problems.map((problem, pIdx) => (
+              <Card key={pIdx} size="small" style={{ marginBottom: 8 }}>
+                <h4>{problem.title}</h4>
+                <p style={{ color: '#333', margin: '8px 0' }}>{problem.content}</p>
+                <p style={{ color: '#52c41a', fontSize: 13 }}>
+                  <strong>答案：</strong>{problem.answer}
+                </p>
+              </Card>
+            ))}
+          </Panel>
+        ))}
+      </Collapse>
+    </div>
+  );
+
+  // 计算题库 Tab
+  const calculationTab = (
+    <div>
+      <Card style={{ marginBottom: 16 }}>
+        <Space>
+          <span>选择年级：</span>
+          <Select value={grade} onChange={setGrade} style={{ width: 120 }}>
+            <Select.Option value={3}>三年级</Select.Option>
+            <Select.Option value={4}>四年级</Select.Option>
+            <Select.Option value={5}>五年级</Select.Option>
+          </Select>
+        </Space>
+      </Card>
+
+      {(calculationProblems[grade] || []).map((category, idx) => (
+        <Card key={idx} title={category.category} style={{ marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+            {category.problems.map((problem, pIdx) => (
+              <div key={pIdx} style={{ padding: 12, background: '#f6ffed', borderRadius: 8, border: '1px solid #b7eb8f' }}>
+                {problem}
+              </div>
+            ))}
+          </div>
+        </Card>
+      ))}
+    </div>
+  );
+
+  // 知识点概念 Tab
+  const knowledgeTab = (
+    <div>
+      <Card style={{ marginBottom: 16 }}>
+        <Space>
+          <span>选择年级：</span>
+          <Select value={grade} onChange={setGrade} style={{ width: 120 }}>
+            <Select.Option value={3}>三年级</Select.Option>
+            <Select.Option value={4}>四年级</Select.Option>
+            <Select.Option value={5}>五年级</Select.Option>
+          </Select>
+        </Space>
+      </Card>
+
+      {(knowledgePoints[grade] || []).map((category, idx) => (
+        <Card key={idx} title={category.category} style={{ marginBottom: 16 }}>
+          {category.points.map((point, pIdx) => (
+            <div key={pIdx} style={{ padding: 12, background: '#f0f5ff', borderRadius: 8, border: '1px solid #adc6ff', marginBottom: 8 }}>
+              <h4 style={{ margin: '0 0 8px', color: '#1890ff' }}>{point.title}</h4>
+              <p style={{ margin: 0, color: '#333' }}>{point.content}</p>
+            </div>
+          ))}
+        </Card>
+      ))}
+    </div>
+  );
+
+  // 试卷生成 Tab
+  const examTab = (
+    <div>
+      <Card>
+        <h3 style={{ marginBottom: 24 }}>试卷生成</h3>
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
+          <div>
+            <span style={{ marginRight: 16 }}>选择年级：</span>
+            <Select value={grade} onChange={setGrade} style={{ width: 120 }}>
+              <Select.Option value={3}>三年级</Select.Option>
+              <Select.Option value={4}>四年级</Select.Option>
+              <Select.Option value={5}>五年级</Select.Option>
+            </Select>
+          </div>
+          <div>
+            <p style={{ color: '#666', marginBottom: 16 }}>试卷内容包含：</p>
+            <ul style={{ color: '#666', marginLeft: 20 }}>
+              <li>四则混合运算（40分）</li>
+              <li>竖式计算（30分）</li>
+              <li>巧算（20分）</li>
+              <li>思维题（10分）</li>
+            </ul>
+          </div>
+          <Space>
+            <Button type="primary" icon={<EyeOutlined />} onClick={handleGenerateExam}>在线预览</Button>
+            <Button icon={<DownloadOutlined />} onClick={() => { handleGenerateExam(); setTimeout(handleDownloadPdf, 500); }}>下载 PDF</Button>
+          </Space>
+        </Space>
+      </Card>
+
+      <Modal
+        title="试卷预览"
+        open={showExamModal}
+        onCancel={() => setShowExamModal(false)}
+        width={900}
+        footer={[
+          <Button key="close" onClick={() => setShowExamModal(false)}>关闭</Button>,
+          <Button key="download" type="primary" icon={<DownloadOutlined />} onClick={handleDownloadPdf}>下载 PDF</Button>,
+        ]}
+      >
+        <div dangerouslySetInnerHTML={{ __html: examHtml }} style={{ maxHeight: '60vh', overflow: 'auto' }} />
+      </Modal>
+    </div>
+  );
+
+  const tabItems = [
+    { key: 'thinking', label: <span><BulbOutlined /> 思维题</span>, children: thinkingTab },
+    { key: 'calculation', label: <span><CalculatorOutlined /> 计算题库</span>, children: calculationTab },
+    { key: 'knowledge', label: <span><BookOutlined /> 知识点</span>, children: knowledgeTab },
+    { key: 'exam', label: <span><DownloadOutlined /> 试卷生成</span>, children: examTab },
+  ];
+
+  return (
+    <MainLayout>
+      <div style={{ padding: 24 }}>
+        <h2 style={{ marginBottom: 24 }}>🔢 数学专项</h2>
+        <Tag color="blue" style={{ marginBottom: 16 }}>护教版（五四学制）</Tag>
+        <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} size="large" />
+      </div>
+    </MainLayout>
+  );
+};
+
+export default MathSpecialPage;
