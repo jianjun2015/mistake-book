@@ -172,7 +172,7 @@ const thinkingProblems: Record<number, { category: string; problems: { title: st
       category: '优化问题',
       problems: [
         { title: '烙饼问题', content: '锅里每次最多烙2张饼，每面3分钟，烙3张饼最少几分钟？', answer: '9分钟' },
-        { title: '排队问题', content: '甲乙丙三人打水，用时分别为1、3、5分钟，怎样安排等待时间最短？', answer: '甲→乙→丙，总等待=1×3+3×2+5×1=14分钟' },
+        { title: '排队问题', content: '甲乙丙三人打水，用时1、3、5分钟，怎样安排等待时间最短？', answer: '甲→乙→丙，总等待=14分钟' },
       ]
     },
   ],
@@ -300,6 +300,32 @@ ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 
 </div></body></html>`;
 };
 
+// ==================== 单个思维题组件 ====================
+const ThinkingProblemCard: React.FC<{ problem: { title: string; content: string; answer: string } }> = ({ problem }) => {
+  const [showAnswer, setShowAnswer] = useState(false);
+
+  return (
+    <Card size="small" style={{ marginBottom: 8 }}>
+      <h4>{problem.title}</h4>
+      <p style={{ color: '#333', margin: '8px 0' }}>{problem.content}</p>
+      {showAnswer ? (
+        <p style={{ color: '#52c41a', fontSize: 13, background: '#f6ffed', padding: '8px 12px', borderRadius: 4 }}>
+          <strong>答案：</strong>{problem.answer}
+        </p>
+      ) : (
+        <Button 
+          type="dashed" 
+          size="small" 
+          icon={<EyeOutlined />} 
+          onClick={() => setShowAnswer(true)}
+        >
+          查看答案
+        </Button>
+      )}
+    </Card>
+  );
+};
+
 // ==================== 页面组件 ====================
 const MathSpecialPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('thinking');
@@ -334,11 +360,7 @@ const MathSpecialPage: React.FC = () => {
         {(thinkingProblems[grade] || []).map((category, idx) => (
           <Panel header={`${category.category}（${category.problems.length}题）`} key={idx}>
             {category.problems.map((problem, pIdx) => (
-              <Card key={pIdx} size="small" style={{ marginBottom: 8 }}>
-                <h4>{problem.title}</h4>
-                <p style={{ color: '#333', margin: '8px 0' }}>{problem.content}</p>
-                <p style={{ color: '#52c41a', fontSize: 13 }}><strong>答案：</strong>{problem.answer}</p>
-              </Card>
+              <ThinkingProblemCard key={pIdx} problem={problem} />
             ))}
           </Panel>
         ))}
