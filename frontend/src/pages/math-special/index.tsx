@@ -280,6 +280,8 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;border-bottom:3px solid #4a90d
 .question{margin:14px 0;padding:8px 12px;background:#fafbfc;border-radius:6px;font-size:14px}
 .blank{display:inline-block;width:140px;border-bottom:2px solid #333;margin:0 8px}
 .answer-area{min-height:70px;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin:10px 0;background:#fff}
+.answer-area-tall{min-height:140px;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin:10px 0;background:#fff;page-break-inside:avoid}
+.answer-area-app{min-height:120px;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin:10px 0;background:#fff;page-break-inside:avoid}
 .answer-section{margin-top:40px;border-top:3px solid #4a90d9;padding-top:20px;page-break-before:always}
 .answer-section h2{color:#4a90d9}
 .answer-section p{margin:6px 0;padding:4px 8px;background:#f0f7ff;border-radius:4px;font-size:13px}
@@ -290,13 +292,13 @@ h1{text-align:center;font-size:24px;color:#1a1a2e;border-bottom:3px solid #4a90d
 <div class="section"><h2>一、四则混合运算（每题3分，共24分）</h2>
 ${calcs[0]?.items.slice(0, 8).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')} = <span class="blank"></span></div>`).join('') || ''}</div>
 <div class="section"><h2>二、竖式计算（每题4分，共24分）</h2>
-${calcs[1]?.items.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area"></div>`).join('') || ''}</div>
+${calcs[1]?.items.slice(0, 6).map((p, i) => `<div class="question">${i + 1}. ${p.replace(/ =$/, '')}</div><div class="answer-area-tall"></div>`).join('') || ''}</div>
 <div class="section"><h2>三、巧算（每题4分，共16分）</h2>
 ${calcs[2]?.items.slice(0, 4).map((p, i) => `<div class="question">${i + 1}. ${p.split('=')[0].trim()} = <span class="blank"></span></div>`).join('') || ''}</div>
 <div class="section"><h2>四、应用题（每题6分，共30分）</h2>
-${calcs[3]?.items.slice(0, 5).map((p, i) => { const [q] = p.split(' | 答案：'); return `<div class="question">${i + 1}. ${q}</div><div class="answer-area"></div>`; }).join('') || ''}</div>
+${calcs[3]?.items.slice(0, 5).map((p, i) => { const [q] = p.split(' | 答案：'); return `<div class="question">${i + 1}. ${q}</div><div class="answer-area-app"></div>`; }).join('') || ''}</div>
 <div class="section"><h2>五、思维挑战（每题3分，共6分）</h2>
-${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area"></div>`).join('') || ''}</div>
+${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 1}. <strong>${p.title}：</strong>${p.content}</div><div class="answer-area-app"></div>`).join('') || ''}</div>
 <div class="answer-section"><h2>参考答案</h2>
 <p><strong>一、四则混合运算</strong></p>
 ${calcs[0]?.items.slice(0, 8).map((p, i) => `<p>${i + 1}. ${p.includes('=') ? p.split('=')[1]?.trim() : ''}</p>`).join('')}
