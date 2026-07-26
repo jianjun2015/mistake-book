@@ -252,13 +252,18 @@ const generateExamPaper = (grade: number) => {
   return `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>${gradeNames[grade]}数学专项试卷</title>
 <style>
-body{font-family:'SimSun',serif;padding:40px;line-height:2}
-h1{text-align:center;border-bottom:2px solid #333;padding-bottom:10px}
-.info{display:flex;justify-content:space-between;margin:20px 0}
-.section{margin:30px 0}.section h2{border-bottom:1px solid #666;padding-bottom:5px}
-.question{margin:15px 0}.blank{display:inline-block;width:150px;border-bottom:1px solid #333}
-.answer-area{min-height:80px;border:1px dashed #ccc;padding:10px;margin:10px 0}
-.answer-section{margin-top:50px;border-top:2px solid #333;padding-top:20px;page-break-before:always}
+body{font-family:'PingFang SC','Microsoft YaHei','SimSun',serif;padding:40px;line-height:2;color:#333}
+h1{text-align:center;font-size:24px;color:#1a1a2e;border-bottom:3px solid #4a90d9;padding-bottom:12px;margin-bottom:24px}
+.info{display:flex;justify-content:space-between;margin:20px 0;padding:12px 16px;background:#f8f9fa;border-radius:8px;font-size:14px}
+.section{margin:28px 0}
+.section h2{font-size:16px;color:#4a90d9;border-bottom:2px solid #4a90d9;padding-bottom:8px;margin-bottom:16px}
+.question{margin:14px 0;padding:8px 12px;background:#fafbfc;border-radius:6px;font-size:14px}
+.blank{display:inline-block;width:140px;border-bottom:2px solid #333;margin:0 8px}
+.answer-area{min-height:70px;border:1px solid #e0e0e0;border-radius:8px;padding:12px;margin:10px 0;background:#fff}
+.answer-section{margin-top:40px;border-top:3px solid #4a90d9;padding-top:20px;page-break-before:always}
+.answer-section h2{color:#4a90d9}
+.answer-section p{margin:6px 0;padding:4px 8px;background:#f0f7ff;border-radius:4px;font-size:13px}
+.watermark{text-align:center;color:#e0e0e0;font-size:10px;margin-top:40px}
 </style></head><body>
 <h1>${gradeNames[grade]}数学专项试卷</h1>
 <div class="info"><span>姓名：_____________</span><span>班级：_____________</span><span>日期：_____________</span><span>得分：_____________</span></div>
@@ -362,7 +367,13 @@ const MathSpecialPage: React.FC = () => {
           <Button icon={<ReloadOutlined />} onClick={handleRefreshCalc}>刷新题目</Button>
           <Button icon={<DownloadOutlined />} onClick={() => {
             const html = `<html><head><meta charset="UTF-8"><title>计算题</title>
-              <style>body{font-family:'SimSun',serif;padding:40px;line-height:2}h1{text-align:center}h2{margin-top:30px}.q{margin:10px 0}.blank{display:inline-block;width:150px;border-bottom:1px solid #333}</style>
+              <style>
+body{font-family:'PingFang SC','Microsoft YaHei','SimSun',serif;padding:40px;line-height:2;color:#333}
+h1{text-align:center;font-size:24px;color:#1a1a2e;border-bottom:3px solid #4a90d9;padding-bottom:12px;margin-bottom:24px}
+h2{margin-top:28px;font-size:16px;color:#4a90d9;border-bottom:2px solid #4a90d9;padding-bottom:8px}
+.q{margin:12px 0;padding:8px 12px;background:#fafbfc;border-radius:6px;font-size:14px}
+.blank{display:inline-block;width:140px;border-bottom:2px solid #333;margin:0 8px}
+</style>
               </head><body><h1>计算题练习</h1>
               ${calcProblems.map(c => `<h2>${c.category}</h2>${c.items.map((p, i) => `<div class="q">${i+1}. ${typeof p === 'string' ? p.replace(/ \| 答案.*/, '').replace(/ =$/, '') + ' = <span class="blank"></span>' : ''}</div>`).join('')}`).join('')}
               </body></html>`;
