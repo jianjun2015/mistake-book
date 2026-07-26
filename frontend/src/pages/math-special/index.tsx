@@ -156,8 +156,8 @@ const generateCalculationProblems = (grade: number) => {
   for (let i = 0; i < 12; i++) {
     const type = randInt(1, 3);
     if (grade === 3) {
-      if (type === 1) verticalProblems.push(`${randInt(100, 999)} × ${randInt(2, 9)} =`);
-      else if (type === 2) verticalProblems.push(`${randInt(1000, 9999)} ÷ ${randInt(2, 9)} =`);
+      if (type === 1) verticalProblems.push(`${randInt(10, 99)} × ${randInt(2, 9)} =`);
+      else if (type === 2) verticalProblems.push(`${randInt(100, 999)} ÷ ${randInt(2, 9)} =`);
       else verticalProblems.push(`${randInt(100, 999)} + ${randInt(100, 999)} =`);
     } else if (grade === 4) {
       if (type === 1) verticalProblems.push(`${randInt(1000, 9999)} × ${randInt(10, 99)} =`);
@@ -171,15 +171,35 @@ const generateCalculationProblems = (grade: number) => {
   }
   problems.push({ category: '竖式计算', items: shuffle(verticalProblems) });
 
-  // 巧算 - 10题
-  const cleverProblems: string[] = [
-    '99 × 7 = (100-1)×7 = 693', '25 × 36 = 25 × 4 × 9 = 900',
-    '125 × 8 = 1000', '999 × 6 = (1000-1)×6 = 5994',
-    '25 × 44 = 25 × 4 × 11 = 1100', '125 × 32 = 125 × 8 × 4 = 4000',
-    '99 × 99 = (100-1)×99 = 9801', '9.9 × 7 = (10-0.1)×7 = 69.3',
-    '2.5 × 4.4 = 2.5 × 4 × 1.1 = 11', '0.99 × 101 = (1-0.01)×101 = 99.99',
-  ];
+  // 巧算 + 分数 - 10题
+  let cleverProblems: string[] = [];
+  if (grade <= 3) {
+    cleverProblems = [
+      '99 × 7 = (100-1)×7 = 693', '25 × 36 = 25 × 4 × 9 = 900',
+      '125 × 8 = 1000', '999 × 6 = (1000-1)×6 = 5994',
+      '25 × 44 = 25 × 4 × 11 = 1100', '125 × 32 = 125 × 8 × 4 = 4000',
+      '99 × 99 = (100-1)×99 = 9801',
+    ];
+  } else {
+    cleverProblems = [
+      '99 × 7 = (100-1)×7 = 693', '25 × 36 = 25 × 4 × 9 = 900',
+      '125 × 8 = 1000', '999 × 6 = (1000-1)×6 = 5994',
+      '25 × 44 = 25 × 4 × 11 = 1100', '125 × 32 = 125 × 8 × 4 = 4000',
+      '99 × 99 = (100-1)×99 = 9801', '9.9 × 7 = (10-0.1)×7 = 69.3',
+      '2.5 × 4.4 = 2.5 × 4 × 1.1 = 11', '0.99 × 101 = (1-0.01)×101 = 99.99',
+    ];
+  }
   problems.push({ category: '巧算', items: shuffle(cleverProblems) });
+
+  // 分数题 - 8题 (仅三年级)
+  if (grade === 3) {
+    const fractionProblems = [
+      '½ + ½ =', '⅓ + ⅓ =', '¼ + ¼ =', '⅕ + ⅕ =',
+      '1 - ½ =', '1 - ⅓ =', '1 - ¼ =', '⅖ + ⅖ =',
+      '⅜ + ⅛ =', '⅚ - ⅙ =', '½ + ¼ =', '⅔ - ⅓ =',
+    ];
+    problems.push({ category: '分数计算', items: shuffle(fractionProblems) });
+  }
 
   // 应用题 - 15题
   const appProblems: { title: string; content: string; answer: string }[] = [
