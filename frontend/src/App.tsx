@@ -13,6 +13,7 @@ import PhoneticLearningPage from './pages/phonetic-learning';
 import PhoneticPracticePage from './pages/phonetic-practice';
 import MathSpecialPage from './pages/math-special';
 import AITechPage from './pages/ai-tech';
+import LearningMethodsPage from './pages/learning-methods';
 import { Spin } from 'antd';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -45,6 +46,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/phonetic-practice" element={<ProtectedRoute><PhoneticPracticePage /></ProtectedRoute>} />
     <Route path="/math-special" element={<ProtectedRoute><MathSpecialPage /></ProtectedRoute>} />
     <Route path="/ai-tech" element={<ProtectedRoute><AITechPage /></ProtectedRoute>} />
+    <Route path="/learning-methods" element={<ProtectedRoute><LearningMethodsPage /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes>
 );

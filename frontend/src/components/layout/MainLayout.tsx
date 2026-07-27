@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Avatar, Space, Tag } from 'antd';
 import {
   UnorderedListOutlined, PlusOutlined, DashboardOutlined, SearchOutlined,
-  UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, CalculatorOutlined, RobotOutlined,
+  UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, CalculatorOutlined, RobotOutlined, ReadOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -17,6 +17,7 @@ const menuItems: MenuProps['items'] = [
   { key: '/search', icon: <SearchOutlined />, label: '搜索错题' },
   { key: '/knowledge-summary', icon: <BookOutlined />, label: '知识总结' },
   { key: '/math-special', icon: <CalculatorOutlined />, label: '数学专项' },
+  { key: '/learning-methods', icon: <ReadOutlined />, label: '学习方法' },
   { key: '/phonetic-learning', icon: <AudioOutlined />, label: '音标学习' },
   { key: '/phonetic-practice', icon: <EditOutlined />, label: '音标练习' },
   { key: '/ai-tech', icon: <RobotOutlined />, label: 'AI前沿技术' },
