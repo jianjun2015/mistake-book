@@ -436,9 +436,10 @@ const MathSpecialPage: React.FC = () => {
               <h1>${gradeNames[grade]}计算题练习</h1>
               ${calcProblems.map(c => {
                 const isApp = c.category === '应用题';
+                const isVert = c.category === '竖式计算';
                 const isFraction = c.category === '分数计算';
-                const items = c.items.slice(0, isApp ? 8 : undefined);
-                return `<h2>${c.category}</h2>${isApp ? items.map((p, i) => {
+                const items = c.items.slice(0, (isApp || isVert) ? 8 : undefined);
+                return `<h2>${c.category}</h2>${(isApp || isVert) ? items.map((p, i) => {
                   const text = typeof p === 'string' ? p.split('|||')[0] : String(p);
                   return `<div class="q"><b>${i+1}.</b> ${text}</div><div class="app-area"></div>`;
                 }).join('') : `<div class="two-col">${items.map((p, i) => {
