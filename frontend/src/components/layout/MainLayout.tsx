@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Dropdown, Avatar, Space, Tag } from 'antd';
 import {
   UnorderedListOutlined, PlusOutlined, DashboardOutlined, SearchOutlined,
-  UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, CalculatorOutlined,
+  UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, CalculatorOutlined, RobotOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +19,7 @@ const menuItems: MenuProps['items'] = [
   { key: '/math-special', icon: <CalculatorOutlined />, label: '数学专项' },
   { key: '/phonetic-learning', icon: <AudioOutlined />, label: '音标学习' },
   { key: '/phonetic-practice', icon: <EditOutlined />, label: '音标练习' },
+  { key: '/ai-tech', icon: <RobotOutlined />, label: 'AI前沿技术' },
 ];
 
 interface MainLayoutProps { children: React.ReactNode; }
