@@ -1,0 +1,7 @@
+{
+  "usingComponents": {
+    "van-tag": "@vant/weapp/tag/index",
+    "van-button": "@vant/weapp/button/index"
+  },
+  "navigationBarTitleText": "音标学习"
+}

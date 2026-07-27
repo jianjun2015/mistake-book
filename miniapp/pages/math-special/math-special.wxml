@@ -1,0 +1,42 @@
+<!--pages/math-special/math-special.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🔢 数学专项</text>
+    <text class="tag">护教版（五四学制）</text>
+  </view>
+
+  <view class="grade-selector">
+    <text>选择年级：</text>
+    <picker mode="selector" range="{{['三年级','四年级','五年级']}}" bindchange="onGradeChange">
+      <view class="picker-value">{{grade === 3 ? '三年级' : grade === 4 ? '四年级' : '五年级'}}</view>
+    </picker>
+  </view>
+
+  <van-tabs active="{{activeTab}}" bind:change="onTabChange">
+    <van-tab title="💡 思维题" name="thinking">
+      <view class="section" wx:for="{{thinkingProblems}}" wx:key="category">
+        <view class="section-title">{{item.category}}</view>
+        <view class="problem-item" wx:for="{{item.items}}" wx:for-item="problem" wx:key="*this">
+          <view class="problem-content">{{problem}}</view>
+          <view class="answer-btn" data-id="{{item.category}}-{{problem}}" bindtap="toggleAnswer">
+            {{showAnswer[`${item.category}-${problem}`] ? '收起' : '查看答案'}}
+          </view>
+        </view>
+      </view>
+    </van-tab>
+
+    <van-tab title="🔢 计算题库" name="calculation">
+      <view class="refresh-bar">
+        <van-button size="small" icon="replay" bind:click="refreshCalc">刷新题目</van-button>
+      </view>
+      <view class="section" wx:for="{{calcProblems}}" wx:key="category">
+        <view class="section-title">{{item.category}}</view>
+        <view class="calc-grid">
+          <view class="calc-item" wx:for="{{item.items}}" wx:for-item="problem" wx:key="*this">
+            {{problem}}
+          </view>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
+</view>

@@ -1,0 +1,50 @@
+<!--pages/phonetic-learning/phonetic-learning.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🔤 音标学习</text>
+    <text class="subtitle">48个国际音标</text>
+  </view>
+
+  <view class="stats">
+    <van-tag type="primary">元音: 20个</van-tag>
+    <van-tag type="success">辅音: 28个</van-tag>
+  </view>
+
+  <view class="filter-bar">
+    <scroll-view scroll-x class="filter-scroll">
+      <view class="filter-item {{selectedType === 'all' ? 'active' : ''}}" bindtap="filterByType" data-type="all">全部</view>
+      <view class="filter-item {{selectedType === '长元音' ? 'active' : ''}}" bindtap="filterByType" data-type="长元音">长元音</view>
+      <view class="filter-item {{selectedType === '短元音' ? 'active' : ''}}" bindtap="filterByType" data-type="短元音">短元音</view>
+      <view class="filter-item {{selectedType === '双元音' ? 'active' : ''}}" bindtap="filterByType" data-type="双元音">双元音</view>
+      <view class="filter-item {{selectedType === '爆破音' ? 'active' : ''}}" bindtap="filterByType" data-type="爆破音">爆破音</view>
+      <view class="filter-item {{selectedType === '摩擦音' ? 'active' : ''}}" bindtap="filterByType" data-type="摩擦音">摩擦音</view>
+      <view class="filter-item {{selectedType === '破擦音' ? 'active' : ''}}" bindtap="filterByType" data-type="破擦音">破擦音</view>
+      <view class="filter-item {{selectedType === '鼻音' ? 'active' : ''}}" bindtap="filterByType" data-type="鼻音">鼻音</view>
+      <view class="filter-item {{selectedType === '边音' ? 'active' : ''}}" bindtap="filterByType" data-type="边音">边音</view>
+      <view class="filter-item {{selectedType === '半元音' ? 'active' : ''}}" bindtap="filterByType" data-type="半元音">半元音</view>
+    </scroll-view>
+  </view>
+
+  <view class="phonetic-list">
+    <view class="phonetic-card" wx:for="{{filteredPhonetics}}" wx:key="symbol">
+      <view class="phonetic-header">
+        <text class="symbol">{{item.symbol}}</text>
+        <van-tag size="small">{{item.type}}</van-tag>
+      </view>
+      <view class="phonetic-desc">{{item.description}}</view>
+      <view class="phonetic-words">
+        <van-button 
+          size="small" 
+          wx:for="{{item.words}}" 
+          wx:key="*this"
+          wx:for-item="word"
+          type="{{playingWord === word ? 'primary' : 'default'}}"
+          bind:click="playWord"
+          data-word="{{word}}"
+        >
+          {{word}}
+        </van-button>
+      </view>
+    </view>
+  </view>
+</view>

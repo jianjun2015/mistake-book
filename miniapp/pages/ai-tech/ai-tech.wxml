@@ -1,0 +1,38 @@
+<!--pages/ai-tech/ai-tech.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">🤖 AI前沿技术</text>
+    <text class="subtitle">上次更新: {{lastUpdate}}</text>
+    <van-button size="small" type="primary" bind:click="refreshData">刷新数据</van-button>
+  </view>
+
+  <view class="filter-bar">
+    <scroll-view scroll-x class="filter-scroll">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="key"
+        class="filter-item {{selectedCategory === item.key ? 'active' : ''}}"
+        style="{{selectedCategory === item.key ? 'background:' + item.color + ';border-color:' + item.color : ''}}"
+        bindtap="filterByCategory"
+        data-category="{{item.key}}"
+      >
+        {{item.name}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="tech-list">
+    <view class="tech-card" wx:for="{{filteredList}}" wx:key="id" bindtap="openLink" data-url="{{item.link}}">
+      <view class="tech-header">
+        <text class="tech-name">{{item.name}}</text>
+        <van-tag type="primary" size="small">{{item.category}}</van-tag>
+      </view>
+      <text class="tech-desc">{{item.description}}</text>
+      <view class="tech-features">
+        <van-tag wx:for="{{item.features}}" wx:key="*this" wx:for-item="feature" size="small" plain>
+          {{feature}}
+        </van-tag>
+      </view>
+    </view>
+  </view>
+</view>

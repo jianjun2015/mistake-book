@@ -1,0 +1,60 @@
+<!--pages/learning-methods/learning-methods.wxml-->
+<view class="container">
+  <view class="header">
+    <text class="title">📚 学习方法</text>
+    <text class="subtitle">小学语文·数学·英语</text>
+  </view>
+
+  <view class="subject-tabs">
+    <view class="tab {{subject === 'chinese' ? 'active' : ''}}" bindtap="onSubjectChange" data-subject="chinese">
+      <text class="tab-icon">📖</text>
+      <text>语文</text>
+    </view>
+    <view class="tab {{subject === 'math' ? 'active' : ''}}" bindtap="onSubjectChange" data-subject="math">
+      <text class="tab-icon">🔢</text>
+      <text>数学</text>
+    </view>
+    <view class="tab {{subject === 'english' ? 'active' : ''}}" bindtap="onSubjectChange" data-subject="english">
+      <text class="tab-icon">🔤</text>
+      <text>英语</text>
+    </view>
+  </view>
+
+  <view class="grade-selector">
+    <text>选择年级：</text>
+    <picker mode="selector" range="{{['三年级','四年级']}}" bindchange="onGradeChange">
+      <view class="picker-value">{{grade}}</view>
+    </picker>
+  </view>
+
+  <view class="method-list">
+    <view class="method-card" wx:for="{{methods}}" wx:key="title">
+      <view class="method-header">
+        <text class="method-title">{{item.title}}</text>
+        <van-tag type="{{item.difficulty === 'easy' ? 'success' : item.difficulty === 'medium' ? 'warning' : 'danger'}}" size="small">
+          {{item.difficulty === 'easy' ? '简单' : item.difficulty === 'medium' ? '中等' : '进阶'}}
+        </van-tag>
+      </view>
+
+      <view class="method-section">
+        <text class="section-title">📝 具体步骤</text>
+        <view class="steps">
+          <view class="step" wx:for="{{item.steps}}" wx:key="*this" wx:for-item="step" wx:for-index="idx">
+            <text class="step-num">{{idx + 1}}</text>
+            <text class="step-text">{{step}}</text>
+          </view>
+        </view>
+      </view>
+
+      <view class="method-section">
+        <text class="section-title">📖 来源</text>
+        <text class="source-text">{{item.source}}</text>
+      </view>
+
+      <view class="method-section">
+        <text class="section-title">🎯 实际效果</text>
+        <text class="result-text">✓ {{item.result}}</text>
+      </view>
+    </view>
+  </view>
+</view>

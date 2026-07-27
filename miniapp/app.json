@@ -6,7 +6,12 @@
     "pages/mistake-list/mistake-list",
     "pages/mistake-detail/mistake-detail",
     "pages/mistake-form/mistake-form",
-    "pages/search/search"
+    "pages/search/search",
+    "pages/math-special/math-special",
+    "pages/phonetic-learning/phonetic-learning",
+    "pages/phonetic-practice/phonetic-practice",
+    "pages/ai-tech/ai-tech",
+    "pages/learning-methods/learning-methods"
   ],
   "window": {
     "backgroundTextStyle": "light",
