@@ -419,7 +419,7 @@ const MathSpecialPage: React.FC = () => {
     <div>
       {gradeSelector}
       <p style={{ color: '#999', marginBottom: 16 }}>共 {thinkingProblems[grade]?.reduce((sum, c) => sum + c.problems.length, 0) || 0} 道思维题，{thinkingProblems[grade]?.length || 0} 个分类</p>
-      <Collapse defaultActiveKey={thinkingProblems[grade]?.map((_, i) => String(i))}>
+      <Collapse defaultActiveKey={[]}>
         {(thinkingProblems[grade] || []).map((category, idx) => (
           <Panel header={`${category.category}（${category.problems.length}题）`} key={idx}>
             {category.problems.map((problem, pIdx) => (
