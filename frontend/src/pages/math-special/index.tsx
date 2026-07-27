@@ -422,17 +422,31 @@ const MathSpecialPage: React.FC = () => {
           <Button icon={<ReloadOutlined />} onClick={handleRefreshCalc}>刷新题目</Button>
           <Button icon={<DownloadOutlined />} onClick={() => {
             const html = `<html><head><meta charset="UTF-8"><title>计算题</title>
-              <style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:'PingFang SC','Microsoft YaHei',serif;padding:40px;line-height:2;color:#333}
+              <style>
+              *{margin:0;padding:0;box-sizing:border-box}
+              body{font-family:'PingFang SC','Microsoft YaHei',serif;padding:30px 40px;line-height:1.8;color:#333}
               h1{text-align:center;font-size:22px;border-bottom:3px solid #2563eb;padding-bottom:10px;margin-bottom:20px}
-              h2{font-size:15px;color:#2563eb;border-left:4px solid #2563eb;padding-left:10px;margin:24px 0 14px}
-              .q{margin:10px 0;padding:6px 10px;font-size:13px;border-radius:4px}.q:nth-child(even){background:#fafbfc}
-              .blank{display:inline-block;width:120px;border-bottom:1.5px solid #555;margin:0 6px}</style>
-              </head><body><h1>${gradeNames[grade]}计算题练习</h1>
-              ${calcProblems.map(c => `<h2>${c.category}</h2>${c.items.map((p, i) => {
-                const text = typeof p === 'string' ? p.split('|||')[0] : String(p);
-                const needsBlank = !text.includes('：');
-                return `<div class="q">${i+1}. ${text}${needsBlank ? ' = <span class="blank"></span>' : ''}</div>`;
-              }).join('')}`).join('')}
+              h2{font-size:15px;color:#2563eb;border-left:4px solid #2563eb;padding-left:10px;margin:20px 0 12px;clear:both}
+              .two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+              .q{padding:5px 8px;font-size:13px;border-bottom:1px dashed #eee;page-break-inside:avoid}
+              .blank{display:inline-block;width:100px;border-bottom:1.5px solid #555;margin:0 4px}
+              .app-area{min-height:70px;border:1px solid #e0e0e0;border-radius:6px;padding:8px;margin:6px 0;background:#fff;page-break-inside:avoid}
+              </style>
+              </head><body>
+              <h1>${gradeNames[grade]}计算题练习</h1>
+              ${calcProblems.map(c => {
+                const isApp = c.category === '应用题';
+                const isFraction = c.category === '分数计算';
+                const items = c.items.slice(0, isApp ? 8 : undefined);
+                return `<h2>${c.category}</h2>${isApp ? items.map((p, i) => {
+                  const text = typeof p === 'string' ? p.split('|||')[0] : String(p);
+                  return `<div class="q"><b>${i+1}.</b> ${text}</div><div class="app-area"></div>`;
+                }).join('') : `<div class="two-col">${items.map((p, i) => {
+                  const text = typeof p === 'string' ? p.split('|||')[0] : String(p);
+                  const needsBlank = !text.includes('：');
+                  return `<div class="q">${i+1}. ${text}${needsBlank || isFraction ? ' = <span class="blank"></span>' : ''}</div>`;
+                }).join('')}</div>`}`;
+              }).join('')}
               </body></html>`;
             const w = window.open('', '_blank');
             if (w) { w.document.write(html); w.document.close(); w.onload = () => w.print(); }
