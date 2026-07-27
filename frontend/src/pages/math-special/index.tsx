@@ -329,9 +329,9 @@ ${thinkings[0]?.problems.slice(0, 2).map((p, i) => `<div class="question">${i + 
 
 <div class="answer-section">
 <h2>参考答案</h2>
-<p class="answer-item"><b>一、四则混合运算：</b>${calcs[0]?.items.slice(0, 8).map((_, i) => `${i + 1}.____`).join('  ')}</p>
+<p class="answer-item"><b>一、四则混合运算：</b>请自行验算</p>
 <p class="answer-item"><b>二、竖式计算：</b>请自行验算</p>
-<p class="answer-item"><b>三、巧算：</b>${calcs[2]?.items.slice(0, 4).map((_, i) => `${i + 1}.____`).join('  ')}</p>
+<p class="answer-item"><b>三、巧算：</b>请自行验算</p>
 ${grade === 3 ? `<p class="answer-item"><b>四、分数计算：</b>${(calcs[3]?.items || []).slice(0, 5).map((_, i) => `${i + 1}.____`).join('  ')}</p>
 <p class="answer-item"><b>五、应用题：</b>${calcs[4]?.items.slice(0, 4).map((p) => { const a = p.split('|||')[1]; return a; }).join('；')}</p>
 <p class="answer-item"><b>六、思维挑战：</b>${thinkings[0]?.problems.slice(0, 2).map(p => p.answer).join('；')}</p>` : `<p class="answer-item"><b>四、应用题：</b>${calcs[3]?.items.slice(0, 5).map(p => p.split('|||')[1]).join('；')}</p>
