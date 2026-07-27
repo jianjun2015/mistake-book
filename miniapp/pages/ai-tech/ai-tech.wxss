@@ -85,3 +85,82 @@
   flex-wrap: wrap;
   gap: 8rpx;
 }
+
+.article-list {
+  margin-top: 16rpx;
+}
+
+.article-card {
+  background: white;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+}
+
+.article-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.article-title {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.article-summary {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.article-meta {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.meta-text {
+  font-size: 22rpx;
+  color: #999;
+}
+
+.tech-release-list {
+  margin-top: 16rpx;
+}
+
+.release-card {
+  background: white;
+  border-radius: 8rpx;
+  padding: 20rpx;
+  margin-bottom: 12rpx;
+  border-left: 4rpx solid #52c41a;
+}
+
+.release-header {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-bottom: 8rpx;
+}
+
+.release-name {
+  font-size: 30rpx;
+  font-weight: bold;
+  color: #333;
+}
+
+.release-desc {
+  font-size: 26rpx;
+  color: #666;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.release-date {
+  font-size: 22rpx;
+  color: #999;
+}

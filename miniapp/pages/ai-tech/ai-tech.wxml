@@ -6,33 +6,67 @@
     <van-button size="small" type="primary" bind:click="refreshData">刷新数据</van-button>
   </view>
 
-  <view class="filter-bar">
-    <scroll-view scroll-x class="filter-scroll">
-      <view 
-        wx:for="{{categories}}" 
-        wx:key="key"
-        class="filter-item {{selectedCategory === item.key ? 'active' : ''}}"
-        style="{{selectedCategory === item.key ? 'background:' + item.color + ';border-color:' + item.color : ''}}"
-        bindtap="filterByCategory"
-        data-category="{{item.key}}"
-      >
-        {{item.name}}
+  <van-tabs active="{{activeTab}}" bind:change="onTabChange">
+    <van-tab title="🔧 AI技术" name="tech">
+      <view class="filter-bar">
+        <scroll-view scroll-x class="filter-scroll">
+          <view 
+            wx:for="{{categories}}" 
+            wx:key="key"
+            class="filter-item {{selectedCategory === item.key ? 'active' : ''}}"
+            style="{{selectedCategory === item.key ? 'background:' + item.color + ';border-color:' + item.color : ''}}"
+            bindtap="filterByCategory"
+            data-category="{{item.key}}"
+          >
+            {{item.name}}
+          </view>
+        </scroll-view>
       </view>
-    </scroll-view>
-  </view>
 
-  <view class="tech-list">
-    <view class="tech-card" wx:for="{{filteredList}}" wx:key="id" bindtap="openLink" data-url="{{item.link}}">
-      <view class="tech-header">
-        <text class="tech-name">{{item.name}}</text>
-        <van-tag type="primary" size="small">{{item.category}}</van-tag>
+      <view class="tech-list">
+        <view class="tech-card" wx:for="{{filteredList}}" wx:key="id">
+          <view class="tech-header">
+            <text class="tech-name">{{item.name}}</text>
+            <van-tag type="primary" size="small">{{item.category}}</van-tag>
+          </view>
+          <text class="tech-desc">{{item.description}}</text>
+          <view class="tech-features">
+            <van-tag wx:for="{{item.features}}" wx:key="*this" wx:for-item="feature" size="small" plain>
+              {{feature}}
+            </van-tag>
+          </view>
+        </view>
       </view>
-      <text class="tech-desc">{{item.description}}</text>
-      <view class="tech-features">
-        <van-tag wx:for="{{item.features}}" wx:key="*this" wx:for-item="feature" size="small" plain>
-          {{feature}}
-        </van-tag>
+    </van-tab>
+
+    <van-tab title="🔥 热点文章" name="hot">
+      <view class="article-list">
+        <view class="article-card" wx:for="{{hotArticles}}" wx:key="id">
+          <view class="article-header">
+            <van-tag type="danger" size="small" wx:if="{{item.hot}}">热门</van-tag>
+            <text class="article-title">{{item.title}}</text>
+          </view>
+          <text class="article-summary">{{item.summary}}</text>
+          <view class="article-meta">
+            <van-tag size="small">{{item.category}}</van-tag>
+            <text class="meta-text">{{item.date}}</text>
+          </view>
+        </view>
       </view>
-    </view>
-  </view>
+    </van-tab>
+
+    <van-tab title="🚀 新技术发布" name="new">
+      <view class="tech-release-list">
+        <view class="release-card" wx:for="{{newTech}}" wx:key="id">
+          <view class="release-header">
+            <van-tag type="success" size="small" wx:if="{{item.isNew}}">新发布</van-tag>
+            <text class="release-name">{{item.name}}</text>
+            <van-tag size="small" plain>{{item.company}}</van-tag>
+          </view>
+          <text class="release-desc">{{item.description}}</text>
+          <text class="release-date">发布日期: {{item.date}}</text>
+        </view>
+      </view>
+    </van-tab>
+  </van-tabs>
 </view>
