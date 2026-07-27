@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, Button, Space, Tabs, Input, Empty, message } from 'antd';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, DownloadOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import { gradeConfigs } from './config';
 import type { SubjectConfig } from './config';
@@ -9,19 +9,19 @@ import { getDoubt, saveDoubt } from '../../api/knowledge';
 const { TextArea } = Input;
 
 const KnowledgeSummaryPage: React.FC = () => {
-  const [selectedGrade, setSelectedGrade] = useState<string>('grade3');
-  const [selectedSemester, setSelectedSemester] = useState<string>('grade3-down');
+  const [selectedGrade, setSelectedGrade] = useState('grade3');
+  const [selectedSemester, setSelectedSemester] = useState('grade3-up');
   const [selectedSubject, setSelectedSubject] = useState<SubjectConfig | null>(null);
-  const [activeTab, setActiveTab] = useState<string>('summary');
-  const [doubtContent, setDoubtContent] = useState<string>('');
-  const [, setDoubtId] = useState<number | undefined>(undefined);
+  const [activeTab, setActiveTab] = useState('summary');
+  const [doubtContent, setDoubtContent] = useState('');
   const [saving, setSaving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const currentGrade = gradeConfigs.find(g => g.key === selectedGrade);
   const currentSemester = currentGrade?.semesters.find(s => s.key === selectedSemester);
 
   // 加载疑难点内容
-  useEffect(() => {
+  React.useEffect(() => {
     if (selectedSubject && selectedSemester) {
       loadDoubt();
     }
@@ -33,13 +33,10 @@ const KnowledgeSummaryPage: React.FC = () => {
     try {
       const res = await getDoubt(selectedSemester, selectedSubject.key);
       if (res.data) {
-        setDoubtContent(res.data.content || '');
-        setDoubtId(res.data.id);
+        setDoubtContent((res.data as any).content || '');
       }
     } catch (err) {
-      console.error('加载疑难点失败', err);
       setDoubtContent('');
-      setDoubtId(undefined);
     }
   };
 
@@ -68,11 +65,29 @@ const KnowledgeSummaryPage: React.FC = () => {
       });
       message.success('保存成功！');
     } catch (err) {
-      console.error('保存疑难点失败', err);
       message.error('保存失败');
     } finally {
       setSaving(false);
     }
+  };
+
+  // 下载PDF
+  const handleDownloadPdf = () => {
+    if (!selectedSubject || !selectedSemester) return;
+    
+    setDownloading(true);
+    message.loading('正在生成PDF...', 0);
+
+    // 获取iframe内容并打印
+    const iframe = document.querySelector('iframe');
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.print();
+    }
+
+    setTimeout(() => {
+      message.destroy();
+      setDownloading(false);
+    }, 1000);
   };
 
   const tabItems = selectedSubject ? [
@@ -160,11 +175,21 @@ const KnowledgeSummaryPage: React.FC = () => {
     return (
       <MainLayout>
         <div style={{ padding: 24 }}>
-          <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', gap: 16 }}>
-            <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
-            <h2 style={{ margin: 0 }}>
-              {selectedSubject.icon} {currentGrade?.name} {currentSemester?.name} - {selectedSubject.name}
-            </h2>
+          <div style={{ marginBottom: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <Button icon={<ArrowLeftOutlined />} onClick={handleBack}>返回</Button>
+              <h2 style={{ margin: 0 }}>
+                {selectedSubject.icon} {currentGrade?.name} {currentSemester?.name} - {selectedSubject.name}
+              </h2>
+            </div>
+            <Button 
+              type="primary" 
+              icon={<DownloadOutlined />} 
+              onClick={handleDownloadPdf}
+              loading={downloading}
+            >
+              下载 PDF
+            </Button>
           </div>
 
           <Tabs
