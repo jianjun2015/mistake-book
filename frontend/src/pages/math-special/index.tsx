@@ -108,10 +108,10 @@ const generateCalculationProblems = (grade: number) => {
       else if (type === 3) { const a = randInt(100, 999); mixProblems.push(`(${a} + ${randInt(100, 999)}) × ${randInt(2, 9)}`); }
       else { const a = randInt(100, 999), b = randInt(10, 99); mixProblems.push(`${a} ÷ ${b % 9 + 2} + ${randInt(100, 999)} ÷ ${b % 9 + 2}`); }
     } else {
-      if (type === 1) { const a = randInt(10, 99) / 10, b = randInt(10, 99) / 10; mixProblems.push(`(${a} + ${b}) × (${randInt(10, 99) / 10} - ${randInt(10, 99) / 10})`); }
-      else if (type === 2) { const a = randInt(100, 999) / 10, b = randInt(10, 30) / 10; mixProblems.push(`${a} ÷ ${b} - ${randInt(10, 99) / 10} × ${randInt(2, 5)}`); }
-      else if (type === 3) { const a = randInt(10, 99) / 10; mixProblems.push(`${a} × ${randInt(2, 5)} + ${randInt(10, 99) / 10} × ${randInt(2, 5)}`); }
-      else { const a = randInt(10, 99) / 10, b = randInt(10, 99) / 10; mixProblems.push(`(${a} + ${b}) × ${randInt(2, 5)}`); }
+      if (type === 1) { const a = randInt(100, 999), b = randInt(10, 99); mixProblems.push(`(${a} + ${b}) × ${randInt(2, 9)}`); }
+      else if (type === 2) { const a = randInt(1000, 9999), b = randInt(10, 99); mixProblems.push(`${a} ÷ ${b} - ${randInt(100, 999)}`); }
+      else if (type === 3) { const a = randInt(100, 999); mixProblems.push(`${a} × ${randInt(2, 9)} + ${randInt(100, 999)} ÷ ${randInt(2, 9)}`); }
+      else { const a = randInt(100, 999), b = randInt(10, 99); mixProblems.push(`(${a} - ${b}) × ${randInt(2, 9)}`); }
     }
   }
   problems.push({ category: '四则混合运算', items: shuffle(mixProblems) });
@@ -129,9 +129,9 @@ const generateCalculationProblems = (grade: number) => {
       else if (type === 2) verticalProblems.push(`${randInt(1000, 9999)} ÷ ${randInt(10, 99)}`);
       else verticalProblems.push(`${randInt(1000, 9999)} + ${randInt(1000, 9999)}`);
     } else {
-      if (type === 1) verticalProblems.push(`${(randInt(10, 99) / 10).toFixed(1)} × ${(randInt(10, 99) / 10).toFixed(1)}`);
-      else if (type === 2) verticalProblems.push(`${(randInt(100, 999) / 10).toFixed(1)} ÷ ${(randInt(10, 99) / 10).toFixed(1)}`);
-      else verticalProblems.push(`${(randInt(100, 999) / 10).toFixed(1)} + ${(randInt(100, 999) / 10).toFixed(1)}`);
+      if (type === 1) verticalProblems.push(`${randInt(100, 999)} × ${randInt(10, 99)}`);
+      else if (type === 2) verticalProblems.push(`${randInt(1000, 9999)} ÷ ${randInt(10, 99)}`);
+      else verticalProblems.push(`${randInt(1000, 9999)} + ${randInt(1000, 9999)}`);
     }
   }
   problems.push({ category: '竖式计算', items: shuffle(verticalProblems) });
@@ -155,17 +155,18 @@ const generateCalculationProblems = (grade: number) => {
   } else {
     cleverProblems = [
       // 凑整法
-      '99 + 78.5', '198 + 456', '1001 - 567', '302 + 698',
-      // 小数巧算
-      '9.9 × 7', '2.5 × 4.4', '0.99 × 101', '1.25 × 32',
-      '0.25 × 44', '9.9 + 99.9', '10.1 × 5.6',
+      '99 + 78', '198 + 456', '1001 - 567', '302 + 698',
+      // 减法巧算
+      '523 - 198', '765 - 299', '1000 - 367', '456 - 199',
       // 乘法巧算
       '25 × 44', '125 × 32', '999 × 6', '99 × 99',
-      '25 × 36', '125 × 24',
+      '25 × 36', '125 × 24', '50 × 18', '25 × 16',
       // 除法巧算
       '360 ÷ 5', '480 ÷ 24', '720 ÷ 36', '250 ÷ 5',
       // 混合巧算
       '125 × 8 + 78', '99 × 5 + 99', '37 × 3 × 9',
+      // 连续运算
+      '125 + 78 + 75', '368 + 256 + 132', '876 - 234 - 76',
     ];
   }
   problems.push({ category: '巧算', items: shuffle(cleverProblems) });
