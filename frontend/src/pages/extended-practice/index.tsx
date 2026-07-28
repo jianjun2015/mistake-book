@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Card, Tabs, Tag, Space, Collapse, Alert, Button } from 'antd';
+import { Card, Tabs, Tag, Collapse, Alert, Image } from 'antd';
 import { ExperimentOutlined, TrophyOutlined, ReadOutlined, SafetyOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 
-const { Panel } = Collapse;
 
-// 学生小实验数据
+// 学生小实验数据（带图片）
 const experiments = [
   {
     title: '🌋 火山喷发实验',
+    image: 'https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400',
     materials: ['小苏打', '白醋', '洗洁精', '食用色素', '塑料瓶'],
     steps: [
       '在塑料瓶中放入2勺小苏打',
@@ -22,6 +22,7 @@ const experiments = [
   },
   {
     title: '🌈 彩虹牛奶实验',
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?w=400',
     materials: ['全脂牛奶', '食用色素', '洗洁精', '棉签', '盘子'],
     steps: [
       '将牛奶倒入盘子中',
@@ -35,6 +36,7 @@ const experiments = [
   },
   {
     title: '🥚 鸡蛋浮沉实验',
+    image: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=400',
     materials: ['鸡蛋', '水', '盐', '玻璃杯'],
     steps: [
       '在玻璃杯中倒入清水',
@@ -47,6 +49,7 @@ const experiments = [
   },
   {
     title: '🎈 静电实验',
+    image: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=400',
     materials: ['气球', '毛衣或头发', '小纸片'],
     steps: [
       '吹起气球',
@@ -59,6 +62,7 @@ const experiments = [
   },
   {
     title: '🌱 植物生长实验',
+    image: 'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?w=400',
     materials: ['绿豆', '纸巾', '塑料杯', '水'],
     steps: [
       '在塑料杯中放入湿润的纸巾',
@@ -71,6 +75,7 @@ const experiments = [
   },
   {
     title: '💧 水的表面张力',
+    image: 'https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=400',
     materials: ['硬币', '滴管', '水', '洗洁精'],
     steps: [
       '用滴管往硬币上滴水',
@@ -87,6 +92,7 @@ const experiments = [
 const games = [
   {
     title: '🔢 24点游戏',
+    image: 'https://images.unsplash.com/photo-1509228468518-180dd4864864?w=400',
     description: '用4个数字通过加减乘除得到24',
     howToPlay: [
       '随机抽取4张扑克牌',
@@ -99,6 +105,7 @@ const games = [
   },
   {
     title: '📝 成语接龙',
+    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400',
     description: '用成语最后一个字接下一个成语',
     howToPlay: [
       '第一个人说一个成语',
@@ -111,6 +118,7 @@ const games = [
   },
   {
     title: '🔤 单词拼写比赛',
+    image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400',
     description: '英语单词拼写竞赛',
     howToPlay: [
       '主持人读出单词和中文意思',
@@ -123,6 +131,7 @@ const games = [
   },
   {
     title: '🧮 数独游戏',
+    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400',
     description: '在9×9格子中填入1-9的数字',
     howToPlay: [
       '每行必须包含1-9不重复',
@@ -135,6 +144,7 @@ const games = [
   },
   {
     title: '🎯 知识问答',
+    image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400',
     description: '各科知识抢答竞赛',
     howToPlay: [
       '准备各科知识题目',
@@ -151,40 +161,41 @@ const games = [
 const extracurricular = [
   {
     title: '📖 经典阅读',
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
     items: [
-      { name: '《西游记》', desc: '中国古典四大名著之一，充满想象力' },
-      { name: '《三国演义》', desc: '了解三国历史，学习智慧和谋略' },
-      { name: '《小王子》', desc: '法国经典童话，富含人生哲理' },
-      { name: '《夏洛的网》', desc: '关于友情和生命的感人故事' },
-      { name: '《窗边的小豆豆》', desc: '日本经典儿童文学，理解教育' },
+      { name: '《西游记》', desc: '中国古典四大名著之一，充满想象力', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200' },
+      { name: '《三国演义》', desc: '了解三国历史，学习智慧和谋略', image: 'https://images.unsplash.com/photo-1541963463532-d6829d20b504?w=200' },
+      { name: '《小王子》', desc: '法国经典童话，富含人生哲理', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200' },
+      { name: '《夏洛的网》', desc: '关于友情和生命的感人故事', image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200' },
     ],
   },
   {
     title: '🎬 教育纪录片',
+    image: 'https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=400',
     items: [
-      { name: '《地球脉动》', desc: 'BBC自然纪录片，了解地球生态' },
-      { name: '《蓝色星球》', desc: '探索海洋世界的奥秘' },
-      { name: '《河西走廊》', desc: '了解中国历史文化' },
-      { name: '《数学的故事》', desc: '探索数学的发展历程' },
-      { name: '《宇宙时空之旅》', desc: '了解宇宙的奥秘' },
+      { name: '《地球脉动》', desc: 'BBC自然纪录片，了解地球生态', image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=200' },
+      { name: '《蓝色星球》', desc: '探索海洋世界的奥秘', image: 'https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=200' },
+      { name: '《河西走廊》', desc: '了解中国历史文化', image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?w=200' },
     ],
   },
   {
     title: '🎨 兴趣培养',
+    image: 'https://images.unsplash.com/photo-1513364776144-60967b0f80ef?w=400',
     items: [
-      { name: '绘画', desc: '培养艺术审美和创造力' },
-      { name: '书法', desc: '练字修身，培养耐心' },
-      { name: '编程', desc: '学习逻辑思维和解决问题能力' },
-      { name: '音乐', desc: '学习乐器，培养艺术修养' },
-      { name: '手工', desc: '锻炼动手能力和创造力' },
+      { name: '绘画', desc: '培养艺术审美和创造力', image: 'https://images.unsplash.com/photo-1513364776144-60967b0f80ef?w=200' },
+      { name: '书法', desc: '练字修身，培养耐心', image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=200' },
+      { name: '编程', desc: '学习逻辑思维和解决问题能力', image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200' },
     ],
   },
 ];
 
 // 运动规则数据
-const sportsRules: Record<string, { icon: string; rules: string[]; tips: string[] }> = {
-  '足球': {
+const sportsRules = [
+  {
+    name: '足球',
     icon: '⚽',
+    image: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400',
+    video: 'https://www.w3schools.com/html/mov_bbb.mp4',
     rules: [
       '每队11人，其中1名守门员',
       '比赛时间90分钟（上下半场各45分钟）',
@@ -194,47 +205,40 @@ const sportsRules: Record<string, { icon: string; rules: string[]; tips: string[
       '犯规可判罚任意球或点球',
       '黄牌警告，两张黄牌或一张红牌罚下',
     ],
-    tips: [
-      '基本功：传球、停球、带球、射门',
-      '团队配合比个人技术更重要',
-      '注意跑位和接应',
-    ],
+    tips: ['基本功：传球、停球、带球、射门', '团队配合比个人技术更重要', '注意跑位和接应'],
   },
-  '篮球': {
+  {
+    name: '篮球',
     icon: '🏀',
+    image: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
     rules: [
       '每队5人上场',
       '比赛时间48分钟（NBA）或40分钟（FIBA）',
       '投篮进入篮筐得分：三分线外3分，线内2分，罚球1分',
       '运球时不能双手同时触球',
       '走步：持球移动超过两步',
-      '犯规5次（NBA）或5次（FIBA）被罚下',
+      '犯规5次被罚下',
       '24秒进攻时限',
     ],
-    tips: [
-      '基本功：运球、投篮、传球、防守',
-      '多练习投篮，找到自己的投篮节奏',
-      '注意团队配合和跑位',
-    ],
+    tips: ['基本功：运球、投篮、传球、防守', '多练习投篮，找到投篮节奏', '注意团队配合和跑位'],
   },
-  '羽毛球': {
+  {
+    name: '羽毛球',
     icon: '🏸',
+    image: 'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400',
     rules: [
       '单打或双打',
       '21分制，三局两胜',
       '发球必须过网，落在对角发球区',
       '球落在对方场地内得分',
       '发球时球拍必须低于腰部',
-      '双打发球区域与单打不同',
     ],
-    tips: [
-      '基本功：握拍、发球、高远球、吊球',
-      '步伐很重要，要多练习移动',
-      '注意观察对手的弱点',
-    ],
+    tips: ['基本功：握拍、发球、高远球、吊球', '步伐很重要，要多练习移动', '注意观察对手的弱点'],
   },
-  '乒乓球': {
+  {
+    name: '乒乓球',
     icon: '🏓',
+    image: 'https://images.unsplash.com/photo-1558741225-31e48c7e8e8a?w=400',
     rules: [
       '单打或双打',
       '11分制，三局两胜或五局三胜',
@@ -242,29 +246,22 @@ const sportsRules: Record<string, { icon: string; rules: string[]; tips: string[
       '每人轮流发2个球',
       '10:10时需领先2分才能获胜',
     ],
-    tips: [
-      '基本功：握拍、发球、正手攻球、反手推挡',
-      '练习旋转球',
-      '注意步伐移动和身体协调',
-    ],
+    tips: ['基本功：握拍、发球、正手攻球、反手推挡', '练习旋转球', '注意步伐移动和身体协调'],
   },
-  '排球': {
+  {
+    name: '排球',
     icon: '🏐',
+    image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67f6?w=400',
     rules: [
       '每队6人上场',
       '25分制，五局三胜',
       '每方最多触球3次（拦网除外）',
       '球落在对方场地内得分',
       '发球不能踩线',
-      '后排球员不能在前排扣球',
     ],
-    tips: [
-      '基本功：垫球、传球、扣球、发球',
-      '团队配合很重要',
-      '注意站位和轮转',
-    ],
+    tips: ['基本功：垫球、传球、扣球、发球', '团队配合很重要', '注意站位和轮转'],
   },
-};
+];
 
 const ExtendedPracticePage: React.FC = () => {
   const [activeTab, setActiveTab] = useState('experiments');
@@ -278,26 +275,14 @@ const ExtendedPracticePage: React.FC = () => {
 
   const experimentsTab = (
     <div>
-      <Alert
-        message="安全提示"
-        description="所有实验请在家长陪同下进行，注意安全！"
-        type="warning"
-        showIcon
-        style={{ marginBottom: 16 }}
-      />
-      <Collapse defaultActiveKey={[]}>
+      <Alert message="安全提示" description="所有实验请在家长陪同下进行，注意安全！" type="warning" showIcon style={{ marginBottom: 16 }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 16 }}>
         {experiments.map((exp, idx) => (
-          <Panel
-            key={idx}
-            header={
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <span style={{ fontWeight: 'bold' }}>{exp.title}</span>
-                <Tag color={exp.difficulty === 'easy' ? 'green' : 'orange'}>
-                  {exp.difficulty === 'easy' ? '简单' : '中等'}
-                </Tag>
-              </div>
-            }
-          >
+          <Card key={idx} hoverable cover={<Image src={exp.image} alt={exp.title} height={200} style={{ objectFit: 'cover' }} />}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <h3 style={{ margin: 0 }}>{exp.title}</h3>
+              <Tag color="green">简单</Tag>
+            </div>
             <Card size="small" style={{ marginBottom: 8 }}>
               <h4>🧪 实验材料</h4>
               <ul>{exp.materials.map((m, i) => <li key={i}>{m}</li>)}</ul>
@@ -310,25 +295,19 @@ const ExtendedPracticePage: React.FC = () => {
               <h4>💡 实验原理</h4>
               <p>{exp.principle}</p>
             </Card>
-          </Panel>
+          </Card>
         ))}
-      </Collapse>
+      </div>
     </div>
   );
 
   const gamesTab = (
     <div>
-      <Collapse defaultActiveKey={[]}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 16 }}>
         {games.map((game, idx) => (
-          <Panel
-            key={idx}
-            header={
-              <div>
-                <span style={{ fontWeight: 'bold' }}>{game.title}</span>
-                <span style={{ color: '#999', marginLeft: 8, fontSize: 13 }}>{game.description}</span>
-              </div>
-            }
-          >
+          <Card key={idx} hoverable cover={<Image src={game.image} alt={game.title} height={200} style={{ objectFit: 'cover' }} />}>
+            <h3 style={{ margin: '0 0 12px' }}>{game.title}</h3>
+            <p style={{ color: '#666', marginBottom: 12 }}>{game.description}</p>
             <Card size="small" style={{ marginBottom: 8 }}>
               <h4>🎮 游戏规则</h4>
               <ol>{game.howToPlay.map((r, i) => <li key={i}>{r}</li>)}</ol>
@@ -341,9 +320,9 @@ const ExtendedPracticePage: React.FC = () => {
               <h4>🎯 学习收获</h4>
               <p>{game.benefits}</p>
             </Card>
-          </Panel>
+          </Card>
         ))}
-      </Collapse>
+      </div>
     </div>
   );
 
@@ -351,12 +330,14 @@ const ExtendedPracticePage: React.FC = () => {
     <div>
       {extracurricular.map((category, idx) => (
         <Card key={idx} title={category.title} style={{ marginBottom: 16 }}>
-          {category.items.map((item, i) => (
-            <div key={i} style={{ padding: '12px 0', borderBottom: i < category.items.length - 1 ? '1px solid #f0f0f0' : 'none' }}>
-              <h4 style={{ margin: '0 0 4px', color: '#1890ff' }}>{item.name}</h4>
-              <p style={{ margin: 0, color: '#666' }}>{item.desc}</p>
-            </div>
-          ))}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: 16 }}>
+            {category.items.map((item, i) => (
+              <Card key={i} size="small" hoverable cover={<Image src={item.image} alt={item.name} height={150} style={{ objectFit: 'cover' }} />}>
+                <h4 style={{ margin: '0 0 8px', color: '#1890ff' }}>{item.name}</h4>
+                <p style={{ margin: 0, color: '#666' }}>{item.desc}</p>
+              </Card>
+            ))}
+          </div>
         </Card>
       ))}
     </div>
@@ -364,28 +345,24 @@ const ExtendedPracticePage: React.FC = () => {
 
   const sportsTab = (
     <div>
-      <Collapse defaultActiveKey={Object.keys(sportsRules)}>
-        {Object.entries(sportsRules).map(([sport, data]) => (
-          <Panel
-            key={sport}
-            header={
-              <span>
-                <span style={{ marginRight: 8 }}>{data.icon}</span>
-                <span style={{ fontWeight: 'bold' }}>{sport}</span>
-              </span>
-            }
-          >
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: 16 }}>
+        {sportsRules.map((sport, idx) => (
+          <Card key={idx} hoverable cover={<Image src={sport.image} alt={sport.name} height={200} style={{ objectFit: 'cover' }} />}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+              <span style={{ fontSize: 32 }}>{sport.icon}</span>
+              <h3 style={{ margin: 0 }}>{sport.name}</h3>
+            </div>
             <Card size="small" style={{ marginBottom: 8 }}>
               <h4>📋 基本规则</h4>
-              <ul>{data.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
+              <ul>{sport.rules.map((r, i) => <li key={i}>{r}</li>)}</ul>
             </Card>
             <Card size="small">
               <h4>💡 学习建议</h4>
-              <ul>{data.tips.map((t, i) => <li key={i}>{t}</li>)}</ul>
+              <ul>{sport.tips.map((t, i) => <li key={i}>{t}</li>)}</ul>
             </Card>
-          </Panel>
+          </Card>
         ))}
-      </Collapse>
+      </div>
     </div>
   );
 
