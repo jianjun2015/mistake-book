@@ -15,6 +15,7 @@ import MathSpecialPage from './pages/math-special';
 import AITechPage from './pages/ai-tech';
 import LearningMethodsPage from './pages/learning-methods';
 import ExtendedPracticePage from './pages/extended-practice';
+import PerformancePage from './pages/performance';
 import { Spin } from 'antd';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -49,6 +50,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/ai-tech" element={<ProtectedRoute><AITechPage /></ProtectedRoute>} />
     <Route path="/learning-methods" element={<ProtectedRoute><LearningMethodsPage /></ProtectedRoute>} />
     <Route path="/extended-practice" element={<ProtectedRoute><ExtendedPracticePage /></ProtectedRoute>} />
+    <Route path="/performance" element={<ProtectedRoute><PerformancePage /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />
   </Routes>
 );

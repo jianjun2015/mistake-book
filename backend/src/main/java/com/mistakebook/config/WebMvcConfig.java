@@ -21,6 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/auth/login",
                         "/api/hello",
                         "/api/test/**",
+                        "/api/ai-news/**",
                         "/doc.html",
                         "/webjars/**",
                         "/swagger-resources/**",

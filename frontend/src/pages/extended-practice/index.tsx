@@ -92,7 +92,7 @@ const experiments = [
 const games = [
   {
     title: '🔢 24点游戏',
-    image: 'https://images.unsplash.com/photo-1509228468518-180dd4864864?w=400',
+    image: '/images/extended-practice/24点游戏.svg',
     description: '用4个数字通过加减乘除得到24',
     howToPlay: [
       '随机抽取4张扑克牌',
@@ -131,7 +131,7 @@ const games = [
   },
   {
     title: '🧮 数独游戏',
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400',
+    image: '/images/extended-practice/数独游戏.svg',
     description: '在9×9格子中填入1-9的数字',
     howToPlay: [
       '每行必须包含1-9不重复',
@@ -163,10 +163,10 @@ const extracurricular = [
     title: '📖 经典阅读',
     image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=400',
     items: [
-      { name: '《西游记》', desc: '中国古典四大名著之一，充满想象力', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200' },
-      { name: '《三国演义》', desc: '了解三国历史，学习智慧和谋略', image: 'https://images.unsplash.com/photo-1541963463532-d6829d20b504?w=200' },
-      { name: '《小王子》', desc: '法国经典童话，富含人生哲理', image: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=200' },
-      { name: '《夏洛的网》', desc: '关于友情和生命的感人故事', image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?w=200' },
+      { name: '《西游记》', desc: '中国古典四大名著之一，充满想象力', image: '/images/extended-practice/西游记.svg' },
+      { name: '《三国演义》', desc: '了解三国历史，学习智慧和谋略', image: "/images/extended-practice/三国演义.svg" },
+      { name: '《小王子》', desc: '法国经典童话，富含人生哲理', image: '/images/extended-practice/小王子.svg' },
+      { name: '《夏洛的网》', desc: '关于友情和生命的感人故事', image: '/images/extended-practice/西游记.svg' },
     ],
   },
   {
@@ -182,7 +182,7 @@ const extracurricular = [
     title: '🎨 兴趣培养',
     image: 'https://images.unsplash.com/photo-1513364776144-60967b0f80ef?w=400',
     items: [
-      { name: '绘画', desc: '培养艺术审美和创造力', image: 'https://images.unsplash.com/photo-1513364776144-60967b0f80ef?w=200' },
+      { name: '绘画', desc: '培养艺术审美和创造力', image: '/images/extended-practice/绘画.svg' },
       { name: '书法', desc: '练字修身，培养耐心', image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=200' },
       { name: '编程', desc: '学习逻辑思维和解决问题能力', image: 'https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=200' },
     ],
@@ -238,7 +238,7 @@ const sportsRules = [
   {
     name: '乒乓球',
     icon: '🏓',
-    image: 'https://images.unsplash.com/photo-1558741225-31e48c7e8e8a?w=400',
+    image: '/images/extended-practice/排球.svg',
     rules: [
       '单打或双打',
       '11分制，三局两胜或五局三胜',
@@ -251,7 +251,7 @@ const sportsRules = [
   {
     name: '排球',
     icon: '🏐',
-    image: 'https://images.unsplash.com/photo-1612872087720-bb876e2e67f6?w=400',
+    image: '/images/extended-practice/乒乓球.svg',
     rules: [
       '每队6人上场',
       '25分制，五局三胜',
@@ -260,6 +260,20 @@ const sportsRules = [
       '发球不能踩线',
     ],
     tips: ['基本功：垫球、传球、扣球、发球', '团队配合很重要', '注意站位和轮转'],
+  },
+  {
+    name: '跳绳',
+    icon: '🤸',
+    image: '/images/extended-practice/跳绳.svg',
+    summary: '简单有效的有氧运动，锻炼协调性',
+    rules: [
+      '单摇：每次跳跃绳子经过脚下一次',
+      '双摇：每次跳跃绳子经过脚下两次',
+      '计时赛：规定时间内跳的次数多者获胜',
+      '计数赛：先达到规定次数者获胜',
+      '花样跳绳：交叉跳、双人跳、多人跳等',
+    ],
+    tips: ['手腕发力，不要大臂甩绳', '起跳高度2-3厘米即可', '保持节奏稳定', '循序渐进增加数量'],
   },
 ];
 

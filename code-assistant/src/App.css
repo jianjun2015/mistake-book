@@ -1,0 +1,193 @@
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.header {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  padding: 16px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 24px;
+  background: linear-gradient(120deg, #1677ff, #722ed1);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.main-content {
+  padding: 24px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.input-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.result-section {
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.code-block {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.markdown-content {
+  line-height: 1.8;
+}
+
+.markdown-content h2 {
+  color: #1677ff;
+  margin-top: 16px;
+}
+
+.markdown-content h3 {
+  color: #722ed1;
+}
+
+.markdown-content ul, .markdown-content ol {
+  padding-left: 20px;
+}
+
+.markdown-content code {
+  background: #f5f5f5;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Monaco', monospace;
+}
+
+.markdown-content pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+
+.chat-container {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 16px;
+  background: #fafafa;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.chat-message {
+  margin-bottom: 12px;
+  display: flex;
+}
+
+.chat-message.user {
+  justify-content: flex-end;
+}
+
+.chat-message.assistant {
+  justify-content: flex-start;
+}
+
+.chat-bubble {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 12px;
+  word-break: break-word;
+}
+
+.chat-bubble.user {
+  background: #1677ff;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.chat-bubble.assistant {
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  border-bottom-left-radius: 4px;
+}
+
+.agent-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.agent-btn {
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 2px solid #d9d9d9;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.agent-btn:hover {
+  border-color: #1677ff;
+  color: #1677ff;
+}
+
+.agent-btn.active {
+  background: #1677ff;
+  color: white;
+  border-color: #1677ff;
+}
+
+.pipeline-steps {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+}
+
+.step-card {
+  min-width: 120px;
+  text-align: center;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.step-card.active {
+  background: #e6f7ff;
+  border: 2px solid #1677ff;
+}
+
+.step-card.completed {
+  background: #f6ffed;
+  border: 2px solid #52c41a;
+}
+
+.step-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.step-name {
+  font-size: 12px;
+  color: #666;
+}
