@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Tag, Space, Button, Spin, message, Tabs, List } from 'antd';
-import { ReloadOutlined, RobotOutlined, ClockCircleOutlined, FireOutlined, ThunderboltOutlined, LinkOutlined } from '@ant-design/icons';
+import { Card, Tag, Space, Button, Tabs, List } from 'antd';
+import { ReloadOutlined, RobotOutlined, ClockCircleOutlined, FireOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import request from '../../utils/request';
 
-// AI技术数据接口
 interface AITechItem {
   id: string;
   name: string;
@@ -35,7 +34,6 @@ interface NewTech {
   isNew: boolean;
 }
 
-// AI技术数据
 const aiTechData: AITechItem[] = [
   { id: '1', name: 'GPT-4o', category: '大语言模型', description: 'OpenAI最新的多模态大模型', features: ['多模态', '实时语音', '代码生成'], link: 'https://openai.com/gpt-4o', color: '#10a37f', year: '2024' },
   { id: '2', name: 'Claude 3.5 Sonnet', category: '大语言模型', description: 'Anthropic高性能AI助手', features: ['长上下文', '代码理解', '安全对齐'], link: 'https://claude.ai', color: '#d97706', year: '2024' },
@@ -75,49 +73,31 @@ const AITechPage: React.FC = () => {
     setLoading(true);
     const now = new Date();
     setLastUpdate(now.toLocaleString('zh-CN'));
-    localStorage.setItem('ai_tech_last_update', now.toISOString());
     
     // 获取热点文章
     request.get('/ai-news/hot').then((res: any) => {
-      if (res.code === 200) {
+      if (res.code === 200 && res.data) {
         setHotArticles(res.data);
       }
-    }).catch(() => {
-      // 使用默认数据
-      setHotArticles([
-        { id: '1', title: 'GPT-5即将发布：OpenAI预告重大突破', summary: 'OpenAI宣布GPT-5将在未来几个月内发布', category: '大语言模型', date: '2024-01-15', source: 'OpenAI', hot: true },
-        { id: '2', title: 'Google发布Gemini 2.0', summary: '性能全面超越GPT-4', category: '大语言模型', date: '2024-01-14', source: 'Google', hot: true },
-        { id: '3', title: 'Meta开源Llama 4', summary: '最强开源模型诞生', category: '开源模型', date: '2024-01-13', source: 'Meta', hot: false },
-      ]);
+    }).catch((err: any) => {
+      console.error('获取热点文章失败:', err);
     });
 
     // 获取新技术
     request.get('/ai-news/new-tech').then((res: any) => {
-      if (res.code === 200) {
+      if (res.code === 200 && res.data) {
         setNewTech(res.data);
       }
-    }).catch(() => {
-      // 使用默认数据
-      setNewTech([
-        { id: '1', name: 'GPT-4o Turbo', company: 'OpenAI', description: '更快更便宜的GPT-4o', date: '2024-01-15', isNew: true },
-        { id: '2', name: 'Stable Diffusion XL Turbo', company: 'Stability AI', description: '实时图像生成', date: '2024-01-14', isNew: true },
-      ]);
+    }).catch((err: any) => {
+      console.error('获取新技术失败:', err);
     });
 
-    setTimeout(() => setLoading(false), 500);
+    setLoading(false);
   };
 
   useEffect(() => {
-    const lastUpdateStr = localStorage.getItem('ai_tech_last_update');
-    if (lastUpdateStr) {
-      const lastUpdateDate = new Date(lastUpdateStr);
-      const now = new Date();
-      const hoursDiff = (now.getTime() - lastUpdateDate.getTime()) / (1000 * 60 * 60);
-      setLastUpdate(lastUpdateDate.toLocaleString('zh-CN'));
-      if (hoursDiff >= 3) loadData();
-    } else {
-      loadData();
-    }
+    loadData();
+    // 每3小时自动刷新
     const interval = setInterval(loadData, 3 * 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -168,7 +148,6 @@ const AITechPage: React.FC = () => {
             key={item.id}
             hoverable
             style={{ borderTop: `3px solid ${item.color}` }}
-            onClick={() => window.open(item.link, '_blank')}
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
@@ -193,31 +172,34 @@ const AITechPage: React.FC = () => {
   const hotTab = (
     <div>
       <Card title="🔥 AI热点文章" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
-        <List
-          dataSource={hotArticles}
-          renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <Space>
-                    {item.hot && <Tag color="red">热门</Tag>}
-                    <span>{item.title}</span>
-                  </Space>
-                }
-                description={
-                  <div>
-                    <p style={{ margin: '4px 0' }}>{item.summary}</p>
+        {hotArticles.length > 0 ? (
+          <List
+            dataSource={hotArticles}
+            renderItem={(item) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
                     <Space>
-                      <Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag>
-                      <span style={{ color: '#999', fontSize: 12 }}>{item.date}</span>
-                      <span style={{ color: '#999', fontSize: 12 }}>来源: {item.source}</span>
+                      {item.hot && <Tag color="red">热门</Tag>}
+                      <span>{item.title}</span>
                     </Space>
-                  </div>
-                }
-              />
-            </List.Item>
-          )}
-        />
+                  }
+                  description={
+                    <div>
+                      <p style={{ margin: '4px 0' }}>{item.summary}</p>
+                      <Space>
+                        <Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag>
+                        <span style={{ color: '#999', fontSize: 12 }}>{item.date}</span>
+                      </Space>
+                    </div>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+        )}
       </Card>
     </div>
   );
@@ -225,28 +207,32 @@ const AITechPage: React.FC = () => {
   const newTechTab = (
     <div>
       <Card title="🚀 新技术发布" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
-        <List
-          dataSource={newTech}
-          renderItem={(item) => (
-            <List.Item>
-              <List.Item.Meta
-                title={
-                  <Space>
-                    {item.isNew && <Tag color="green">新发布</Tag>}
-                    <span>{item.name}</span>
-                    <Tag color="blue">{item.company}</Tag>
-                  </Space>
-                }
-                description={
-                  <div>
-                    <p style={{ margin: '4px 0' }}>{item.description}</p>
-                    <span style={{ color: '#999', fontSize: 12 }}>发布日期: {item.date}</span>
-                  </div>
-                }
-              />
-            </List.Item>
-          )}
-        />
+        {newTech.length > 0 ? (
+          <List
+            dataSource={newTech}
+            renderItem={(item) => (
+              <List.Item>
+                <List.Item.Meta
+                  title={
+                    <Space>
+                      {item.isNew && <Tag color="green">新发布</Tag>}
+                      <span>{item.name}</span>
+                      <Tag color="blue">{item.company}</Tag>
+                    </Space>
+                  }
+                  description={
+                    <div>
+                      <p style={{ margin: '4px 0' }}>{item.description}</p>
+                      <span style={{ color: '#999', fontSize: 12 }}>发布日期: {item.date}</span>
+                    </div>
+                  }
+                />
+              </List.Item>
+            )}
+          />
+        ) : (
+          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+        )}
       </Card>
     </div>
   );
@@ -261,19 +247,16 @@ const AITechPage: React.FC = () => {
               <ClockCircleOutlined /> 上次更新: {lastUpdate || '未更新'} · 每3小时自动刷新
             </p>
           </div>
+          <Button icon={<ReloadOutlined />} onClick={loadData} loading={loading}>
+            刷新
+          </Button>
         </div>
 
         <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} style={{ marginBottom: 16 }} />
 
-        {loading ? (
-          <div style={{ textAlign: 'center', padding: 100 }}><Spin size="large" /></div>
-        ) : (
-          <>
-            {activeTab === 'tech' && techTab}
-            {activeTab === 'hot' && hotTab}
-            {activeTab === 'new' && newTechTab}
-          </>
-        )}
+        {activeTab === 'tech' && techTab}
+        {activeTab === 'hot' && hotTab}
+        {activeTab === 'new' && newTechTab}
       </div>
     </MainLayout>
   );
