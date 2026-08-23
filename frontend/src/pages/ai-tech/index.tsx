@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Tag, Space, Button, Tabs, List } from 'antd';
-import { ReloadOutlined, RobotOutlined, ClockCircleOutlined, FireOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { ReloadOutlined, RobotOutlined, ClockCircleOutlined, FireOutlined, ThunderboltOutlined, AppstoreOutlined, ToolOutlined } from '@ant-design/icons';
 import MainLayout from '../../components/layout/MainLayout';
 import request from '../../utils/request';
 
@@ -32,6 +32,17 @@ interface NewTech {
   description: string;
   date: string;
   isNew: boolean;
+}
+
+interface SkillOrPlugin {
+  id: string;
+  name: string;
+  company: string;
+  description: string;
+  trend: string;
+  rating: number;
+  usage: number;
+  date: string;
 }
 
 const aiTechData: AITechItem[] = [
@@ -68,6 +79,8 @@ const AITechPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [hotArticles, setHotArticles] = useState<HotArticle[]>([]);
   const [newTech, setNewTech] = useState<NewTech[]>([]);
+  const [skills, setSkills] = useState<SkillOrPlugin[]>([]);
+  const [plugins, setPlugins] = useState<SkillOrPlugin[]>([]);
 
   const loadData = () => {
     setLoading(true);
@@ -76,28 +89,29 @@ const AITechPage: React.FC = () => {
     
     // 获取热点文章
     request.get('/ai-news/hot').then((res: any) => {
-      if (res.code === 200 && res.data) {
-        setHotArticles(res.data);
-      }
-    }).catch((err: any) => {
-      console.error('获取热点文章失败:', err);
-    });
+      if (res.code === 200 && res.data) setHotArticles(res.data);
+    }).catch(() => {});
 
     // 获取新技术
     request.get('/ai-news/new-tech').then((res: any) => {
-      if (res.code === 200 && res.data) {
-        setNewTech(res.data);
-      }
-    }).catch((err: any) => {
-      console.error('获取新技术失败:', err);
-    });
+      if (res.code === 200 && res.data) setNewTech(res.data);
+    }).catch(() => {});
+
+    // 获取 Skills
+    request.get('/ai-resources/skills').then((res: any) => {
+      if (res.code === 200 && res.data) setSkills(res.data);
+    }).catch(() => {});
+
+    // 获取 Plugins
+    request.get('/ai-resources/plugins').then((res: any) => {
+      if (res.code === 200 && res.data) setPlugins(res.data);
+    }).catch(() => {});
 
     setLoading(false);
   };
 
   useEffect(() => {
     loadData();
-    // 每3小时自动刷新
     const interval = setInterval(loadData, 3 * 60 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -116,53 +130,38 @@ const AITechPage: React.FC = () => {
     { key: 'tech', label: <span><RobotOutlined /> AI技术</span> },
     { key: 'hot', label: <span><FireOutlined /> 热点文章</span> },
     { key: 'new', label: <span><ThunderboltOutlined /> 新技术发布</span> },
+    { key: 'skills', label: <span><AppstoreOutlined /> Top Skills</span> },
+    { key: 'plugins', label: <span><ToolOutlined /> DSH 插件</span> },
   ];
+
+  const getTrendTag = (trend: string) => {
+    if (trend === 'rising') return <Tag color="red">🔥 上升中</Tag>;
+    if (trend === 'popular') return <Tag color="green">🔥 热门</Tag>;
+    return <Tag>{trend}</Tag>;
+  };
 
   const techTab = (
     <div>
       <div style={{ marginBottom: 16 }}>
         <Space wrap>
-          <Tag
-            color={activeCategory === 'all' ? '#1890ff' : undefined}
-            style={{ cursor: 'pointer', padding: '4px 12px' }}
-            onClick={() => setActiveCategory('all')}
-          >
-            全部
-          </Tag>
+          <Tag color={activeCategory === 'all' ? '#1890ff' : undefined} style={{ cursor: 'pointer', padding: '4px 12px' }} onClick={() => setActiveCategory('all')}>全部</Tag>
           {categoryCounts.map(cat => (
-            <Tag
-              key={cat.name}
-              color={activeCategory === cat.name ? cat.color : undefined}
-              style={{ cursor: 'pointer', padding: '4px 12px' }}
-              onClick={() => setActiveCategory(cat.name)}
-            >
-              {cat.name} ({cat.count})
-            </Tag>
+            <Tag key={cat.name} color={activeCategory === cat.name ? cat.color : undefined} style={{ cursor: 'pointer', padding: '4px 12px' }} onClick={() => setActiveCategory(cat.name)}>{cat.name} ({cat.count})</Tag>
           ))}
         </Space>
       </div>
-
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 16 }}>
         {filteredData.map(item => (
-          <Card
-            key={item.id}
-            hoverable
-            style={{ borderTop: `3px solid ${item.color}` }}
-          >
+          <Card key={item.id} hoverable style={{ borderTop: `3px solid ${item.color}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
                 <h3 style={{ margin: '0 0 8px', color: item.color }}>{item.name}</h3>
-                <Space>
-                  <Tag color={categoryColors[item.category]}>{item.category}</Tag>
-                  <Tag>{item.year}</Tag>
-                </Space>
+                <Space><Tag color={categoryColors[item.category]}>{item.category}</Tag><Tag>{item.year}</Tag></Space>
               </div>
               <RobotOutlined style={{ fontSize: 24, color: item.color }} />
             </div>
             <p style={{ color: '#666', margin: '0 0 12px', fontSize: 14 }}>{item.description}</p>
-            <div>
-              {item.features.map((f, i) => <Tag key={i} style={{ marginBottom: 4 }}>{f}</Tag>)}
-            </div>
+            <div>{item.features.map((f, i) => <Tag key={i} style={{ marginBottom: 4 }}>{f}</Tag>)}</div>
           </Card>
         ))}
       </div>
@@ -170,71 +169,101 @@ const AITechPage: React.FC = () => {
   );
 
   const hotTab = (
-    <div>
-      <Card title="🔥 AI热点文章" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
-        {hotArticles.length > 0 ? (
-          <List
-            dataSource={hotArticles}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <Space>
-                      {item.hot && <Tag color="red">热门</Tag>}
-                      <span>{item.title}</span>
-                    </Space>
-                  }
-                  description={
-                    <div>
-                      <p style={{ margin: '4px 0' }}>{item.summary}</p>
-                      <Space>
-                        <Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag>
-                        <span style={{ color: '#999', fontSize: 12 }}>{item.date}</span>
-                      </Space>
-                    </div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        ) : (
-          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
-        )}
-      </Card>
-    </div>
+    <Card title="🔥 AI热点文章" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
+      {hotArticles.length > 0 ? (
+        <List dataSource={hotArticles} renderItem={(item) => (
+          <List.Item>
+            <List.Item.Meta
+              title={<Space>{item.hot && <Tag color="red">热门</Tag>}<span>{item.title}</span></Space>}
+              description={<div><p style={{ margin: '4px 0' }}>{item.summary}</p><Space><Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag><span style={{ color: '#999', fontSize: 12 }}>{item.date}</span></Space></div>}
+            />
+          </List.Item>
+        )} />
+      ) : (
+        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+      )}
+    </Card>
   );
 
   const newTechTab = (
-    <div>
-      <Card title="🚀 新技术发布" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
-        {newTech.length > 0 ? (
-          <List
-            dataSource={newTech}
-            renderItem={(item) => (
-              <List.Item>
-                <List.Item.Meta
-                  title={
-                    <Space>
-                      {item.isNew && <Tag color="green">新发布</Tag>}
-                      <span>{item.name}</span>
-                      <Tag color="blue">{item.company}</Tag>
-                    </Space>
-                  }
-                  description={
-                    <div>
-                      <p style={{ margin: '4px 0' }}>{item.description}</p>
-                      <span style={{ color: '#999', fontSize: 12 }}>发布日期: {item.date}</span>
-                    </div>
-                  }
-                />
-              </List.Item>
-            )}
-          />
-        ) : (
-          <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
-        )}
-      </Card>
-    </div>
+    <Card title="🚀 新技术发布" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
+      {newTech.length > 0 ? (
+        <List dataSource={newTech} renderItem={(item) => (
+          <List.Item>
+            <List.Item.Meta
+              title={<Space>{item.isNew && <Tag color="green">新发布</Tag>}<span>{item.name}</span><Tag color="blue">{item.company}</Tag></Space>}
+              description={<div><p style={{ margin: '4px 0' }}>{item.description}</p><span style={{ color: '#999', fontSize: 12 }}>发布日期: {item.date}</span></div>}
+            />
+          </List.Item>
+        )} />
+      ) : (
+        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+      )}
+    </Card>
+  );
+
+  const skillsTab = (
+    <Card title="🎯 Top50 Skills" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
+      {skills.length > 0 ? (
+        <List dataSource={skills} renderItem={(item, index) => (
+          <List.Item>
+            <List.Item.Meta
+              title={
+                <Space>
+                  <span style={{ color: '#1890ff', fontWeight: 'bold' }}>#{index + 1}</span>
+                  <span>{item.name}</span>
+                  <Tag color="blue">{item.company}</Tag>
+                  {getTrendTag(item.trend)}
+                </Space>
+              }
+              description={
+                <div>
+                  <p style={{ margin: '4px 0' }}>{item.description}</p>
+                  <Space>
+                    <span>⭐ {item.rating}</span>
+                    <span>🔥 {item.usage.toLocaleString()} 次使用</span>
+                  </Space>
+                </div>
+              }
+            />
+          </List.Item>
+        )} />
+      ) : (
+        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+      )}
+    </Card>
+  );
+
+  const pluginsTab = (
+    <Card title="🔧 DSH 插件" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
+      {plugins.length > 0 ? (
+        <List dataSource={plugins} renderItem={(item, index) => (
+          <List.Item>
+            <List.Item.Meta
+              title={
+                <Space>
+                  <span style={{ color: '#722ed1', fontWeight: 'bold' }}>#{index + 1}</span>
+                  <span>{item.name}</span>
+                  <Tag color="purple">{item.company}</Tag>
+                  {getTrendTag(item.trend)}
+                </Space>
+              }
+              description={
+                <div>
+                  <p style={{ margin: '4px 0' }}>{item.description}</p>
+                  <Space>
+                    <span>⭐ {item.rating}</span>
+                    <span>🔥 {item.usage.toLocaleString()} 次使用</span>
+                  </Space>
+                </div>
+              }
+            />
+          </List.Item>
+        )} />
+      ) : (
+        <div style={{ textAlign: 'center', padding: 40, color: '#999' }}>暂无数据</div>
+      )}
+    </Card>
   );
 
   return (
@@ -247,9 +276,7 @@ const AITechPage: React.FC = () => {
               <ClockCircleOutlined /> 上次更新: {lastUpdate || '未更新'} · 每3小时自动刷新
             </p>
           </div>
-          <Button icon={<ReloadOutlined />} onClick={loadData} loading={loading}>
-            刷新
-          </Button>
+          <Button icon={<ReloadOutlined />} onClick={loadData} loading={loading}>刷新</Button>
         </div>
 
         <Tabs activeKey={activeTab} onChange={setActiveTab} items={tabItems} style={{ marginBottom: 16 }} />
@@ -257,6 +284,8 @@ const AITechPage: React.FC = () => {
         {activeTab === 'tech' && techTab}
         {activeTab === 'hot' && hotTab}
         {activeTab === 'new' && newTechTab}
+        {activeTab === 'skills' && skillsTab}
+        {activeTab === 'plugins' && pluginsTab}
       </div>
     </MainLayout>
   );
