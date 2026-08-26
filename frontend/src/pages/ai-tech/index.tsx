@@ -11,6 +11,7 @@ interface AITechItem {
   description: string;
   features: string[];
   link: string;
+  source: string;
   color: string;
   year: string;
 }
@@ -23,6 +24,7 @@ interface HotArticle {
   date: string;
   source: string;
   hot: boolean;
+  link: string;
 }
 
 interface NewTech {
@@ -32,6 +34,8 @@ interface NewTech {
   description: string;
   date: string;
   isNew: boolean;
+  link: string;
+  source: string;
 }
 
 interface SkillOrPlugin {
@@ -43,24 +47,26 @@ interface SkillOrPlugin {
   rating: number;
   usage: number;
   date: string;
+  link: string;
+  source: string;
 }
 
 const aiTechData: AITechItem[] = [
-  { id: '1', name: 'GPT-4o', category: '大语言模型', description: 'OpenAI最新的多模态大模型', features: ['多模态', '实时语音', '代码生成'], link: 'https://openai.com/gpt-4o', color: '#10a37f', year: '2024' },
-  { id: '2', name: 'Claude 3.5 Sonnet', category: '大语言模型', description: 'Anthropic高性能AI助手', features: ['长上下文', '代码理解', '安全对齐'], link: 'https://claude.ai', color: '#d97706', year: '2024' },
-  { id: '3', name: 'Gemini 1.5 Pro', category: '大语言模型', description: 'Google多模态AI模型', features: ['100万token', '多模态', '代码生成'], link: 'https://gemini.google.com', color: '#4285f4', year: '2024' },
-  { id: '4', name: 'Llama 3.1', category: '开源模型', description: 'Meta开源大语言模型', features: ['开源免费', '本地部署', '社区支持'], link: 'https://llama.meta.com', color: '#1877f2', year: '2024' },
-  { id: '5', name: 'DeepSeek-V2', category: '开源模型', description: '深度求索MoE模型', features: ['MoE架构', '低成本', '中文优化'], link: 'https://deepseek.com', color: '#0066ff', year: '2024' },
-  { id: '6', name: 'Qwen2.5', category: '开源模型', description: '阿里云通义千问', features: ['中文优化', '工具调用', '多模态'], link: 'https://qwen.aliyun.com', color: '#ff6a00', year: '2024' },
-  { id: '7', name: 'AutoGPT', category: 'AI Agent', description: '自主AI代理框架', features: ['任务规划', '自主执行', '工具使用'], link: 'https://agpt.co', color: '#00897b', year: '2023' },
-  { id: '8', name: 'LangChain', category: 'AI Agent', description: 'LLM应用开发框架', features: ['链式调用', '工具集成', '记忆管理'], link: 'https://langchain.com', color: '#1c3d5a', year: '2023' },
-  { id: '9', name: 'CrewAI', category: 'AI Agent', description: '多智能体协作框架', features: ['多角色协作', '任务分配', '流程编排'], link: 'https://crewai.com', color: '#7c3aed', year: '2024' },
-  { id: '10', name: 'DALL-E 3', category: '图像生成', description: 'OpenAI文生图模型', features: ['文生图', '风格控制', '高分辨率'], link: 'https://openai.com/dall-e-3', color: '#10a37f', year: '2023' },
-  { id: '11', name: 'Midjourney V6', category: '图像生成', description: 'AI绘画工具', features: ['艺术风格', '高画质', '风格多样'], link: 'https://midjourney.com', color: '#5865f2', year: '2024' },
-  { id: '12', name: 'Sora', category: '视频生成', description: 'OpenAI文生视频模型', features: ['文生视频', '长视频', '高质量'], link: 'https://openai.com/sora', color: '#10a37f', year: '2024' },
-  { id: '13', name: 'Cursor', category: 'AI编程', description: 'AI代码编辑器', features: ['代码补全', '智能重构', '对话编程'], link: 'https://cursor.sh', color: '#000000', year: '2024' },
-  { id: '14', name: 'GitHub Copilot', category: 'AI编程', description: 'AI编程助手', features: ['代码补全', '多语言', 'IDE集成'], link: 'https://github.com/features/copilot', color: '#2088ff', year: '2021' },
-  { id: '15', name: 'Whisper V3', category: '语音技术', description: '语音识别模型', features: ['多语言', '高精度', '实时转录'], link: 'https://openai.com/research/whisper', color: '#10a37f', year: '2023' },
+  { id: '1', name: 'GPT-4o', category: '大语言模型', description: 'OpenAI最新的多模态大模型', features: ['多模态', '实时语音', '代码生成'], link: 'https://openai.com/gpt-4o', source: 'OpenAI', color: '#10a37f', year: '2024' },
+  { id: '2', name: 'Claude 3.5 Sonnet', category: '大语言模型', description: 'Anthropic高性能AI助手', features: ['长上下文', '代码理解', '安全对齐'], link: 'https://claude.ai', source: 'Anthropic', color: '#d97706', year: '2024' },
+  { id: '3', name: 'Gemini 1.5 Pro', category: '大语言模型', description: 'Google多模态AI模型', features: ['100万token', '多模态', '代码生成'], link: 'https://gemini.google.com', source: 'Google', color: '#4285f4', year: '2024' },
+  { id: '4', name: 'Llama 3.1', category: '开源模型', description: 'Meta开源大语言模型', features: ['开源免费', '本地部署', '社区支持'], link: 'https://llama.meta.com', source: 'Meta', color: '#1877f2', year: '2024' },
+  { id: '5', name: 'DeepSeek-V2', category: '开源模型', description: '深度求索MoE模型', features: ['MoE架构', '低成本', '中文优化'], link: 'https://deepseek.com', source: '深度求索', color: '#0066ff', year: '2024' },
+  { id: '6', name: 'Qwen2.5', category: '开源模型', description: '阿里云通义千问', features: ['中文优化', '工具调用', '多模态'], link: 'https://qwen.aliyun.com', source: '阿里云', color: '#ff6a00', year: '2024' },
+  { id: '7', name: 'AutoGPT', category: 'AI Agent', description: '自主AI代理框架', features: ['任务规划', '自主执行', '工具使用'], link: 'https://agpt.co', source: 'Significant Gravitas', color: '#00897b', year: '2023' },
+  { id: '8', name: 'LangChain', category: 'AI Agent', description: 'LLM应用开发框架', features: ['链式调用', '工具集成', '记忆管理'], link: 'https://langchain.com', source: 'LangChain AI', color: '#1c3d5a', year: '2023' },
+  { id: '9', name: 'CrewAI', category: 'AI Agent', description: '多智能体协作框架', features: ['多角色协作', '任务分配', '流程编排'], link: 'https://crewai.com', source: 'CrewAI', color: '#7c3aed', year: '2024' },
+  { id: '10', name: 'DALL-E 3', category: '图像生成', description: 'OpenAI文生图模型', features: ['文生图', '风格控制', '高分辨率'], link: 'https://openai.com/dall-e-3', source: 'OpenAI', color: '#10a37f', year: '2023' },
+  { id: '11', name: 'Midjourney V6', category: '图像生成', description: 'AI绘画工具', features: ['艺术风格', '高画质', '风格多样'], link: 'https://midjourney.com', source: 'Midjourney', color: '#5865f2', year: '2024' },
+  { id: '12', name: 'Sora', category: '视频生成', description: 'OpenAI文生视频模型', features: ['文生视频', '长视频', '高质量'], link: 'https://openai.com/sora', source: 'OpenAI', color: '#10a37f', year: '2024' },
+  { id: '13', name: 'Cursor', category: 'AI编程', description: 'AI代码编辑器', features: ['代码补全', '智能重构', '对话编程'], link: 'https://cursor.sh', source: 'Cursor', color: '#000000', year: '2024' },
+  { id: '14', name: 'GitHub Copilot', category: 'AI编程', description: 'AI编程助手', features: ['代码补全', '多语言', 'IDE集成'], link: 'https://github.com/features/copilot', source: 'GitHub', color: '#2088ff', year: '2021' },
+  { id: '15', name: 'Whisper V3', category: '语音技术', description: '语音识别模型', features: ['多语言', '高精度', '实时转录'], link: 'https://openai.com/research/whisper', source: 'OpenAI', color: '#10a37f', year: '2023' },
 ];
 
 const categoryColors: Record<string, string> = {
@@ -131,7 +137,7 @@ const AITechPage: React.FC = () => {
     { key: 'hot', label: <span><FireOutlined /> 热点文章</span> },
     { key: 'new', label: <span><ThunderboltOutlined /> 新技术发布</span> },
     { key: 'skills', label: <span><AppstoreOutlined /> Top Skills</span> },
-    { key: 'plugins', label: <span><ToolOutlined /> DSH 插件</span> },
+    { key: 'plugins', label: <span><ToolOutlined /> DeepSeek Harness</span> },
   ];
 
   const getTrendTag = (trend: string) => {
@@ -155,13 +161,16 @@ const AITechPage: React.FC = () => {
           <Card key={item.id} hoverable style={{ borderTop: `3px solid ${item.color}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
               <div>
-                <h3 style={{ margin: '0 0 8px', color: item.color }}>{item.name}</h3>
+                <a href={item.link} target="_blank" rel="noopener noreferrer" style={{ color: item.color, textDecoration: 'none' }}><h3 style={{ margin: '0 0 8px', color: item.color }}>{item.name} ↗</h3></a>
                 <Space><Tag color={categoryColors[item.category]}>{item.category}</Tag><Tag>{item.year}</Tag></Space>
               </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: '#999' }}>来源: {item.source}</div>
               <RobotOutlined style={{ fontSize: 24, color: item.color }} />
             </div>
+            <div style={{ marginTop: 8, fontSize: 12, color: '#999' }}>来源: {item.source}</div>
             <p style={{ color: '#666', margin: '0 0 12px', fontSize: 14 }}>{item.description}</p>
             <div>{item.features.map((f, i) => <Tag key={i} style={{ marginBottom: 4 }}>{f}</Tag>)}</div>
+            <div style={{ marginTop: 8, fontSize: 12, color: '#999' }}>来源: {item.source}</div>
           </Card>
         ))}
       </div>
@@ -174,8 +183,8 @@ const AITechPage: React.FC = () => {
         <List dataSource={hotArticles} renderItem={(item) => (
           <List.Item>
             <List.Item.Meta
-              title={<Space>{item.hot && <Tag color="red">热门</Tag>}<span>{item.title}</span></Space>}
-              description={<div><p style={{ margin: '4px 0' }}>{item.summary}</p><Space><Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag><span style={{ color: '#999', fontSize: 12 }}>{item.date}</span></Space></div>}
+              title={<Space>{item.hot && <Tag color="red">热门</Tag>}<a href={item.link} target="_blank" rel="noopener noreferrer">{item.title} ↗</a></Space>}
+              description={<div><p style={{ margin: '4px 0' }}>{item.summary}</p><Space><Tag color={categoryColors[item.category] || '#666'}>{item.category}</Tag><span style={{ color: '#999', fontSize: 12 }}>{item.date}</span></Space><div style={{ marginTop: 4, fontSize: 12, color: '#999' }}>来源: {item.source}</div></div>}
             />
           </List.Item>
         )} />
@@ -191,7 +200,7 @@ const AITechPage: React.FC = () => {
         <List dataSource={newTech} renderItem={(item) => (
           <List.Item>
             <List.Item.Meta
-              title={<Space>{item.isNew && <Tag color="green">新发布</Tag>}<span>{item.name}</span><Tag color="blue">{item.company}</Tag></Space>}
+              title={<Space>{item.isNew && <Tag color="green">新发布</Tag>}<a href={item.link} target="_blank" rel="noopener noreferrer">{item.name} ↗</a><Tag color="blue">{item.source}</Tag></Space>}
               description={<div><p style={{ margin: '4px 0' }}>{item.description}</p><span style={{ color: '#999', fontSize: 12 }}>发布日期: {item.date}</span></div>}
             />
           </List.Item>
@@ -211,8 +220,8 @@ const AITechPage: React.FC = () => {
               title={
                 <Space>
                   <span style={{ color: '#1890ff', fontWeight: 'bold' }}>#{index + 1}</span>
-                  <span>{item.name}</span>
-                  <Tag color="blue">{item.company}</Tag>
+                  <a href={item.link} target="_blank" rel="noopener noreferrer">{item.name} ↗</a>
+                  <Tag color="blue">{item.source}</Tag>
                   {getTrendTag(item.trend)}
                 </Space>
               }
@@ -235,7 +244,7 @@ const AITechPage: React.FC = () => {
   );
 
   const pluginsTab = (
-    <Card title="🔧 DSH 插件" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
+    <Card title="🔧 DeepSeek Harness" extra={<Button icon={<ReloadOutlined />} onClick={loadData} size="small">刷新</Button>}>
       {plugins.length > 0 ? (
         <List dataSource={plugins} renderItem={(item, index) => (
           <List.Item>
@@ -243,8 +252,8 @@ const AITechPage: React.FC = () => {
               title={
                 <Space>
                   <span style={{ color: '#722ed1', fontWeight: 'bold' }}>#{index + 1}</span>
-                  <span>{item.name}</span>
-                  <Tag color="purple">{item.company}</Tag>
+                  <a href={item.link} target="_blank" rel="noopener noreferrer">{item.name} ↗</a>
+                  <Tag color="purple">{item.source}</Tag>
                   {getTrendTag(item.trend)}
                 </Space>
               }

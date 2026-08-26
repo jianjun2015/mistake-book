@@ -22,12 +22,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/api/hello",
                         "/api/test/**",
                         "/api/ai-news/**",
+                        "/api/ai-resources/**",
                         "/doc.html",
                         "/webjars/**",
                         "/swagger-resources/**",
                         "/v3/api-docs/**"
                 );
     }
-
-    // CORS 由 CorsConfig 统一处理
 }
