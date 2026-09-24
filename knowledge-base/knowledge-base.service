@@ -1,0 +1,15 @@
+[Unit]
+Description=Knowledge Base API Service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/workplace/mistake-book/knowledge-base
+ExecStart=/home/ubuntu/workplace/mistake-book/knowledge-base/start.sh
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -5,6 +5,7 @@ import {
   UnorderedListOutlined, PlusOutlined, DashboardOutlined, SearchOutlined,
   UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, 
   CalculatorOutlined, RobotOutlined, ReadOutlined, ExperimentOutlined, LineChartOutlined,
+  DatabaseOutlined,
  } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -24,6 +25,7 @@ const menuItems: MenuProps['items'] = [
   { key: '/phonetic-practice', icon: <EditOutlined />, label: '音标练习' },
   { key: '/ai-tech', icon: <RobotOutlined />, label: 'AI前沿技术' },
   { key: '/performance', icon: <LineChartOutlined />, label: '表现记录' },
+  { key: '/knowledge-base', icon: <DatabaseOutlined />, label: '本地知识库' },
 ];
 
 interface MainLayoutProps { children: React.ReactNode; }
