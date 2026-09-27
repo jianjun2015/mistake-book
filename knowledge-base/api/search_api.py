@@ -2,9 +2,12 @@
 知识检索API
 """
 import time
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models.schemas import SearchRequest
 from services.vector_store import get_vector_store
+
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -12,6 +15,10 @@ router = APIRouter()
 @router.post("/", summary="混合搜索")
 async def search(req: SearchRequest):
     """语义 + 关键词混合搜索"""
+    if not req.query or not req.query.strip():
+        raise HTTPException(400, "查询内容不能为空")
+    
+    logger.info(f"搜索[{req.search_type}]: {req.query[:50]}")
     start = time.time()
     vs = get_vector_store()
     
@@ -23,6 +30,7 @@ async def search(req: SearchRequest):
         results = vs.hybrid_search(req.query, req.top_k, req.filters)
     
     latency = (time.time() - start) * 1000
+    logger.info(f"搜索完成: {len(results)}条结果, {latency:.0f}ms")
     return {
         "query": req.query,
         "results": results,

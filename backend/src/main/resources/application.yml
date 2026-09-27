@@ -44,15 +44,6 @@ jwt:
   secret: mistake-book-jwt-secret-key-must-be-at-least-32-characters-long-for-hs256
   expiration: 604800000  # 7天 (毫秒)
 
-# PowerJob 配置
-powerjob:
-  worker:
-    enabled: true
-    app-name: mistake-book
-    server-address: 122.51.45.199:7700
-    protocol: http
-    port: 27777
-
 # 日志配置
 logging:
   level:

@@ -1,10 +1,13 @@
 """
 智能问答API
 """
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models.schemas import ChatRequest
 from services.rag_engine import get_rag_engine
 from utils import database as db
+
+import logging
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -12,6 +15,10 @@ router = APIRouter()
 @router.post("/", summary="RAG问答")
 async def chat(req: ChatRequest):
     """基于知识库的智能问答"""
+    if not req.question or not req.question.strip():
+        raise HTTPException(400, "问题不能为空")
+    
+    logger.info(f"RAG问答: {req.question[:50]}")
     rag = get_rag_engine()
     
     # 获取历史

@@ -47,7 +47,7 @@ class EmbeddingService:
         return self.model.get_sentence_embedding_dimension()
 
 
-# 全局单例
+# 全局单例（启动时预加载模型）
 _embedding_service = None
 
 
@@ -56,3 +56,10 @@ def get_embedding_service() -> EmbeddingService:
     if _embedding_service is None:
         _embedding_service = EmbeddingService()
     return _embedding_service
+
+
+def preload_model():
+    """预加载Embedding模型（减少首次请求延迟）"""
+    service = get_embedding_service()
+    _ = service.dimension  # 触发模型加载
+    return service

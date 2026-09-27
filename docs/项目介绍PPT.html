@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>错题本 - 学生智能学习助手</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif; background: #0a0a1a; color: #e0e0e0; overflow: hidden; }
+
+.slide { display: none; width: 100vw; height: 100vh; padding: 60px 80px; position: relative; overflow: hidden; }
+.slide.active { display: flex; flex-direction: column; justify-content: center; }
+
+/* 渐变背景 */
+.bg1 { background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); }
+.bg2 { background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460); }
+.bg3 { background: linear-gradient(135deg, #0d1117, #161b22, #1a2332); }
+.bg4 { background: linear-gradient(135deg, #1b1b2f, #162447, #1f4068); }
+.bg5 { background: linear-gradient(135deg, #0c0c1d, #1a1a3e, #2d2d6b); }
+.bg6 { background: linear-gradient(135deg, #141e30, #243b55, #2d4a6f); }
+.bg7 { background: linear-gradient(135deg, #0f2027, #203a43, #2c5364); }
+.bg8 { background: linear-gradient(135deg, #1d1d3b, #2b2b5c, #3d3d7a); }
+
+/* 装饰 */
+.slide::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+h1 { font-size: 3.5em; font-weight: 800; margin-bottom: 20px; background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
+h2 { font-size: 2.5em; font-weight: 700; margin-bottom: 30px; color: #c7d2fe; }
+h3 { font-size: 1.5em; color: #a5b4fc; margin-bottom: 15px; }
+p { font-size: 1.3em; line-height: 1.8; color: #94a3b8; }
+
+.subtitle { font-size: 1.5em; color: #818cf8; margin-bottom: 40px; font-weight: 300; }
+.tagline { font-size: 1.2em; color: #64748b; margin-top: 20px; }
+
+/* 卡片网格 */
+.grid { display: grid; gap: 20px; margin-top: 20px; }
+.grid-2 { grid-template-columns: 1fr 1fr; }
+.grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.grid-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+
+.card {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  padding: 24px;
+  backdrop-filter: blur(10px);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(99,102,241,0.2); }
+.card .icon { font-size: 2.5em; margin-bottom: 12px; }
+.card h4 { font-size: 1.1em; color: #e2e8f0; margin-bottom: 8px; }
+.card p { font-size: 0.9em; color: #94a3b8; line-height: 1.6; }
+
+/* 列表 */
+.feature-list { list-style: none; margin-top: 15px; }
+.feature-list li { font-size: 1.15em; padding: 8px 0; color: #cbd5e1; display: flex; align-items: center; gap: 12px; }
+.feature-list li::before { content: '✦'; color: #818cf8; font-size: 0.8em; }
+
+/* 架构图 */
+.arch-box { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; text-align: center; font-size: 0.95em; color: #a5b4fc; }
+.arch-arrow { text-align: center; color: #4f46e5; font-size: 1.5em; padding: 5px 0; }
+
+/* 标签 */
+.tech-tag { display: inline-block; background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3); border-radius: 20px; padding: 6px 16px; margin: 4px; font-size: 0.85em; color: #c7d2fe; }
+
+/* 统计数字 */
+.stat { text-align: center; }
+.stat .number { font-size: 3.5em; font-weight: 800; background: linear-gradient(135deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.stat .label { font-size: 1em; color: #64748b; margin-top: 8px; }
+
+/* 导航 */
+.nav { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 100; }
+.nav button { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; padding: 10px 24px; border-radius: 8px; cursor: pointer; font-size: 0.9em; transition: all 0.3s; }
+.nav button:hover { background: rgba(99,102,241,0.3); border-color: #667eea; }
+.nav .page-info { display: flex; align-items: center; color: #64748b; font-size: 0.9em; padding: 0 10px; }
+
+/* 表格 */
+table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+th, td { padding: 10px 16px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 0.9em; }
+th { color: #a5b4fc; font-weight: 600; }
+td { color: #94a3b8; }
+
+/* 分隔线 */
+.divider { width: 80px; height: 3px; background: linear-gradient(90deg, #667eea, #764ba2); border-radius: 2px; margin: 15px 0 25px; }
+
+/* 动画 */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.slide.active > * { animation: fadeIn 0.6s ease-out forwards; }
+.slide.active > *:nth-child(2) { animation-delay: 0.1s; }
+.slide.active > *:nth-child(3) { animation-delay: 0.2s; }
+.slide.active > *:nth-child(4) { animation-delay: 0.3s; }
+</style>
+</head>
+<body>
+
+<!-- Slide 1: 封面 -->
+<div class="slide bg1 active" id="s1">
+  <h1>📝 错题本</h1>
+  <p class="subtitle">学生智能学习助手</p>
+  <div class="divider"></div>
+  <p>帮助小学生系统化管理错题 · 巩固薄弱知识点 · 提升学习效率</p>
+  <p class="tagline">基于护教版（五四学制）上海教材 · 覆盖小学3-5年级</p>
+</div>
+
+<!-- Slide 2: 项目概览 -->
+<div class="slide bg2" id="s2">
+  <h2>📊 项目概览</h2>
+  <div class="divider"></div>
+  <div class="grid grid-4">
+    <div class="stat"><div class="number">16</div><div class="label">功能模块</div></div>
+    <div class="stat"><div class="number">9</div><div class="label">API 控制器</div></div>
+    <div class="stat"><div class="number">8</div><div class="label">数据库表</div></div>
+    <div class="stat"><div class="number">3</div><div class="label">客户端平台</div></div>
+  </div>
+  <div style="margin-top:40px;">
+    <h3>技术覆盖</h3>
+    <div>
+      <span class="tech-tag">Spring Boot 3.2</span>
+      <span class="tech-tag">React 18</span>
+      <span class="tech-tag">TypeScript</span>
+      <span class="tech-tag">MySQL</span>
+      <span class="tech-tag">Redis</span>
+      <span class="tech-tag">MongoDB</span>
+      <span class="tech-tag">Nginx SSL</span>
+      <span class="tech-tag">Docker</span>
+      <span class="tech-tag">微信小程序</span>
+      <span class="tech-tag">AI Agent</span>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 3: 核心功能 -->
+<div class="slide bg3" id="s3">
+  <h2>🎯 核心功能模块</h2>
+  <div class="divider"></div>
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="icon">📝</div>
+      <h4>错题管理</h4>
+      <p>录入、编辑、搜索、分类错题，支持图片上传和标签管理</p>
+    </div>
+    <div class="card">
+      <div class="icon">📊</div>
+      <h4>仪表盘</h4>
+      <p>错题统计概览、学科分布、掌握程度分析</p>
+    </div>
+    <div class="card">
+      <div class="icon">📚</div>
+      <h4>知识总结</h4>
+      <p>按学科和单元整理知识点，支持语义搜索</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔤</div>
+      <h4>拼音学习</h4>
+      <p>声母韵母学习、拼读练习、拼音专项训练</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔢</div>
+      <h4>数学专项</h4>
+      <p>速算巧算、数的整除、行程问题等专项训练</p>
+    </div>
+    <div class="card">
+      <div class="icon">🎮</div>
+      <h4>拓展实践</h4>
+      <p>小实验、游戏、课外学习、运动规则</p>
+    </div>
+    <div class="card">
+      <div class="icon">📈</div>
+      <h4>表现记录</h4>
+      <p>考试/学习/日常表现、阶段汇总、奖惩记录</p>
+    </div>
+    <div class="card">
+      <div class="icon">🤖</div>
+      <h4>AI 辅助</h4>
+      <p>AI 问答、智能推荐、知识图谱</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔍</div>
+      <h4>智能搜索</h4>
+      <p>全文检索、向量语义搜索、知识库问答</p>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 4: 系统架构 -->
+<div class="slide bg4" id="s4">
+  <h2>🏗️ 系统架构</h2>
+  <div class="divider"></div>
+  <div style="display:flex;gap:30px;">
+    <div style="flex:1;">
+      <div class="grid grid-2" style="gap:12px;">
+        <div class="arch-box">🌐 React Web<br><small>Ant Design · TypeScript</small></div>
+        <div class="arch-box">📱 微信小程序<br><small>原生开发</small></div>
+      </div>
+      <div class="arch-arrow">⬇ HTTPS</div>
+      <div class="arch-box" style="background:rgba(99,102,241,0.1);border-color:rgba(99,102,241,0.3);">🔒 Nginx SSL (443)<br><small>反向代理 · 静态文件 · CORS</small></div>
+      <div class="arch-arrow">⬇</div>
+      <div class="grid grid-2" style="gap:12px;">
+        <div class="arch-box">☕ Spring Boot :9999<br><small>REST API · JWT</small></div>
+        <div class="arch-box">🐍 知识库服务<br><small>ChromaDB · FastAPI</small></div>
+      </div>
+      <div class="arch-arrow">⬇</div>
+      <div class="grid grid-3" style="gap:12px;">
+        <div class="arch-box">🐬 MySQL</div>
+        <div class="arch-box">🔴 Redis</div>
+        <div class="arch-box">🍃 MongoDB</div>
+      </div>
+    </div>
+    <div style="flex:0.6;">
+      <h3>请求链路</h3>
+      <ul class="feature-list">
+        <li>浏览器 → HTTPS(443)</li>
+        <li>Nginx SSL 终止</li>
+        <li>静态文件直接返回</li>
+        <li>/api/* → Spring Boot</li>
+        <li>JWT 认证拦截</li>
+        <li>业务逻辑处理</li>
+        <li>数据库读写</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 5: 技术栈详情 -->
+<div class="slide bg5" id="s5">
+  <h2>⚙️ 技术栈详情</h2>
+  <div class="divider"></div>
+  <div class="grid grid-2">
+    <div>
+      <h3>后端技术</h3>
+      <table>
+        <tr><th>技术</th><th>版本</th><th>用途</th></tr>
+        <tr><td>Java</td><td>23</td><td>运行时</td></tr>
+        <tr><td>Spring Boot</td><td>3.2.5</td><td>Web 框架</td></tr>
+        <tr><td>Spring Data JPA</td><td>-</td><td>ORM</td></tr>
+        <tr><td>JWT</td><td>0.12.5</td><td>认证</td></tr>
+        <tr><td>PowerJob</td><td>5.1.1</td><td>定时任务</td></tr>
+        <tr><td>Knife4j</td><td>4.3.0</td><td>API 文档</td></tr>
+      </table>
+    </div>
+    <div>
+      <h3>前端技术</h3>
+      <table>
+        <tr><th>技术</th><th>版本</th><th>用途</th></tr>
+        <tr><td>React</td><td>18.3</td><td>UI 框架</td></tr>
+        <tr><td>TypeScript</td><td>7.0</td><td>类型安全</td></tr>
+        <tr><td>Vite</td><td>5.4</td><td>构建工具</td></tr>
+        <tr><td>Ant Design</td><td>5.21</td><td>UI 组件</td></tr>
+        <tr><td>Zustand</td><td>4.5</td><td>状态管理</td></tr>
+        <tr><td>Axios</td><td>1.7</td><td>HTTP</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 6: 数据库设计 -->
+<div class="slide bg6" id="s6">
+  <h2>💾 数据库设计</h2>
+  <div class="divider"></div>
+  <div class="grid grid-3">
+    <div class="card">
+      <div class="icon">🐬</div>
+      <h4>MySQL — 关系数据</h4>
+      <p>user · mistake · mistake_image · tag · performance_record · performance_category · reward_punishment · study_log</p>
+    </div>
+    <div class="card">
+      <div class="icon">🍃</div>
+      <h4>MongoDB — 文档存储</h4>
+      <p>knowledge_summaries · ai_news · ai_resources</p>
+    </div>
+    <div class="card">
+      <div class="icon">🔴</div>
+      <h4>Redis — 缓存</h4>
+      <p>Token 缓存 · 会话管理 · 热点数据 · JWT 黑名单</p>
+    </div>
+  </div>
+  <div style="margin-top:30px;">
+    <h3>核心表关系</h3>
+    <div style="display:flex;gap:20px;margin-top:15px;">
+      <div class="arch-box" style="flex:1;">👤 User<br><small>id · username · password · grade</small></div>
+      <div style="display:flex;align-items:center;color:#4f46e5;">→</div>
+      <div class="arch-box" style="flex:1;">📝 Mistake<br><small>subject · question · answer · analysis</small></div>
+      <div style="display:flex;align-items:center;color:#4f46e5;">→</div>
+      <div class="arch-box" style="flex:1;">🖼️ MistakeImage<br><small>image_url · image_type · sort_order</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 7: 安全与部署 -->
+<div class="slide bg7" id="s7">
+  <h2>🔒 安全与部署</h2>
+  <div class="divider"></div>
+  <div class="grid grid-2">
+    <div>
+      <h3>安全设计</h3>
+      <ul class="feature-list">
+        <li>密码 BCrypt 加密存储</li>
+        <li>JWT Token 有效期 7 天</li>
+        <li>Token Redis 存储，支持主动失效</li>
+        <li>前端密码 Base64 编码传输</li>
+        <li>CORS 跨域白名单</li>
+        <li>HTTPS 强制 (TLS 1.2/1.3)</li>
+        <li>SQL 注入防护 (JPA 参数化)</li>
+        <li>文件上传大小限制 (10MB)</li>
+      </ul>
+    </div>
+    <div>
+      <h3>部署架构</h3>
+      <table>
+        <tr><th>组件</th><th>部署方式</th><th>端口</th></tr>
+        <tr><td>Spring Boot</td><td>systemd</td><td>9999</td></tr>
+        <tr><td>Nginx</td><td>systemd</td><td>80/443</td></tr>
+        <tr><td>MySQL</td><td>Docker</td><td>3306</td></tr>
+        <tr><td>Redis</td><td>Docker</td><td>6379</td></tr>
+        <tr><td>MongoDB</td><td>Docker</td><td>27017</td></tr>
+        <tr><td>PowerJob</td><td>Docker</td><td>7700</td></tr>
+      </table>
+      <div style="margin-top:15px;">
+        <span class="tech-tag">腾讯云 Ubuntu</span>
+        <span class="tech-tag">3.6GB RAM</span>
+        <span class="tech-tag">40GB SSD</span>
+        <span class="tech-tag">ty66666.cloud</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 8: AI 能力 -->
+<div class="slide bg8" id="s8">
+  <h2>🤖 AI 能力</h2>
+  <div class="divider"></div>
+  <div class="grid grid-2">
+    <div class="card">
+      <div class="icon">🧠</div>
+      <h4>知识库 — 向量检索</h4>
+      <p>基于 ChromaDB 向量数据库，支持 PDF/Word/PPT 文档解析，Transformer 模型文本嵌入，语义搜索和知识问答</p>
+      <div style="margin-top:10px;">
+        <span class="tech-tag">ChromaDB</span>
+        <span class="tech-tag">PyTorch</span>
+        <span class="tech-tag">Transformers</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="icon">💬</div>
+      <h4>AI Agent — 智能助手</h4>
+      <p>Hermes Agent 框架，集成 DeepSeek 和小米 MiMo 模型，支持飞书/微信消息通道</p>
+      <div style="margin-top:10px;">
+        <span class="tech-tag">DeepSeek</span>
+        <span class="tech-tag">MiMo v2.6</span>
+        <span class="tech-tag">飞书</span>
+        <span class="tech-tag">微信</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="icon">💻</div>
+      <h4>代码助手</h4>
+      <p>FastAPI 后端 + React 前端，集成小米 MiMo 模型，提供 AI 编程辅助</p>
+      <div style="margin-top:10px;">
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">React</span>
+        <span class="tech-tag">MiMo</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="icon">⏰</div>
+      <h4>定时任务</h4>
+      <p>PowerJob 分布式任务调度，支持定时数据统计、学习报告生成</p>
+      <div style="margin-top:10px;">
+        <span class="tech-tag">PowerJob 5.x</span>
+        <span class="tech-tag">Spring Boot Starter</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Slide 9: 总结 -->
+<div class="slide bg1" id="s9">
+  <h1>🚀 错题本</h1>
+  <p class="subtitle">让学习更有方法，让进步看得见</p>
+  <div class="divider"></div>
+  <div class="grid grid-3" style="margin-top:30px;">
+    <div class="stat"><div class="number">16+</div><div class="label">功能模块</div></div>
+    <div class="stat"><div class="number">3</div><div class="label">客户端平台</div></div>
+    <div class="stat"><div class="number">100%</div><div class="label">全栈覆盖</div></div>
+  </div>
+  <div style="margin-top:50px;text-align:center;">
+    <p style="font-size:1.1em;">线上体验：<span style="color:#818cf8;">https://ty66666.cloud</span></p>
+    <p style="font-size:1.1em;margin-top:10px;">开源仓库：<span style="color:#818cf8;">github.com/jianjun2015/mistake-book</span></p>
+  </div>
+</div>
+
+<!-- 导航 -->
+<div class="nav">
+  <button onclick="prev()">◀ 上一页</button>
+  <span class="page-info" id="pageInfo">1 / 9</span>
+  <button onclick="next()">下一页 ▶</button>
+</div>
+
+<script>
+let current = 0;
+const slides = document.querySelectorAll('.slide');
+const total = slides.length;
+
+function show(n) {
+  slides[current].classList.remove('active');
+  current = (n + total) % total;
+  slides[current].classList.add('active');
+  document.getElementById('pageInfo').textContent = (current + 1) + ' / ' + total;
+}
+function next() { show(current + 1); }
+function prev() { show(current - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft' || e.key === 'Backspace') { e.preventDefault(); prev(); }
+});
+
+// Touch support
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const diff = touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) { diff > 0 ? next() : prev(); }
+});
+</script>
+</body>
+</html>

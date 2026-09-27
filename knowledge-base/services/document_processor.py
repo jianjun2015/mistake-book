@@ -210,6 +210,43 @@ class DocumentProcessor:
                 return ParsedResult(content="[PDF解析库未安装]", metadata={"error": "no pdf lib"})
     
     def _parse_docx(self, path: str) -> ParsedResult:
+        ext = Path(path).suffix.lower()
+        # .doc 旧格式先转为 .docx 或用 antiword
+        if ext == ".doc":
+            # 方案1: 用 antiword 提取文本
+            import subprocess
+            try:
+                result = subprocess.run(["antiword", path], capture_output=True, text=True, timeout=30)
+                if result.returncode == 0 and result.stdout.strip():
+                    return ParsedResult(
+                        content=result.stdout,
+                        metadata={"format": "doc", "parser": "antiword"}
+                    )
+            except (FileNotFoundError, subprocess.TimeoutExpired):
+                pass
+            # 方案2: 用 textract
+            try:
+                import textract
+                text = textract.process(path).decode("utf-8")
+                return ParsedResult(
+                    content=text,
+                    metadata={"format": "doc", "parser": "textract"}
+                )
+            except Exception:
+                pass
+            # 方案3: 用 python-docx 尝试（部分 .doc 可以打开）
+            try:
+                from docx import Document
+                doc = Document(path)
+                paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+                return ParsedResult(
+                    content="\n\n".join(paragraphs),
+                    metadata={"format": "doc", "parser": "python-docx"}
+                )
+            except Exception as e:
+                return ParsedResult(content=f"[.doc格式解析失败: {str(e)}]", metadata={"error": str(e)})
+        
+        # .docx 标准格式
         try:
             from docx import Document
             doc = Document(path)
@@ -247,22 +284,42 @@ class DocumentProcessor:
             return ParsedResult(content="[python-pptx未安装]", metadata={"error": "no pptx lib"})
     
     def _parse_xlsx(self, path: str) -> ParsedResult:
-        try:
-            from openpyxl import load_workbook
-            wb = load_workbook(path, data_only=True)
-            lines = []
-            for sheet in wb.worksheets:
-                lines.append(f"[Sheet: {sheet.title}]")
-                for row in sheet.iter_rows(values_only=True):
-                    row_text = " | ".join(str(c) for c in row if c is not None)
-                    if row_text.strip():
-                        lines.append(row_text)
-            return ParsedResult(
-                content="\n".join(lines),
-                metadata={"sheet_count": len(wb.worksheets)}
-            )
-        except ImportError:
-            return ParsedResult(content="[openpyxl未安装]", metadata={"error": "no openpyxl"})
+        ext = Path(path).suffix.lower()
+        # .xls 旧格式用 xlrd，.xlsx 用 openpyxl
+        if ext == ".xls":
+            try:
+                import xlrd
+                wb = xlrd.open_workbook(path)
+                lines = []
+                for sheet in wb.sheets():
+                    lines.append(f"[Sheet: {sheet.name}]")
+                    for row_idx in range(sheet.nrows):
+                        row_text = " | ".join(str(sheet.cell_value(row_idx, col_idx)) for col_idx in range(sheet.ncols) if sheet.cell_value(row_idx, col_idx))
+                        if row_text.strip():
+                            lines.append(row_text)
+                return ParsedResult(
+                    content="\n".join(lines),
+                    metadata={"sheet_count": wb.nsheets, "format": "xls"}
+                )
+            except ImportError:
+                return ParsedResult(content="[xlrd未安装，无法解析.xls文件]", metadata={"error": "no xlrd"})
+        else:
+            try:
+                from openpyxl import load_workbook
+                wb = load_workbook(path, data_only=True)
+                lines = []
+                for sheet in wb.worksheets:
+                    lines.append(f"[Sheet: {sheet.title}]")
+                    for row in sheet.iter_rows(values_only=True):
+                        row_text = " | ".join(str(c) for c in row if c is not None)
+                        if row_text.strip():
+                            lines.append(row_text)
+                return ParsedResult(
+                    content="\n".join(lines),
+                    metadata={"sheet_count": len(wb.worksheets)}
+                )
+            except ImportError:
+                return ParsedResult(content="[openpyxl未安装]", metadata={"error": "no openpyxl"})
     
     def _parse_csv(self, path: str) -> ParsedResult:
         import csv

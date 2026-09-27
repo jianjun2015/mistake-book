@@ -12,11 +12,16 @@ from api.category_api import router as category_router
 from config.settings import settings
 from services.vector_store import VectorStore
 from services.document_processor import DocumentProcessor
+from services.embedding_service import preload_model
+from utils.logger import setup_logging
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """应用生命周期管理"""
+    # 配置日志
+    setup_logging()
+    
     # 启动时初始化
     print("🚀 知识库系统启动中...")
     
@@ -27,6 +32,10 @@ async def lifespan(app: FastAPI):
     # 初始化文档处理器
     app.state.doc_processor = DocumentProcessor()
     print("✅ 文档处理器初始化完成")
+    
+    # 预加载Embedding模型
+    preload_model()
+    print("✅ Embedding模型预加载完成")
     
     print("✅ 知识库系统启动完成")
     

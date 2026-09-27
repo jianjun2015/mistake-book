@@ -21,7 +21,6 @@
         <java.version>23</java.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <knife4j.version>4.3.0</knife4j.version>
-        <powerjob.version>5.1.1</powerjob.version>
     </properties>
 
     <dependencies>
@@ -107,13 +106,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
-        <!-- PowerJob Worker -->
-        <dependency>
-            <groupId>tech.powerjob</groupId>
-            <artifactId>powerjob-worker-spring-boot-starter</artifactId>
-            <version>${powerjob.version}</version>
         </dependency>
 
         <!-- MongoDB -->

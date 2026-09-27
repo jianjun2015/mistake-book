@@ -11,7 +11,7 @@ import {
   UploadOutlined, SearchOutlined, MessageOutlined, DeleteOutlined,
   FileTextOutlined, FilePdfOutlined, FileWordOutlined, FileExcelOutlined,
   FileImageOutlined, AudioOutlined, VideoCameraOutlined, CodeOutlined,
-  FolderOutlined, TagOutlined, PlusOutlined, SendOutlined, ReloadOutlined,
+  FolderOutlined, TagOutlined, PlusOutlined, SendOutlined, ReloadOutlined, DatabaseOutlined,
   GlobalOutlined
 } from '@ant-design/icons';
 import request from '../../utils/kbRequest';
@@ -122,18 +122,20 @@ const KnowledgeBasePage: React.FC = () => {
   const handleUpload = async (file: any) => {
     const formData = new FormData();
     formData.append('file', file);
-    const hide = message.loading('正在上传并处理...', 0);
+    const hide = message.loading(`正在上传 ${file.name} 并处理...`, 0);
     try {
-      await request.post('/documents/', formData, {
+      const res: any = await request.post('/documents/', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
       hide();
-      message.success('上传成功');
+      message.success(`上传成功，已生成 ${res.chunk_count} 个知识分块`);
       loadDocs();
       loadStats();
+      loadMeta();
     } catch (e: any) {
       hide();
-      message.error(e?.response?.data?.detail || '上传失败');
+      const detail = e?.response?.data?.detail;
+      message.error(detail ? `上传失败: ${detail}` : '上传失败，请检查文件格式');
     }
     return false;
   };
@@ -148,7 +150,10 @@ const KnowledgeBasePage: React.FC = () => {
 
   // 搜索
   const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
+    if (!searchQuery.trim()) {
+      message.warning('请输入搜索内容');
+      return;
+    }
     setSearching(true);
     try {
       const res = await request.post('/search/', {
@@ -166,7 +171,11 @@ const KnowledgeBasePage: React.FC = () => {
 
   // 发送问答
   const handleChat = async () => {
-    if (!chatInput.trim() || chatting) return;
+    if (!chatInput.trim()) {
+      message.warning('请输入问题');
+      return;
+    }
+    if (chatting) return;
     const question = chatInput;
     setChatInput('');
     setMessages(prev => [...prev, { role: 'user', content: question }]);
@@ -218,14 +227,17 @@ const KnowledgeBasePage: React.FC = () => {
   const uploadTab = (
     <Card>
       <Row gutter={16} style={{ marginBottom: 16 }}>
-        <Col span={8}>
-          <Statistic title="文档总数" value={stats.total_documents} prefix={<FolderOutlined />} />
+        <Col span={6}>
+          <Statistic title="文档总数" value={stats.total_documents} prefix={<FolderOutlined style={{color: '#1890ff'}} />} />
         </Col>
-        <Col span={8}>
-          <Statistic title="知识分块" value={stats.total_chunks} prefix={<FileTextOutlined />} />
+        <Col span={6}>
+          <Statistic title="知识分块" value={stats.total_chunks} prefix={<FileTextOutlined style={{color: '#52c41a'}} />} />
         </Col>
-        <Col span={8}>
-          <Statistic title="标签数" value={tags.length} prefix={<TagOutlined />} />
+        <Col span={6}>
+          <Statistic title="标签数" value={tags.length} prefix={<TagOutlined style={{color: '#fa8c16'}} />} />
+        </Col>
+        <Col span={6}>
+          <Statistic title="分类数" value={categories.length} prefix={<DatabaseOutlined style={{color: '#722ed1'}} />} />
         </Col>
       </Row>
       
@@ -288,7 +300,13 @@ const KnowledgeBasePage: React.FC = () => {
               description={
                 <Space direction="vertical" size={0}>
                   <Text type="secondary">{item.filename} · {item.file_type?.toUpperCase()} · {(item.file_size / 1024).toFixed(1)}KB</Text>
-                  <Text type="secondary">分块数: {item.chunk_count} · {item.created_at?.slice(0, 10)}</Text>
+                  <Text type="secondary">
+                    {item.status === 'pending' && <Tag color="orange">等待解析</Tag>}
+                    {item.status === 'processing' && <Tag color="blue">解析中...</Tag>}
+                    {item.status === 'failed' && <Tag color="red">解析失败</Tag>}
+                    {item.status === 'completed' && <span>分块数: {item.chunk_count}</span>}
+                    {' · '}{item.created_at?.slice(0, 10)}
+                  </Text>
                 </Space>
               }
             />
@@ -346,7 +364,14 @@ const KnowledgeBasePage: React.FC = () => {
           />
         </>
       )}
-      {searchQuery && !searching && searchResults.length === 0 && <Empty description="暂无结果" />}
+      {searchQuery && !searching && searchResults.length === 0 && (
+          <Empty description={
+            <span>
+              未找到相关内容<br/>
+              <Text type="secondary" style={{fontSize: 12}}>试试换个关键词或使用语义搜索</Text>
+            </span>
+          } />
+        )}
     </Card>
   );
 
