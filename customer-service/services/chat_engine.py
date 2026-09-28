@@ -10,19 +10,12 @@ from services.intent_service import classify_intent
 
 logger = logging.getLogger(__name__)
 
-SYSTEM_PROMPT = """你是一个专业的智能客服助手。请根据以下知识库内容回答用户问题。
+SYSTEM_PROMPT = """你是智能客服。基于知识库简洁回答问题（100字内）。知识库无答案则建议转人工。敏感操作引导转人工。
 
-规则：
-1. 优先使用知识库中的信息回答
-2. 回答要简洁、准确、友好
-3. 如果知识库中没有相关内容，如实告知并建议转人工
-4. 涉及投诉、退款等敏感操作，引导用户转人工处理
-5. 回答控制在200字以内
-
-知识库内容：
+知识库：
 {context}
 
-用户问题：{question}"""
+问：{question}"""
 
 
 async def chat_with_rag(question: str, session_history: List[Dict] = None) -> Dict:
@@ -113,8 +106,9 @@ async def chat_with_rag(question: str, session_history: List[Dict] = None) -> Di
                 json={
                     "model": LLM_MODEL,
                     "messages": messages,
-                    "temperature": 0.7,
-                    "max_tokens": 300
+                    "temperature": 0.3,
+                    "max_tokens": 200,
+                    "top_p": 0.9
                 }
             )
             data = resp.json()

@@ -14,7 +14,9 @@ import PhoneticPracticePage from './pages/phonetic-practice';
 import MathSpecialPage from './pages/math-special';
 import AITechPage from './pages/ai-tech';
 import KnowledgeBasePage from './pages/knowledge-base';
+import CustomerServicePage from './pages/customer-service';
 import KnowledgeBasePage from './pages/knowledge-base';
+import CustomerServicePage from './pages/customer-service';
 import LearningMethodsPage from './pages/learning-methods';
 import ExtendedPracticePage from './pages/extended-practice';
 import PerformancePage from './pages/performance';
@@ -52,6 +54,7 @@ const AppRoutes: React.FC = () => (
     <Route path="/ai-tech" element={<ProtectedRoute><AITechPage /></ProtectedRoute>} />
     <Route path="/learning-methods" element={<ProtectedRoute><LearningMethodsPage /></ProtectedRoute>} />
     <Route path="/knowledge-base" element={<ProtectedRoute><KnowledgeBasePage /></ProtectedRoute>} />
+    <Route path="/customer-service" element={<ProtectedRoute><CustomerServicePage /></ProtectedRoute>} />
     <Route path="/extended-practice" element={<ProtectedRoute><ExtendedPracticePage /></ProtectedRoute>} />
     <Route path="/performance" element={<ProtectedRoute><PerformancePage /></ProtectedRoute>} />
     <Route path="*" element={<Navigate to="/dashboard" replace />} />

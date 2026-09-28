@@ -26,6 +26,7 @@ const menuItems: MenuProps['items'] = [
   { key: '/ai-tech', icon: <RobotOutlined />, label: 'AI前沿技术' },
   { key: '/performance', icon: <LineChartOutlined />, label: '表现记录' },
   { key: '/knowledge-base', icon: <DatabaseOutlined />, label: '本地知识库' },
+  { key: '/customer-service', icon: <CustomerServiceOutlined />, label: '智能客服' },
 ];
 
 interface MainLayoutProps { children: React.ReactNode; }
