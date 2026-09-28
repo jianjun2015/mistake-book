@@ -5,7 +5,7 @@ import {
   UnorderedListOutlined, PlusOutlined, DashboardOutlined, SearchOutlined,
   UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, 
   CalculatorOutlined, RobotOutlined, ReadOutlined, ExperimentOutlined, LineChartOutlined,
-  DatabaseOutlined, CustomerServiceOutlined,
+  DatabaseOutlined, CustomerServiceOutlined, TeamOutlined,
  } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
@@ -27,6 +27,7 @@ const menuItems: MenuProps['items'] = [
   { key: '/performance', icon: <LineChartOutlined />, label: '表现记录' },
   { key: '/knowledge-base', icon: <DatabaseOutlined />, label: '本地知识库' },
   { key: '/customer-service', icon: <CustomerServiceOutlined />, label: '智能客服' },
+  { key: '/agent-workbench', icon: <TeamOutlined />, label: '客服工作台' },
 ];
 
 interface MainLayoutProps { children: React.ReactNode; }
