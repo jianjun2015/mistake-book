@@ -114,7 +114,7 @@ async def chat_with_rag(question: str, session_history: List[Dict] = None) -> Di
                     "model": LLM_MODEL,
                     "messages": messages,
                     "temperature": 0.7,
-                    "max_tokens": 500
+                    "max_tokens": 300
                 }
             )
             data = resp.json()
