@@ -38,7 +38,7 @@ const CustomerServicePage: React.FC = () => {
 
   const initSession = async () => {
     try {
-      const data: any = await csRequest.post('/api/cs/sessions', {
+      const data: any = await csRequest.post('/sessions', {
         user_id: localStorage.getItem('user_id') || 'guest_' + Date.now(),
         user_name: localStorage.getItem('user_name') || '访客',
       });
@@ -69,7 +69,7 @@ const CustomerServicePage: React.FC = () => {
     setLoading(true);
 
     try {
-      const data: any = await csRequest.post(`/api/cs/sessions/${sessionId}/messages`, {
+      const data: any = await csRequest.post(`/sessions/${sessionId}/messages`, {
         content: input
       });
 
@@ -102,7 +102,7 @@ const CustomerServicePage: React.FC = () => {
   const transferToHuman = async () => {
     if (!sessionId) return;
     try {
-      await csRequest.post(`/api/cs/sessions/${sessionId}/transfer`, {
+      await csRequest.post(`/sessions/${sessionId}/transfer`, {
         reason: 'user_request'
       });
       setStatus('waiting_human');
@@ -119,7 +119,7 @@ const CustomerServicePage: React.FC = () => {
 
   const submitSatisfaction = async (score: number) => {
     if (!sessionId) return;
-    await csRequest.post(`/api/cs/sessions/${sessionId}/satisfaction`, {
+    await csRequest.post(`/sessions/${sessionId}/satisfaction`, {
       score, comment: '用户评价'
     });
     setShowSatisfaction(false);

@@ -5,7 +5,7 @@ import {
   UnorderedListOutlined, PlusOutlined, DashboardOutlined, SearchOutlined,
   UserOutlined, LogoutOutlined, BookOutlined, AudioOutlined, EditOutlined, 
   CalculatorOutlined, RobotOutlined, ReadOutlined, ExperimentOutlined, LineChartOutlined,
-  DatabaseOutlined,
+  DatabaseOutlined, CustomerServiceOutlined,
  } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { useAuth } from '../../context/AuthContext';
