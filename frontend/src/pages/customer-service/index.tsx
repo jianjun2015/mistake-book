@@ -36,6 +36,48 @@ const CustomerServicePage: React.FC = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // 轮询会话状态和新消息（检测人工客服接入）
+  useEffect(() => {
+    if (!sessionId) return;
+    const timer = setInterval(async () => {
+      try {
+        // 检查会话状态
+        const session: any = await csRequest.get(`/sessions/${sessionId}`);
+        const prevStatus = status;
+        if (session.status !== prevStatus) {
+          setStatus(session.status);
+          if (session.status === 'human_handling') {
+            setMessages(prev => [...prev, {
+              id: Date.now().toString(),
+              role: 'system',
+              content: '人工客服已接入，正在为您服务！',
+              timestamp: new Date()
+            }]);
+          }
+        }
+        // 人工处理中时轮询新消息
+        if (session.status === 'human_handling') {
+          const msgs: any = await csRequest.get(`/sessions/${sessionId}/messages`);
+          if (msgs && msgs.length > messages.length) {
+            // 只添加新的agent/system消息
+            const newMsgs = msgs.slice(messages.length)
+              .filter((m: any) => m.role === 'agent' || m.role === 'system')
+              .map((m: any) => ({
+                id: m.id?.toString() || Date.now().toString(),
+                role: m.role,
+                content: m.content,
+                timestamp: new Date(m.created_at)
+              }));
+            if (newMsgs.length > 0) {
+              setMessages(prev => [...prev, ...newMsgs]);
+            }
+          }
+        }
+      } catch (err) {}
+    }, 5000); // 5秒轮询
+    return () => clearInterval(timer);
+  }, [sessionId, status, messages.length]);
+
   const initSession = async () => {
     try {
       const data: any = await csRequest.post('/sessions', {
