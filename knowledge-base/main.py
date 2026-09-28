@@ -14,6 +14,7 @@ from services.vector_store import VectorStore
 from services.document_processor import DocumentProcessor
 from services.embedding_service import preload_model
 from utils.logger import setup_logging
+import gc
 
 
 @asynccontextmanager
@@ -21,6 +22,9 @@ async def lifespan(app: FastAPI):
     """应用生命周期管理"""
     # 配置日志
     setup_logging()
+    
+    # GC优化：减少内存碎片
+    gc.set_threshold(700, 10, 10)
     
     # 启动时初始化
     print("🚀 知识库系统启动中...")
@@ -33,9 +37,13 @@ async def lifespan(app: FastAPI):
     app.state.doc_processor = DocumentProcessor()
     print("✅ 文档处理器初始化完成")
     
-    # 预加载Embedding模型
-    preload_model()
-    print("✅ Embedding模型预加载完成")
+    # 后台预加载Embedding模型（不阻塞启动）
+    import threading
+    def _preload():
+        preload_model()
+        print("✅ Embedding模型预加载完成")
+    threading.Thread(target=_preload, daemon=True).start()
+    print("⏳ Embedding模型后台加载中...")
     
     print("✅ 知识库系统启动完成")
     

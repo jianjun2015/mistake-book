@@ -13,7 +13,14 @@ class VectorStore:
     
     def __init__(self, collection_name: str = None):
         self.name = collection_name or settings.CHROMA_COLLECTION
-        self.client = chromadb.PersistentClient(path=settings.CHROMA_PERSIST_DIR)
+        # ChromaDB内存优化：限制缓存大小
+        self.client = chromadb.PersistentClient(
+            path=settings.CHROMA_PERSIST_DIR,
+            settings=chromadb.Settings(
+                anonymized_telemetry=False,
+                persist_directory=settings.CHROMA_PERSIST_DIR
+            )
+        )
         self.embedder = get_embedding_service()
         
         # 使用自定义embedding函数，避免ChromaDB下载默认模型

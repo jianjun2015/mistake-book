@@ -1,5 +1,5 @@
 """
-Embedding服务 - 文本向量化
+Embedding服务 - 文本向量化（稳定版）
 使用 text2vec-base-chinese 轻量级中文语义模型
 """
 import os
@@ -9,45 +9,63 @@ from config.settings import settings
 
 # 设置HuggingFace镜像
 os.environ.setdefault("HF_ENDPOINT", settings.HF_ENDPOINT)
+os.environ.setdefault("OMP_NUM_THREADS", "2")
 
 
 class EmbeddingService:
-    """文本向量化服务"""
+    """Embedding服务"""
     
-    def __init__(self):
-        self._model = None
-        self._model_name = settings.EMBEDDING_MODEL
+    _instance = None
+    _model = None
+    
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
     
     @property
     def model(self):
         if self._model is None:
-            from sentence_transformers import SentenceTransformer
-            self._model = SentenceTransformer(self._model_name)
+            self._load_model()
         return self._model
     
-    def encode(self, texts: List[str], batch_size: int = 32) -> List[List[float]]:
-        """批量向量化"""
-        if not texts:
-            return []
-        embeddings = self.model.encode(
-            texts,
-            batch_size=batch_size,
-            show_progress_bar=False,
-            normalize_embeddings=True
+    def _load_model(self):
+        """加载PyTorch模型（限制线程减少内存）"""
+        import torch
+        from sentence_transformers import SentenceTransformer
+        
+        torch.set_num_threads(2)
+        self._model = SentenceTransformer(
+            settings.EMBEDDING_MODEL,
+            device="cpu"
         )
-        return embeddings.tolist()
-    
-    def encode_single(self, text: str) -> List[float]:
-        """单条向量化"""
-        return self.encode([text])[0]
+        print(f"✅ Embedding模型加载完成: {settings.EMBEDDING_MODEL}")
     
     @property
     def dimension(self) -> int:
-        """向量维度"""
-        return self.model.get_sentence_embedding_dimension()
+        return 768
+    
+    def encode(self, texts: List[str]) -> np.ndarray:
+        if not texts:
+            return np.array([])
+        return self.model.encode(
+            texts,
+            batch_size=16,
+            show_progress_bar=False,
+            normalize_embeddings=True
+        )
+    
+    def encode_single(self, text: str) -> List[float]:
+        vec = self.encode([text])
+        return vec[0].tolist()
+    
+    def warmup(self):
+        try:
+            self.encode(["预热"])
+        except Exception:
+            pass
 
 
-# 全局单例（启动时预加载模型）
 _embedding_service = None
 
 
@@ -59,7 +77,6 @@ def get_embedding_service() -> EmbeddingService:
 
 
 def preload_model():
-    """预加载Embedding模型（减少首次请求延迟）"""
     service = get_embedding_service()
-    _ = service.dimension  # 触发模型加载
+    service.warmup()
     return service

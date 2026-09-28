@@ -4,6 +4,13 @@ After=network.target
 
 [Service]
 Type=simple
+# 内存限制（防止内存泄漏导致OOM）
+MemoryLimit=800M
+# 重启策略
+Restart=always
+RestartSec=10
+# 优雅关闭
+TimeoutStopSec=30
 User=ubuntu
 WorkingDirectory=/home/ubuntu/workplace/mistake-book/knowledge-base
 ExecStart=/home/ubuntu/workplace/mistake-book/knowledge-base/start.sh
