@@ -53,9 +53,21 @@ const AgentWorkbench: React.FC = () => {
 
   useEffect(() => {
     if (!selectedSession) return;
-    const t = setInterval(() => { loadMessages(selectedSession.id, true); }, 5000);
+    const t = setInterval(async () => {
+      loadMessages(selectedSession.id, true);
+      // 同步会话状态（客户可能结束人工）
+      try {
+        const session: any = await csRequest.get(`/sessions/${selectedSession.id}`);
+        if (session.status !== selectedSession.status) {
+          setSelectedSession(prev => prev ? {...prev, status: session.status} : prev);
+          if (session.status === 'active') {
+            message.info('客户已结束人工服务，恢复AI对话');
+          }
+        }
+      } catch (e) {}
+    }, 3000);
     return () => clearInterval(t);
-  }, [selectedSession?.id]);
+  }, [selectedSession?.id, selectedSession?.status]);
 
   const loadSessions = async (silent = false) => {
     try {
