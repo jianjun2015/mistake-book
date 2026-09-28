@@ -116,6 +116,53 @@ async def auto_close(session_id: int):
     add_message(session_id, "system", "由于长时间未收到回复，人工服务已自动结束，恢复AI对话。", "system")
     return {"status": "active"}
 
+# ========== 目录管理 ==========
+from services.directory_service import (create_directory, list_directories, rename_directory,
+    delete_directory, move_session, toggle_star, delete_session as delete_session_service)
+
+class DirectoryCreate(BaseModel):
+    name: str
+    parent_id: Optional[int] = None
+
+class DirectoryRename(BaseModel):
+    name: str
+
+class SessionMove(BaseModel):
+    directory_id: Optional[int] = None
+
+@router.post("/directories", summary="创建目录")
+async def create_dir(data: DirectoryCreate):
+    return create_directory(data.name, data.parent_id)
+
+@router.get("/directories", summary="目录列表")
+async def list_dirs():
+    return list_directories()
+
+@router.put("/directories/{dir_id}", summary="重命名目录")
+async def rename_dir(dir_id: int, data: DirectoryRename):
+    rename_directory(dir_id, data.name)
+    return {"status": "ok"}
+
+@router.delete("/directories/{dir_id}", summary="删除目录")
+async def delete_dir(dir_id: int):
+    delete_directory(dir_id)
+    return {"status": "ok"}
+
+@router.post("/sessions/{session_id}/move", summary="移动会话到目录")
+async def move_session_api(session_id: int, data: SessionMove):
+    move_session(session_id, data.directory_id)
+    return {"status": "ok"}
+
+@router.post("/sessions/{session_id}/star", summary="星标会话")
+async def star_session(session_id: int):
+    starred = toggle_star(session_id)
+    return {"starred": starred}
+
+@router.delete("/sessions/{session_id}", summary="删除会话")
+async def delete_session_api(session_id: int):
+    delete_session_service(session_id)
+    return {"status": "ok"}
+
 @router.post("/sessions/{session_id}/rename", summary="重命名会话")
 async def rename_session(session_id: int, data: dict = None):
     session = get_session(session_id)
