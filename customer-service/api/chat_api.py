@@ -69,9 +69,9 @@ async def send_message(session_id: int, data: MessageSend):
     # 保存用户消息
     user_msg = add_message(session_id, "user", data.content, data.msg_type)
     
-    # 人工处理中 → 不自动回复
-    if session["status"] == "human_handling":
-        return {"user_message": user_msg, "ai_reply": None}
+    # 人工处理中或等待人工 → 不走AI，消息发给客服
+    if session["status"] in ("human_handling", "waiting_human"):
+        return {"user_message": user_msg, "ai_reply": None, "action": "waiting_agent"}
     
     # AI自动回复
     history = get_messages(session_id, limit=10)

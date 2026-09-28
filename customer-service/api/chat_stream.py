@@ -17,10 +17,22 @@ logger = logging.getLogger(__name__)
 
 @router.post("/sessions/{session_id}/stream")
 async def stream_chat(session_id: int, request: Request):
+    from services.session_service import get_session
+    from services.message_service import add_message
+    
     body = await request.json()
     question = body.get("content", "")
+    
+    session = get_session(session_id)
 
     async def generate():
+        # 人工接管后不走AI
+        if session and session.get("status") in ("human_handling", "waiting_human"):
+            add_message(session_id, "user", question, "text")
+            yield f"data: {json.dumps({'type':'text','content':'您的消息已发送给人工客服，请稍候回复。'})}\n\n"
+            yield f"data: {json.dumps({'type':'done','action':'waiting_agent','citations':[]})}\n\n"
+            return
+        
         intent = classify_intent(question)
         instant = {
             "transfer_human": ("好的，正在为您转接人工客服，请稍候...", "transfer_human"),
