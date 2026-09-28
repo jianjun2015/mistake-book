@@ -23,6 +23,7 @@ class SessionCreate(BaseModel):
 class MessageSend(BaseModel):
     content: str
     msg_type: str = "text"
+    metadata: Optional[dict] = None
 
 
 class TransferRequest(BaseModel):
@@ -67,7 +68,7 @@ async def send_message(session_id: int, data: MessageSend):
         raise HTTPException(400, "会话已关闭")
     
     # 保存用户消息
-    user_msg = add_message(session_id, "user", data.content, data.msg_type)
+    user_msg = add_message(session_id, "user", data.content, data.msg_type, data.metadata)
     
     # 人工处理中或等待人工 → 不走AI，消息发给客服
     if session["status"] in ("human_handling", "waiting_human"):

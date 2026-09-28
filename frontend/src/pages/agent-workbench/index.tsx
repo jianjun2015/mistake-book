@@ -9,7 +9,7 @@ import {
 import {
   UserOutlined, SendOutlined, CheckCircleOutlined, ReloadOutlined,
   CustomerServiceOutlined, ClockCircleOutlined, EditOutlined, StarOutlined, StarFilled,
-  FolderOutlined, FolderAddOutlined, DeleteOutlined, DragOutlined, MoreOutlined,
+  FolderOutlined, FolderAddOutlined, DeleteOutlined, DragOutlined, MoreOutlined, PaperClipOutlined, AudioOutlined, StopOutlined,
   RightOutlined
 } from '@ant-design/icons';
 import csRequest from '../../utils/csRequest';
@@ -38,6 +38,11 @@ const AgentWorkbench: React.FC = () => {
   const [renaming, setRenaming] = useState<number | null>(null);
   const [renameValue, setRenameValue] = useState('');
   const [activeDir, setActiveDir] = useState<number | null | 'all'>('all');
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [recording, setRecording] = useState(false);
+  const mediaRecorderRef = useRef<any>(null);
+  const [recordTime, setRecordTime] = useState(0);
   const [showNewDir, setShowNewDir] = useState(false);
   const [newDirName, setNewDirName] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -148,6 +153,120 @@ const AgentWorkbench: React.FC = () => {
       await csRequest.post(`/sessions/${sid}/move`, { directory_id: dirId });
       message.success('已移动'); loadSessions(true);
     } catch (e) { message.error('移动失败'); }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !selectedSession) return;
+    if (file.size > 50 * 1024 * 1024) { message.error('文件不能超过50MB'); return; }
+    
+    setUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    try {
+      const resp = await fetch('/cs-api/upload', { method: 'POST', body: formData });
+      const data = await resp.json();
+      const ext = data.ext.toLowerCase();
+      const isImage = ['.jpg','.jpeg','.png','.gif','.bmp','.webp'].includes(ext);
+      const isAudio = ['.mp3','.wav','.ogg','.m4a','.aac','.webm'].includes(ext);
+      const msgType = isImage ? 'image' : isAudio ? 'audio' : 'file';
+      
+      await csRequest.post(`/agent/sessions/${selectedSession.id}/reply`, {
+        content: data.filename,
+        msg_type: msgType,
+        metadata: data
+      });
+      message.success('文件已发送');
+      loadMessages(selectedSession.id);
+    } catch (err) {
+      message.error('文件上传失败');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const toggleVoice = async () => {
+    if (recording) {
+      stopVoice();
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+      const chunks: Blob[] = [];
+      
+      recorder.ondataavailable = (e: BlobEvent) => { if (e.data.size > 0) chunks.push(e.data); };
+      recorder.onstop = async () => {
+        stream.getTracks().forEach((t: MediaStreamTrack) => t.stop());
+        await uploadVoice(new Blob(chunks, { type: 'audio/webm' }));
+      };
+      
+      recorder.start();
+      mediaRecorderRef.current = recorder;
+      setRecording(true);
+      setRecordTime(0);
+      const timer = setInterval(() => {
+        setRecordTime(prev => {
+          if (prev >= 60) { stopVoice(); return prev; }
+          return prev + 1;
+        });
+      }, 1000);
+      (window as any).__voiceTimer = timer;
+    } catch (err) {
+      message.error('无法访问麦克风');
+    }
+  };
+
+  const stopVoice = () => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    setRecording(false);
+    clearInterval((window as any).__voiceTimer);
+  };
+
+  const uploadVoice = async (blob: Blob) => {
+    if (!selectedSession) return;
+    const formData = new FormData();
+    formData.append('file', blob, 'voice.webm');
+    
+    try {
+      const resp = await fetch('/cs-api/upload', { method: 'POST', body: formData });
+      const data = await resp.json();
+      await csRequest.post(`/agent/sessions/${selectedSession.id}/reply`, {
+        content: '[语音消息]',
+        msg_type: 'audio',
+        metadata: data
+      });
+      message.success('语音已发送');
+      loadMessages(selectedSession.id);
+    } catch (err) {
+      message.error('语音上传失败');
+    }
+  };
+
+  const renderMessageContent = (msg: Msg) => {
+    const meta = (msg as any).metadata;
+    if (msg.msg_type === 'image' && meta?.file_url) {
+      return <img src={meta.file_url} style={{ maxWidth: 200, borderRadius: 8, cursor: 'pointer' }} onClick={() => window.open(meta.file_url)} />;
+    }
+    if (msg.msg_type === 'audio' && meta?.file_url) {
+      return <audio controls src={meta.file_url} style={{ maxWidth: 250 }} />;
+    }
+    if (msg.msg_type === 'file' && meta?.file_url) {
+      return (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: 8, background: '#f5f5f5', borderRadius: 8, cursor: 'pointer' }} onClick={() => window.open(meta.file_url)}>
+          <span style={{ fontSize: 24 }}>📄</span>
+          <div>
+            <div style={{ fontSize: 13 }}>{meta.filename}</div>
+            <div style={{ fontSize: 11, color: '#999' }}>{(meta.size/1024).toFixed(1)}KB</div>
+          </div>
+        </div>
+      );
+    }
+    return msg.content;
   };
 
   const handleCreateDir = async () => {
@@ -333,7 +452,7 @@ const AgentWorkbench: React.FC = () => {
                   )}
                   <div style={{ maxWidth: '65%' }}>
                     <div style={{ padding: '10px 16px', borderRadius: 12, background: msg.role === 'user' ? '#1890ff' : '#fff', color: msg.role === 'user' ? '#fff' : '#333', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', fontSize: 14, lineHeight: 1.6 }}>
-                      {msg.content}
+                      {renderMessageContent(msg)}
                     </div>
                     <div style={{ fontSize: 11, color: '#bbb', marginTop: 4, textAlign: msg.role === 'user' ? 'right' : 'left' }}>
                       {msg.role === 'ai' ? 'AI助手' : msg.role === 'agent' ? '人工客服' : msg.role === 'system' ? '系统' : '用户'} · {msg.created_at?.substring(11, 19)}
@@ -346,6 +465,17 @@ const AgentWorkbench: React.FC = () => {
             </div>
 
             <div style={{ padding: 16, background: '#fff', borderTop: '1px solid #e8e8e8' }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+                <Button icon={<PaperClipOutlined />} onClick={() => fileInputRef.current?.click()} loading={uploading}>文件</Button>
+                <Button icon={recording ? <StopOutlined /> : <AudioOutlined />} 
+                  onClick={toggleVoice}
+                  danger={recording}
+                  type={recording ? 'primary' : 'default'}>
+                  {recording ? `录音中 ${recordTime}s (点击停止)` : '语音'}
+                </Button>
+                <input ref={fileInputRef} type="file" style={{ display: 'none' }} onChange={handleFileUpload}
+                  accept="image/*,audio/*,video/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.md" />
+              </div>
               <div style={{ display: 'flex', gap: 12 }}>
                 <Input.TextArea value={reply} onChange={e => setReply(e.target.value)} placeholder="输入回复... (Enter发送)" rows={3}
                   style={{ flex: 1 }} onPressEnter={(e) => { if (!e.shiftKey) { e.preventDefault(); sendReply(); } }} />
