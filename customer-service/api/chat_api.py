@@ -95,6 +95,17 @@ async def send_message(session_id: int, data: MessageSend):
     }
 
 
+@router.post("/sessions/{session_id}/end-human", summary="结束人工，恢复AI")
+async def end_human(session_id: int):
+    session = get_session(session_id)
+    if not session:
+        raise HTTPException(404, "会话不存在")
+    if session["status"] not in ("waiting_human", "human_handling"):
+        raise HTTPException(400, "当前不在人工服务中")
+    update_session(session_id, {"status": "active"})
+    add_message(session_id, "system", "人工服务已结束，恢复AI对话", "system")
+    return {"status": "active"}
+
 @router.post("/sessions/{session_id}/transfer", summary="转人工")
 async def transfer(session_id: int, data: TransferRequest):
     session = get_session(session_id)

@@ -119,6 +119,10 @@ const AgentWorkbench: React.FC = () => {
         content: '您好，人工客服已接入，请问有什么可以帮您？'
       });
       message.success('已接入会话');
+      // 更新本地选中会话状态
+      if (selectedSession?.id === sessionId) {
+        setSelectedSession(prev => prev ? {...prev, status: 'human_handling'} : prev);
+      }
       loadSessions(true);
     } catch (err) {}
   };
