@@ -7,7 +7,7 @@ import {
   Row, Col, Empty, Spin, Popconfirm
 } from 'antd';
 import {
-  UserOutlined, SendOutlined, CheckCircleOutlined, ReloadOutlined,
+  import { UserOutlined, SendOutlined, CheckCircleOutlined, ReloadOutlined, EditOutlined,
   CustomerServiceOutlined, ClockCircleOutlined
 } from '@ant-design/icons';
 import csRequest from '../../utils/csRequest';
@@ -46,6 +46,8 @@ const AgentWorkbench: React.FC = () => {
   const [stats, setStats] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [sending, setSending] = useState(false);
+  const [renaming, setRenaming] = useState<number | null>(null);
+  const [renameValue, setRenameValue] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const pollRef = useRef<any>(null);
 
@@ -110,6 +112,21 @@ const AgentWorkbench: React.FC = () => {
     // 如果是等待人工状态，自动切换为处理中
     if (s.status === 'waiting_human') {
       acceptSession(s.id);
+    }
+  };
+
+  const handleRename = async (sessionId: number) => {
+    if (!renameValue.trim()) return;
+    try {
+      await csRequest.post(`/sessions/${sessionId}/rename`, { name: renameValue.trim() });
+      message.success('重命名成功');
+      setRenaming(null);
+      loadSessions(true);
+      if (selectedSession?.id === sessionId) {
+        setSelectedSession(prev => prev ? {...prev, user_name: renameValue.trim()} : prev);
+      }
+    } catch (err) {
+      message.error('重命名失败');
     }
   };
 
@@ -204,8 +221,27 @@ const AgentWorkbench: React.FC = () => {
                       </Badge>
                     }
                     title={
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span>{s.user_name || `用户${s.id}`}</span>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        {renaming === s.id ? (
+                          <Input
+                            size="small"
+                            value={renameValue}
+                            onChange={e => setRenameValue(e.target.value)}
+                            onPressEnter={() => handleRename(s.id)}
+                            onBlur={() => handleRename(s.id)}
+                            autoFocus
+                            style={{ width: 120 }}
+                          />
+                        ) : (
+                          <span style={{ cursor: 'pointer' }} onClick={(e) => {
+                            e.stopPropagation();
+                            setRenaming(s.id);
+                            setRenameValue(s.user_name || `用户${s.id}`);
+                          }}>
+                            {s.user_name || `用户${s.id}`}
+                            <EditOutlined style={{ fontSize: 11, marginLeft: 4, color: '#bbb' }} />
+                          </span>
+                        )}
                         {s.status === 'waiting_human' && <Badge count={1} style={{ backgroundColor: '#fa8c16' }} />}
                       </div>
                     }

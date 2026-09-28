@@ -95,6 +95,38 @@ async def send_message(session_id: int, data: MessageSend):
     }
 
 
+@router.post("/sessions/{session_id}/agent-followup", summary="客服追问")
+async def agent_followup(session_id: int):
+    session = get_session(session_id)
+    if not session:
+        raise HTTPException(404, "会话不存在")
+    if session["status"] != "human_handling":
+        raise HTTPException(400, "当前不在人工服务中")
+    add_message(session_id, "agent", "您好，请问还在吗？如果60秒内没有回复，本次人工服务将自动结束。", "text")
+    return {"status": "followup_sent"}
+
+@router.post("/sessions/{session_id}/auto-close", summary="自动关闭人工会话")
+async def auto_close(session_id: int):
+    session = get_session(session_id)
+    if not session:
+        raise HTTPException(404, "会话不存在")
+    if session["status"] != "human_handling":
+        raise HTTPException(400, "当前不在人工服务中")
+    update_session(session_id, {"status": "active"})
+    add_message(session_id, "system", "由于长时间未收到回复，人工服务已自动结束，恢复AI对话。", "system")
+    return {"status": "active"}
+
+@router.post("/sessions/{session_id}/rename", summary="重命名会话")
+async def rename_session(session_id: int, data: dict = None):
+    session = get_session(session_id)
+    if not session:
+        raise HTTPException(404, "会话不存在")
+    name = (data or {}).get("name", "")
+    if not name:
+        raise HTTPException(400, "名称不能为空")
+    update_session(session_id, {"user_name": name})
+    return {"status": "ok", "user_name": name}
+
 @router.post("/sessions/{session_id}/end-human", summary="结束人工，恢复AI")
 async def end_human(session_id: int):
     session = get_session(session_id)
