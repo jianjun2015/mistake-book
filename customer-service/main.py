@@ -8,6 +8,7 @@ import logging
 
 from utils.database import init_db
 from api.chat_api import router as chat_router
+from api.chat_stream import router as stream_router
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s [%(name)s] %(message)s")
 logger = logging.getLogger(__name__)
@@ -40,6 +41,7 @@ app.add_middleware(
 )
 
 app.include_router(chat_router, prefix="/api/cs", tags=["智能客服"])
+app.include_router(stream_router, prefix="/api/cs", tags=["流式对话"])
 
 
 @app.get("/")
