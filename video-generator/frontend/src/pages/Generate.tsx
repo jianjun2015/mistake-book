@@ -1,18 +1,23 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-  Card, Input, Select, Button, Slider, Space, Typography, message, Spin, Tag, Progress,
+  Card, Input, Select, Button, Slider, Space, Typography, message, Tag,
+  Modal, Form, Alert, Tooltip,
 } from 'antd'
-import { ThunderboltOutlined, DownloadOutlined, RedoOutlined, PlayCircleOutlined } from '@ant-design/icons'
+import {
+  ThunderboltOutlined, DownloadOutlined, RedoOutlined,
+  KeyOutlined, PlusOutlined, CheckCircleFilled,
+} from '@ant-design/icons'
 import api from '../services/api'
 
 const { TextArea } = Input
-const { Title, Text } = Typography
+const { Text, Title } = Typography
 
 interface Provider {
   provider: string
   display_name: string
   default_model: string
   api_key_masked: string
+  is_active: boolean
 }
 
 interface Task {
@@ -27,6 +32,8 @@ export default function Generate() {
   const [prompt, setPrompt] = useState('')
   const [provider, setProvider] = useState('kling')
   const [model, setModel] = useState('')
+  const [customModel, setCustomModel] = useState('')
+  const [useCustomModel, setUseCustomModel] = useState(false)
   const [resolution, setResolution] = useState('720p')
   const [duration, setDuration] = useState(5)
   const [providers, setProviders] = useState<Provider[]>([])
@@ -35,7 +42,13 @@ export default function Generate() {
   const [videoUrl, setVideoUrl] = useState('')
   const pollRef = useRef<ReturnType<typeof setInterval>>()
 
-  useEffect(() => {
+  // API Key 配置弹窗
+  const [keyModalOpen, setKeyModalOpen] = useState(false)
+  const [keyInput, setKeyInput] = useState('')
+  const [keySaving, setKeySaving] = useState(false)
+  const [pendingProvider, setPendingProvider] = useState('')
+
+  const loadProviders = () => {
     api.get('/config').then(r => {
       setProviders(r.data)
       const active = r.data.find((p: Provider) => p.api_key_masked)
@@ -44,7 +57,9 @@ export default function Generate() {
         setModel(active.default_model)
       }
     }).catch(() => {})
-  }, [])
+  }
+
+  useEffect(() => { loadProviders() }, [])
 
   // Poll task status
   const pollTask = (taskId: string) => {
@@ -69,14 +84,61 @@ export default function Generate() {
     }, 3000)
   }
 
+  // 切换模型时检查 API Key
+  const handleProviderChange = (value: string) => {
+    const p = providers.find(x => x.provider === value)
+    setProvider(value)
+    if (p) {
+      setModel(p.default_model)
+      setUseCustomModel(false)
+      // 未配置 API Key → 弹窗
+      if (!p.api_key_masked) {
+        setPendingProvider(value)
+        setKeyModalOpen(true)
+      }
+    }
+  }
+
+  // 保存 API Key
+  const handleSaveKey = async () => {
+    if (!keyInput.trim()) return message.warning('请输入 API Key')
+    setKeySaving(true)
+    try {
+      await api.post('/config', {
+        provider: pendingProvider,
+        api_key: keyInput.trim(),
+      })
+      message.success('API Key 配置成功！')
+      setKeyModalOpen(false)
+      setKeyInput('')
+      loadProviders()
+    } catch (e: any) {
+      message.error(e?.response?.data?.detail || '保存失败')
+    }
+    setKeySaving(false)
+  }
+
+  // 生成视频
   const handleGenerate = async () => {
     if (!prompt.trim()) return message.warning('请输入视频描述')
+
+    // 检查 API Key
+    const current = providers.find(p => p.provider === provider)
+    if (current && !current.api_key_masked) {
+      setPendingProvider(provider)
+      setKeyModalOpen(true)
+      return message.warning('请先配置该模型的 API Key')
+    }
+
+    // 确定模型名
+    const finalModel = useCustomModel && customModel.trim() ? customModel.trim() : model
+
     setLoading(true)
     setVideoUrl('')
     setTask(null)
     try {
       const r = await api.post('/generate', {
-        prompt, provider, model,
+        prompt, provider, model: finalModel,
         params: { resolution, duration },
       })
       setTask(r.data)
@@ -113,21 +175,54 @@ export default function Generate() {
             />
           </div>
 
+          {/* 模型选择 */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16 }}>
             <div>
               <Text strong>🤖 模型</Text>
               <Select
                 value={provider}
-                onChange={v => { setProvider(v); const p = providers.find(x => x.provider === v); if (p) setModel(p.default_model) }}
+                onChange={handleProviderChange}
                 style={{ width: '100%', marginTop: 8 }}
                 options={providers.map(p => ({
                   value: p.provider,
-                  label: `${p.display_name} ${p.api_key_masked ? '🟢' : '🔴'}`,
+                  label: (
+                    <span>
+                      {p.display_name}
+                      {p.api_key_masked
+                        ? <CheckCircleFilled style={{ color: '#52c41a', marginLeft: 8, fontSize: 12 }} />
+                        : <KeyOutlined style={{ color: '#ff4d4f', marginLeft: 8, fontSize: 12 }} />
+                      }
+                    </span>
+                  ),
                 }))}
               />
+              {/* API Key 状态提示 */}
+              {currentProvider && !currentProvider.api_key_masked && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="尚未配置 API Key"
+                  description={
+                    <Button size="small" type="link" icon={<KeyOutlined />} onClick={() => { setPendingProvider(provider); setKeyModalOpen(true) }}>
+                      点击配置
+                    </Button>
+                  }
+                  style={{ marginTop: 8 }}
+                />
+              )}
+              {currentProvider?.api_key_masked && (
+                <Text type="success" style={{ fontSize: 12, marginTop: 4, display: 'block' }}>
+                  ✓ API Key: {currentProvider.api_key_masked}
+                </Text>
+              )}
             </div>
+
             <div>
-              <Text strong>📐 分辨率</Text>
+              <Text strong>
+                <Space>
+                  📐 分辨率
+                </Space>
+              </Text>
               <Select
                 value={resolution}
                 onChange={setResolution}
@@ -139,6 +234,7 @@ export default function Generate() {
                 ]}
               />
             </div>
+
             <div>
               <Text strong>⏱ 时长: {duration}s</Text>
               <Slider
@@ -149,6 +245,39 @@ export default function Generate() {
               />
             </div>
           </div>
+
+          {/* 模型名配置 */}
+          <Card size="small" style={{ background: '#fafafa', borderRadius: 8 }}>
+            <Space direction="vertical" style={{ width: '100%' }}>
+              <Space>
+                <Text strong>⚙️ 模型版本</Text>
+                <Select
+                  value={useCustomModel ? 'custom' : 'default'}
+                  onChange={v => setUseCustomModel(v === 'custom')}
+                  style={{ width: 200 }}
+                  options={[
+                    { value: 'default', label: `默认 (${model || currentProvider?.default_model})` },
+                    { value: 'custom', label: '+ 自定义模型' },
+                  ]}
+                />
+              </Space>
+
+              {useCustomModel && (
+                <div>
+                  <Input
+                    placeholder="输入自定义模型名，如 kling-v1-6 / gen3a_turbo / seedance-1-0-pro ..."
+                    value={customModel}
+                    onChange={e => setCustomModel(e.target.value)}
+                    prefix={<PlusOutlined style={{ color: '#1677ff' }} />}
+                    style={{ width: '100%' }}
+                  />
+                  <Text type="secondary" style={{ fontSize: 12 }}>
+                    💡 不同厂商模型名不同，留空则使用默认模型
+                  </Text>
+                </div>
+              )}
+            </Space>
+          </Card>
 
           <Button
             type="primary" size="large" block
@@ -166,9 +295,8 @@ export default function Generate() {
       {loading && task && (
         <Card style={{ borderRadius: 12 }}>
           <Space direction="vertical" style={{ width: '100%' }}>
-            <Spin />
-            <Text>视频生成中，通常需要 1-5 分钟...</Text>
-            <Progress percent={task.status === 'processing' ? 50 : 10} status="active" />
+            <Text>🔄 视频生成中，通常需要 1-5 分钟...</Text>
+            <Text type="secondary">任务 ID: {task.id}</Text>
           </Space>
         </Card>
       )}
@@ -206,6 +334,48 @@ export default function Generate() {
           <Text type="danger">❌ 生成失败: {task.error_message}</Text>
         </Card>
       )}
+
+      {/* API Key 配置弹窗 */}
+      <Modal
+        title={
+          <Space>
+            <KeyOutlined />
+            配置 {providers.find(p => p.provider === pendingProvider)?.display_name || pendingProvider} API Key
+          </Space>
+        }
+        open={keyModalOpen}
+        onCancel={() => { setKeyModalOpen(false); setKeyInput('') }}
+        onOk={handleSaveKey}
+        okText="保存"
+        confirmLoading={keySaving}
+        width={500}
+      >
+        <Space direction="vertical" size="middle" style={{ width: '100%', marginTop: 16 }}>
+          <Alert
+            type="info"
+            showIcon
+            message="配置 API Key 后即可开始生成视频"
+            description="API Key 仅存储在本地数据库，用于调用厂商 API"
+          />
+          <div>
+            <Text strong>API Key</Text>
+            <Input.Password
+              placeholder="粘贴你的 API Key..."
+              value={keyInput}
+              onChange={e => setKeyInput(e.target.value)}
+              onPressEnter={handleSaveKey}
+              autoFocus
+              style={{ marginTop: 8 }}
+            />
+          </div>
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            获取方式：
+            {pendingProvider === 'runway' && 'runwayml.com → Settings → API Keys'}
+            {pendingProvider === 'kling' && 'klingai.com → 开发者 → API Key'}
+            {pendingProvider === 'seedance' && '火山引擎 → 方舟平台 → API Key'}
+          </Text>
+        </Space>
+      </Modal>
     </div>
   )
 }
