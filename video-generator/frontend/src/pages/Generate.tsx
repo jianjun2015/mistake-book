@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   Card, Input, Select, Button, Slider, Space, Typography, message, Tag,
   Divider, Row, Col, Switch, Tooltip, Steps, Progress,
@@ -116,6 +116,11 @@ export default function Generate() {
 
   // Mock
   const [mockMode, setMockMode] = useState(true)
+  const [aspectRatio, setAspectRatio] = useState('16:9')
+  const [negativePrompt, setNegativePrompt] = useState('')
+  const [genProgress, setGenProgress] = useState(0)
+  const [collapsedGroups, setCollapsedGroups] = useState<string[]>([])
+  const previewRef = useRef<HTMLDivElement>(null)
 
   // 悬浮按钮
   const [showFloatingBtn, setShowFloatingBtn] = useState(false)
@@ -131,8 +136,23 @@ export default function Generate() {
 
   useEffect(() => {
     loadProviders()
-    try { setPromptHistory(JSON.parse(localStorage.getItem('prompt_history') || '[]')) } catch {}
+    try {
+      setPromptHistory(JSON.parse(localStorage.getItem('prompt_history') || '[]'))
+      const draft = localStorage.getItem('prompt_draft')
+      if (draft && !prompt) setPrompt(draft)
+      const negDraft = localStorage.getItem('negative_draft')
+      if (negDraft && !negativePrompt) setNegativePrompt(negDraft)
+    } catch {}
   }, [])
+
+  // 草稿自动保存
+  useEffect(() => {
+    const t = setTimeout(() => {
+      if (prompt) localStorage.setItem('prompt_draft', prompt)
+      if (negativePrompt) localStorage.setItem('negative_draft', negativePrompt)
+    }, 1000)
+    return () => clearTimeout(t)
+  }, [prompt, negativePrompt])
 
   useEffect(() => {
     if (selectedTags.length > 0) setPrompt(selectedTags.join('，'))
@@ -205,6 +225,10 @@ export default function Generate() {
   }
 
   const pollTask = (taskId: string) => {
+    setGenProgress(10)
+    const progressInterval = setInterval(() => {
+      setGenProgress(prev => Math.min(prev + Math.random() * 15, 90))
+    }, 2000)
     pollRef.current = setInterval(async () => {
       try {
         const r = await api.get(`/tasks/${taskId}`)
@@ -212,16 +236,23 @@ export default function Generate() {
         if (r.data.status === 'completed') {
           setVideoUrl(r.data.video_url)
           setLoading(false)
+          setGenProgress(100)
           clearInterval(pollRef.current)
+          clearInterval(progressInterval)
           message.success('🎉 视频生成完成！')
+          setTimeout(() => previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
         } else if (r.data.status === 'failed') {
           setLoading(false)
+          setGenProgress(0)
           clearInterval(pollRef.current)
+          clearInterval(progressInterval)
           message.error(`生成失败: ${r.data.error_message}`)
         }
       } catch {
         setLoading(false)
+        setGenProgress(0)
         clearInterval(pollRef.current)
+        clearInterval(progressInterval)
       }
     }, 3000)
   }
@@ -241,7 +272,7 @@ export default function Generate() {
         prompt,
         provider: mockMode ? 'mock' : provider,
         model: finalModel,
-        params: { resolution, duration },
+        params: { resolution, duration, aspect_ratio: aspectRatio, negative_prompt: negativePrompt || undefined },
       })
       setTask(r.data)
       if (r.data.status === 'failed') {
@@ -250,7 +281,9 @@ export default function Generate() {
       } else if (r.data.status === 'completed') {
         setVideoUrl(r.data.video_url)
         setLoading(false)
+        setGenProgress(100)
         message.success('🎉 视频生成完成！')
+        setTimeout(() => previewRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100)
       } else {
         message.info('任务已提交，生成中...')
         pollTask(r.data.id)
@@ -273,19 +306,36 @@ export default function Generate() {
     return () => window.removeEventListener('keydown', onKey)
   })
 
-  const TagGroup = ({ title, icon, tags }: { title: string; icon: React.ReactNode; tags: string[] }) => (
-    <div style={{ marginBottom: 6 }}>
-      <Space style={{ marginBottom: 4 }}>{icon}<Text type="secondary" style={{ fontSize: 12 }}>{title}</Text></Space>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
-        {tags.map(tag => (
-          <Tag.CheckableTag key={tag} checked={selectedTags.includes(tag)} onChange={() => toggleTag(tag)}
-            style={{ borderRadius: 12, padding: '1px 10px', fontSize: 12, border: selectedTags.includes(tag) ? 'none' : '1px solid #d9d9d9' }}>
-            {tag}
-          </Tag.CheckableTag>
-        ))}
+  const toggleGroup = useCallback((key: string) => {
+    setCollapsedGroups(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key])
+  }, [])
+
+  const TagGroup = ({ title, icon, tags }: { title: string; icon: React.ReactNode; tags: string[] }) => {
+    const isCollapsed = collapsedGroups.includes(title)
+    return (
+      <div style={{ marginBottom: 6 }}>
+        <div
+          data-testid={`tag-group-${title}`}
+          onMouseDown={(e) => { e.preventDefault(); toggleGroup(title) }}
+          style={{ marginBottom: 4, cursor: 'pointer', userSelect: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
+        >
+          {icon}
+          <Text type="secondary" style={{ fontSize: 12 }}>{title}</Text>
+          <Text type="secondary" style={{ fontSize: 10 }}>{isCollapsed ? '▶' : '▼'} ({tags.length})</Text>
+        </div>
+        {!isCollapsed && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 5 }}>
+            {tags.map(tag => (
+              <Tag.CheckableTag key={tag} checked={selectedTags.includes(tag)} onChange={() => toggleTag(tag)}
+                style={{ borderRadius: 12, padding: '1px 10px', fontSize: 12, border: selectedTags.includes(tag) ? 'none' : '1px solid #d9d9d9' }}>
+                {tag}
+              </Tag.CheckableTag>
+            ))}
+          </div>
+        )}
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div style={{ display: 'flex', gap: 16, flexDirection: 'column' }}>
@@ -468,7 +518,7 @@ export default function Generate() {
 
                 {/* 参数 */}
                 <Row gutter={12}>
-                  <Col span={12}>
+                  <Col span={8}>
                     <Text strong style={{ fontSize: 13 }}>📐 分辨率</Text>
                     <Select value={resolution} onChange={setResolution} size="small" style={{ width: '100%', marginTop: 6 }}
                       options={[
@@ -477,7 +527,17 @@ export default function Generate() {
                         { value: '1080p', label: '1080p (高清)' },
                       ]} />
                   </Col>
-                  <Col span={12}>
+                  <Col span={8}>
+                    <Text strong style={{ fontSize: 13 }}>📺 宽高比</Text>
+                    <Select value={aspectRatio} onChange={setAspectRatio} size="small" style={{ width: '100%', marginTop: 6 }}
+                      options={[
+                        { value: '16:9', label: '16:9 横屏' },
+                        { value: '9:16', label: '9:16 竖屏' },
+                        { value: '1:1', label: '1:1 方形' },
+                        { value: '4:3', label: '4:3 标准' },
+                      ]} />
+                  </Col>
+                  <Col span={8}>
                     <Text strong style={{ fontSize: 13 }}>⏱ 时长: {duration}s</Text>
                     <Slider min={2} max={10} value={duration} onChange={setDuration}
                       marks={{ 2: '2s', 10: '10s' }} style={{ marginTop: 12 }} />
@@ -503,6 +563,21 @@ export default function Generate() {
                   </Col>
                 </Row>
 
+                {/* 负面提示词 */}
+                <div>
+                  <Text strong style={{ fontSize: 13 }}>🚫 负面提示词</Text>
+                  <Text type="secondary" style={{ fontSize: 11, marginLeft: 8 }}>不希望出现的内容</Text>
+                  <Input.TextArea
+                    rows={2}
+                    value={negativePrompt}
+                    onChange={e => setNegativePrompt(e.target.value)}
+                    placeholder="例如：模糊、变形、文字水印、低质量..."
+                    maxLength={500}
+                    showCount
+                    style={{ marginTop: 6, fontSize: 12 }}
+                  />
+                </div>
+
                 {/* Mock 开关 */}
                 <div style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -519,6 +594,20 @@ export default function Generate() {
               </Space>
             </Card>
 
+            {/* 生成进度 */}
+            {loading && (
+              <div style={{ padding: '12px 16px', borderRadius: 8, background: '#f6ffed', border: '1px solid #b7eb8f' }}>
+                <Space direction="vertical" style={{ width: '100%' }} size={4}>
+                  <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                    <Text strong style={{ fontSize: 13 }}>⏳ 生成中...</Text>
+                    <Text type="secondary" style={{ fontSize: 12 }}>{Math.round(genProgress)}%</Text>
+                  </Space>
+                  <Progress percent={genProgress} status="active" strokeColor="#52c41a" />
+                  <Text type="secondary" style={{ fontSize: 11 }}>通常需要 1-5 分钟，请耐心等待</Text>
+                </Space>
+              </div>
+            )}
+
             {/* 生成按钮 */}
             <Button type="primary" size="large" block icon={<ThunderboltOutlined />}
               loading={loading} onClick={handleGenerate}
@@ -528,7 +617,7 @@ export default function Generate() {
 
             {/* 视频预览 */}
             {videoUrl && (
-              <Card title="🎥 视频预览" size="small" style={{ borderRadius: 12 }}
+              <Card title="🎥 视频预览" size="small" style={{ borderRadius: 12 }} ref={previewRef}
                 extra={
                   <Space>
                     <Button size="small" icon={<DownloadOutlined />} href={videoUrl} target="_blank">下载</Button>
