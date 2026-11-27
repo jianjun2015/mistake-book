@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import {
-  Card, Input, Select, Button, Slider, Space, Typography, message, Tag,
+  Card, Input, Select, Button, Slider, Space, Typography, message, Tag, Switch,
   Divider, Row, Col,
 } from 'antd'
 import {
@@ -94,6 +94,7 @@ export default function Generate() {
   // API Key
   const [keyInput, setKeyInput] = useState('')
   const [keySaving, setKeySaving] = useState(false)
+  const [mockMode, setMockMode] = useState(true)
 
   // 提示词构建器
   const [showBuilder, setShowBuilder] = useState(true)
@@ -206,7 +207,7 @@ export default function Generate() {
   // 生成
   const handleGenerate = async () => {
     if (!prompt.trim()) return message.warning('请输入视频描述')
-    if (currentProvider && !currentProvider.api_key_masked) {
+    if (!mockMode && currentProvider && !currentProvider.api_key_masked) {
       return message.warning('请先在下方填写 API Key')
     }
     const finalModel = useCustomModel && customModel.trim() ? customModel.trim() : model
@@ -215,13 +216,20 @@ export default function Generate() {
     setTask(null)
     try {
       const r = await api.post('/generate', {
-        prompt, provider, model: finalModel,
+        prompt,
+        provider: mockMode ? 'mock' : provider,
+        model: finalModel,
         params: { resolution, duration },
       })
       setTask(r.data)
       if (r.data.status === 'failed') {
         message.error(r.data.error_message)
         setLoading(false)
+      } else if (r.data.status === 'completed') {
+        // Mock mode: instant completion
+        setVideoUrl(r.data.video_url)
+        setLoading(false)
+        message.success('🎉 视频生成完成！')
       } else {
         message.info('任务已提交，生成中...')
         pollTask(r.data.id)
@@ -433,10 +441,27 @@ export default function Generate() {
               prefix={<PlusOutlined style={{ color: '#1677ff' }} />} />
           )}
 
+          {/* Mock 模式开关 */}
+          <div style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '12px 16px', borderRadius: 8,
+            background: mockMode ? '#fff7e6' : '#f6ffed',
+            border: `1px solid ${mockMode ? '#ffd591' : '#b7eb8f'}`,
+          }}>
+            <Space>
+              <Text strong>🧪 测试模式 (Mock)</Text>
+              <Text type="secondary" style={{ fontSize: 12 }}>
+                {mockMode ? '无需真实 API Key，使用模拟视频测试所有功能' : '使用真实 API 调用生成视频'}
+              </Text>
+            </Space>
+            <Switch checked={mockMode} onChange={setMockMode}
+              checkedChildren="ON" unCheckedChildren="OFF" />
+          </div>
+
           <Button type="primary" size="large" block icon={<ThunderboltOutlined />}
             loading={loading} onClick={handleGenerate}
-            style={{ height: 52, fontSize: 18, borderRadius: 10 }}>
-            {loading ? '⏳ 生成中...' : '🚀 生成视频'}
+            style={{ height: 52, fontSize: 18, borderRadius: 10, background: mockMode ? '#fa8c16' : undefined }}>
+            {loading ? '⏳ 生成中...' : mockMode ? '🧪 测试生成 (Mock)' : '🚀 生成视频'}
           </Button>
         </Space>
       </Card>

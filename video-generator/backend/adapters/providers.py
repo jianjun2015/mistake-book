@@ -8,6 +8,7 @@ Based on official API documentation (2026-11):
 import time
 import httpx
 from .base import BaseVideoAdapter, VideoGenerationResult
+from .mock import MockAdapter
 
 
 class RunwayAdapter(BaseVideoAdapter):
@@ -286,11 +287,14 @@ ADAPTERS = {
     "runway": RunwayAdapter,
     "kling": KlingAdapter,
     "seedance": SeedanceAdapter,
+    "mock": MockAdapter,
 }
 
 
 def get_adapter(provider: str, api_key: str, base_url: str = "") -> BaseVideoAdapter:
-    """Get adapter instance for provider."""
+    """Get adapter instance for provider. Use MockAdapter when api_key='mock'."""
+    if api_key == "mock" or provider == "mock":
+        return MockAdapter(api_key=api_key, base_url=base_url)
     cls = ADAPTERS.get(provider)
     if not cls:
         raise ValueError(f"unknown provider: {provider}")
