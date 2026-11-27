@@ -32,9 +32,12 @@ async def list_configs(db: Session = Depends(get_db)):
 @router.post("/config")
 async def save_config(req: ConfigSaveRequest, db: Session = Depends(get_db)):
     """Save/update API config."""
+    if not req.provider:
+        raise HTTPException(400, "provider 不能为空")
+    
     config = db.query(ApiConfig).filter(ApiConfig.provider == req.provider).first()
     if not config:
-        config = ApiConfig(provider=req.provider)
+        config = ApiConfig(provider=req.provider, display_name=req.provider)
         db.add(config)
 
     if req.api_key:  # Only update key if provided (don't overwrite with empty)
@@ -48,7 +51,13 @@ async def save_config(req: ConfigSaveRequest, db: Session = Depends(get_db)):
 
     config.updated_at = datetime.utcnow()
     db.commit()
-    return {"saved": True, "provider": req.provider}
+    db.refresh(config)
+    
+    return {
+        "saved": True, 
+        "provider": config.provider,
+        "api_key_masked": _mask_key(config.api_key),
+    }
 
 
 @router.post("/config/{provider}/test")

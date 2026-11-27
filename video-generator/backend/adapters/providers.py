@@ -1,44 +1,59 @@
-"""Provider adapters: Runway, Kling, Seedance."""
+"""Provider adapters: Runway, Kling, Seedance.
 
+Based on official API documentation (2026-11):
+- Runway: https://docs.dev.runwayml.com (gen4.5, gen3a_turbo retired)
+- Kling: https://klingai.com/document-api (v1/v2)
+- Seedance: https://www.volcengine.com/docs (Ark API v3)
+"""
 import time
 import httpx
 from .base import BaseVideoAdapter, VideoGenerationResult
 
 
 class RunwayAdapter(BaseVideoAdapter):
-    """Runway Gen-3 API adapter."""
+    """Runway API adapter (Gen-4 / multi-model platform).
+
+    Auth: Bearer + X-Runway-Version header.
+    Models: gen4.5 (T2V), gen4_turbo (I2V), plus veo3/seedance2/kling etc.
+    Note: gen3a_turbo was retired July 2026 - do not use.
+    """
     provider = "runway"
-    display_name = "Runway Gen-3"
+    display_name = "Runway"
+    default_model = "gen4.5"
+    API_VERSION = "2024-11-06"
+
+    def _headers(self):
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "X-Runway-Version": self.API_VERSION,
+            "Content-Type": "application/json",
+        }
 
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
-        model = model or "gen3a_turbo"
+        model = model or self.default_model
+
+        # ratio is required for Runway (not resolution)
+        ratio_map = {"480p": "1280:720", "720p": "1280:720", "1080p": "1280:720"}
         payload = {
             "model": model,
-            "promptText": prompt,
-            "duration": params.get("duration", 5),
-            "resolution": params.get("resolution", "720p"),
+            "promptText": prompt[:1000],  # max 1000 chars
+            "ratio": params.get("ratio", ratio_map.get(params.get("resolution", "720p"), "1280:720")),
+            "duration": int(params.get("duration", 5)),
         }
         try:
             resp = httpx.post(
-                f"{self.base_url}/image_to_video" if params.get("image_url") else f"{self.base_url}/text_to_video",
+                f"{self.base_url}/text_to_video",
                 json=payload,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
+                headers=self._headers(),
                 timeout=30,
             )
             data = resp.json()
-            if resp.status_code == 200:
-                return VideoGenerationResult(
-                    task_id=data.get("id", ""),
-                    status="processing",
-                    raw_response=data,
-                )
+            if resp.status_code in (200, 201):
+                return VideoGenerationResult(task_id=data.get("id", ""), status="processing", raw_response=data)
             return VideoGenerationResult(
                 task_id="", status="failed",
-                error=data.get("error", f"HTTP {resp.status_code}"),
+                error=data.get("error", data.get("failure", f"HTTP {resp.status_code}")),
             )
         except Exception as e:
             return VideoGenerationResult(task_id="", status="failed", error=str(e))
@@ -47,20 +62,27 @@ class RunwayAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/tasks/{task_id}",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=15,
             )
             data = resp.json()
-            status_map = {"PENDING": "pending", "RUNNING": "processing", "SUCCEEDED": "completed", "FAILED": "failed"}
+            status_map = {
+                "PENDING": "pending", "THROTTLED": "pending",
+                "RUNNING": "processing", "SUCCEEDED": "completed",
+                "FAILED": "failed", "CANCELLED": "failed",
+            }
             status = status_map.get(data.get("status", ""), "processing")
             video_url = ""
             if status == "completed":
-                output = data.get("output", {})
-                video_url = output.get("video", "") if isinstance(output, dict) else str(output)
+                output = data.get("output", [])
+                if isinstance(output, list) and output:
+                    video_url = output[0]
+                elif isinstance(output, dict):
+                    video_url = output.get("video", "")
             return VideoGenerationResult(
                 task_id=task_id, status=status,
                 video_url=video_url,
-                error=data.get("failure", ""),
+                error=data.get("failure", "") or data.get("failureCode", ""),
                 raw_response=data,
             )
         except Exception as e:
@@ -70,7 +92,7 @@ class RunwayAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/organization",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=10,
             )
             return resp.status_code == 200, f"HTTP {resp.status_code}"
@@ -79,27 +101,41 @@ class RunwayAdapter(BaseVideoAdapter):
 
 
 class KlingAdapter(BaseVideoAdapter):
-    """可灵 Kling API adapter."""
+    """可灵 Kling API adapter (Kuaishou).
+
+    Auth: Bearer token (JWT signed with API Key/Secret).
+    Models: kling-v1-6, kling-v2-master, kling-v2-1, etc.
+    Endpoint: POST /v1/videos/text2video
+    """
     provider = "kling"
     display_name = "可灵 Kling"
+    default_model = "kling-v1-6"
+
+    def _headers(self):
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
-        model = model or "kling-v1-6"
+        model = model or self.default_model
         payload = {
             "model_name": model,
-            "prompt": prompt,
-            "duration": str(params.get("duration", 5)),
+            "prompt": prompt[:2500],  # recommended max 2500
+            "duration": str(int(params.get("duration", 5))),
             "aspect_ratio": params.get("aspect_ratio", "16:9"),
         }
+        # Optional: resolution in settings
+        resolution = params.get("resolution")
+        if resolution:
+            payload["settings"] = {"resolution": resolution}
+
         try:
             resp = httpx.post(
                 f"{self.base_url}/videos/text2video",
                 json=payload,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
+                headers=self._headers(),
                 timeout=30,
             )
             data = resp.json()
@@ -117,12 +153,16 @@ class KlingAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/videos/text2video/{task_id}",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=15,
             )
             data = resp.json()
             task_data = data.get("data", {})
-            status_map = {"submitted": "pending", "processing": "processing", "succeed": "completed", "failed": "failed"}
+            status_map = {
+                "submitted": "pending", "processing": "processing",
+                "succeed": "completed", "succeeded": "completed",
+                "failed": "failed",
+            }
             status = status_map.get(task_data.get("task_status", ""), "processing")
             video_url = ""
             if status == "completed":
@@ -142,46 +182,61 @@ class KlingAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/videos/text2video/nonexistent",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=10,
             )
-            # Even 404 means we can reach the API
-            return resp.status_code in (200, 404, 401), f"HTTP {resp.status_code}"
+            return resp.status_code in (200, 400, 401, 404), f"HTTP {resp.status_code}"
         except Exception as e:
             return False, str(e)
 
 
 class SeedanceAdapter(BaseVideoAdapter):
-    """Seedance (字节跳动) API adapter."""
+    """字节跳动 Seedance API adapter (Volcengine Ark).
+
+    Auth: Bearer API Key (from ark.volcengine.com).
+    Models: doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-lite-t2v-250428, etc.
+    Endpoint: POST /contents/generations/tasks
+    """
     provider = "seedance"
     display_name = "Seedance (字节)"
+    default_model = "doubao-seedance-1-0-lite-t2v-250428"
+
+    def _headers(self):
+        return {
+            "Authorization": f"Bearer {self.api_key}",
+            "Content-Type": "application/json",
+        }
 
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
-        model = model or "seedance-1-0"
+        model = model or self.default_model
         payload = {
             "model": model,
             "content": [{"type": "text", "text": prompt}],
             "resolution": params.get("resolution", "720p"),
-            "duration": params.get("duration", 5),
+            "duration": int(params.get("duration", 5)),
         }
+        # Optional params
+        if params.get("ratio"):
+            payload["ratio"] = params["ratio"]
+        else:
+            payload["ratio"] = params.get("aspect_ratio", "16:9")
+
         try:
             resp = httpx.post(
                 f"{self.base_url}/contents/generations/tasks",
                 json=payload,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                    "Content-Type": "application/json",
-                },
+                headers=self._headers(),
                 timeout=30,
             )
             data = resp.json()
-            task_id = data.get("id", "") or data.get("data", {}).get("task_id", "")
+            task_id = data.get("id", "")
             if task_id:
                 return VideoGenerationResult(task_id=task_id, status="processing", raw_response=data)
+            error = data.get("error", {})
             return VideoGenerationResult(
                 task_id="", status="failed",
-                error=data.get("error", {}).get("message", str(data)),
+                error=error.get("message", str(data)) if isinstance(error, dict) else str(error),
             )
         except Exception as e:
             return VideoGenerationResult(task_id="", status="failed", error=str(e))
@@ -190,20 +245,25 @@ class SeedanceAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/contents/generations/tasks/{task_id}",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=15,
             )
             data = resp.json()
-            status_map = {"queued": "pending", "running": "processing", "succeeded": "completed", "failed": "failed"}
+            status_map = {
+                "queued": "pending", "running": "processing",
+                "succeeded": "completed", "failed": "failed",
+                "cancelled": "failed", "expired": "failed",
+            }
             status = status_map.get(data.get("status", ""), "processing")
             video_url = ""
             if status == "completed":
                 content = data.get("content", {})
                 video_url = content.get("video_url", "")
+            error = data.get("error", {})
             return VideoGenerationResult(
                 task_id=task_id, status=status,
                 video_url=video_url,
-                error=data.get("error", {}).get("message", ""),
+                error=error.get("message", "") if isinstance(error, dict) else str(error),
                 raw_response=data,
             )
         except Exception as e:
@@ -213,7 +273,7 @@ class SeedanceAdapter(BaseVideoAdapter):
         try:
             resp = httpx.get(
                 f"{self.base_url}/contents/generations/tasks",
-                headers={"Authorization": f"Bearer {self.api_key}"},
+                headers=self._headers(),
                 timeout=10,
             )
             return resp.status_code in (200, 401), f"HTTP {resp.status_code}"
