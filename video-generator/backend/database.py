@@ -48,6 +48,11 @@ def init_db():
                 "base_url": "https://ark.cn-beijing.volces.com/api/v3",
                 "default_model": "doubao-seedance-1-0-lite-t2v-250428",
             },
+            {
+                "provider": "mock", "display_name": "🧪 Mock 测试",
+                "base_url": "",
+                "default_model": "mock-v1",
+            },
         ]
         for d in defaults:
             if d["provider"] not in existing:

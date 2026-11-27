@@ -17,16 +17,18 @@ router = APIRouter()
 async def list_configs(db: Session = Depends(get_db)):
     """Get all API configs (masked keys)."""
     configs = db.query(ApiConfig).all()
-    return [
-        {
+    result = []
+    for c in configs:
+        # Mock provider always shows as configured
+        masked = "内置测试模式" if c.provider == "mock" else _mask_key(c.api_key)
+        result.append({
             "id": c.id, "provider": c.provider, "display_name": c.display_name,
-            "api_key_masked": _mask_key(c.api_key),
+            "api_key_masked": masked,
             "base_url": c.base_url, "default_model": c.default_model,
             "params_template": c.params_template or {},
             "is_active": c.is_active,
-        }
-        for c in configs
-    ]
+        })
+    return result
 
 
 @router.post("/config")
