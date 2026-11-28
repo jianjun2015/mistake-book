@@ -94,3 +94,28 @@ cd frontend && npm install && npm run dev                        # 前端 :5180
 
 `source` 为 `ai` 表示大模型生成，`local` 表示已降级。前端会把 `notice` 以警示条展示，
 并标明本次填充的数据来源。LLM 返回「结构合法但描述为空」的结果同样视为无效，自动降级补全。
+
+## 模型选择与开通状态（v2.2）
+
+平台区分两类模型，**不能混用**：
+
+| 类型 | 端点 | 用途 | 计费 |
+|------|------|------|------|
+| 语言模型（Coding 套餐 14 个：Doubao-Seed / Kimi / DeepSeek / GLM） | `api/coding/v3/chat/completions` | AI 润色、分镜 | Coding 套餐额度 |
+| 视频模型（Seedance 系列） | `api/v3/contents/generations/tasks` | 生成视频 | 独立按量/资源包 |
+
+语言模型调用 Seedance 会报 `does not support the coding plan feature`。
+
+### 模型版本下拉
+
+「模型版本」不再硬编码，改为动态拉取账户真实状态：
+
+- `GET /api/config/{provider}/models?probe=true` 先取方舟 `/api/v3/models` 中
+  `domain=VideoGeneration` 的清单，再用非法 duration 逐个探测（不会创建付费任务）。
+- 下拉项标注：✅ 可用 / ⛔ 未开通（ModelNotOpen）/ 🚫 不存在（NotFound）/ ❔ 未探测；
+  未开通与不存在的项灰显禁选，全部不可用时给出开通指引。
+- 探测结果服务端缓存 10 分钟。
+- 语言模型清单见 `GET /api/ai/models`。
+
+当前账户 2135031164 的 Seedance 模型均未开通，需到方舟控制台
+`console.volcengine.com/ark → 开通管理` 单独开通后，下拉才会出现可选项。

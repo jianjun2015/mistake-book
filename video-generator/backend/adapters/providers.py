@@ -39,6 +39,9 @@ class RunwayAdapter(BaseVideoAdapter):
     display_name = "Runway"
     default_base_url = "https://api.dev.runwayml.com/v1"
     default_model = "gen4.5"
+    models = [
+        {"id": "gen4.5", "label": "Gen-4.5", "note": "文生视频主力模型，支持 1280:720 / 720:1280"},
+    ]
     API_VERSION = "2024-11-06"
 
     def _headers(self):
@@ -133,6 +136,9 @@ class KlingAdapter(BaseVideoAdapter):
     display_name = "可灵 Kling"
     default_base_url = "https://api.klingai.com/v1"
     default_model = "kling-v2-master"
+    models = [
+        {"id": "kling-v2-master", "label": "Kling v2 Master", "note": "文生视频，画质优先"},
+    ]
 
     def _headers(self):
         return {
@@ -225,6 +231,10 @@ class SeedanceAdapter(BaseVideoAdapter):
     display_name = "Seedance (字节)"
     default_base_url = "https://ark.cn-beijing.volces.com/api/v3"
     default_model = "doubao-seedance-2-0-260128"
+    models = [
+        {"id": "doubao-seedance-2-5-260628", "label": "Seedance 2.5", "note": "最新系列，画质与一致性更强"},
+        {"id": "doubao-seedance-2-0-260128", "label": "Seedance 2.0", "note": "默认，稳定通用"},
+    ]
 
     def _headers(self):
         return {
@@ -296,6 +306,78 @@ class SeedanceAdapter(BaseVideoAdapter):
             )
         except Exception as e:
             return VideoGenerationResult(task_id=task_id, status="failed", error=str(e))
+
+    # 离线兜底清单（仅当账户模型清单接口不可用时使用）
+    FALLBACK_MODELS = [
+        {"id": "doubao-seedance-2-5-flash-261115", "label": "Seedance 2.5 Flash", "note": "最新，性价比高"},
+        {"id": "doubao-seedance-2-5-260628", "label": "Seedance 2.5", "note": "最新系列，画质更强"},
+        {"id": "doubao-seedance-2-0-fast-260128", "label": "Seedance 2.0 Fast", "note": "生成更快"},
+        {"id": "doubao-seedance-2-0-260128", "label": "Seedance 2.0", "note": "稳定通用"},
+        {"id": "doubao-seedance-2-0-mini-260615", "label": "Seedance 2.0 Mini", "note": "轻量低成本"},
+    ]
+
+    def list_remote_models(self) -> list:
+        """从方舟账户真实模型清单拉取视频模型（domain=VideoGeneration）。"""
+        try:
+            resp = httpx.get(
+                f"{self.base_url}/models",
+                params={"page_size": 200},
+                headers=self._headers(),
+                timeout=20,
+            )
+            if resp.status_code != 200:
+                return []
+            data = resp.json().get("data", [])
+            out = []
+            for m in data:
+                if m.get("domain") != "VideoGeneration":
+                    continue
+                if not m.get("api_supported", {}).get("contents/generations"):
+                    continue
+                mid = m.get("id", "")
+                if not mid:
+                    continue
+                label = mid.replace("doubao-seedance-", "Seedance ").replace("-", " ")
+                note = "来自方舟账户模型清单"
+                out.append({"id": mid, "label": label, "note": note})
+            # 新的排前面（created 越大越新）
+            order = {m.get("id"): m.get("created", 0) for m in data}
+            out.sort(key=lambda x: order.get(x["id"], 0), reverse=True)
+            return out
+        except Exception:
+            return []
+
+    def available_models(self) -> list:
+        """优先用账户真实清单；不可用时退回兜底清单。"""
+        return self.list_remote_models() or self.FALLBACK_MODELS or list(self.models)
+
+    def probe_model(self, model: str):
+        """用非法 duration 探测模型可用性：不会真正创建付费任务。"""
+        try:
+            resp = httpx.post(
+                f"{self.base_url}/contents/generations/tasks",
+                json={"model": model, "content": [{"type": "text", "text": "probe"}],
+                      "duration": 9999, "resolution": "720p"},
+                headers=self._headers(),
+                timeout=20,
+            )
+            try:
+                err = resp.json().get("error", {})
+            except Exception:
+                err = {}
+            code = err.get("code", "")
+            msg = (err.get("message") or "").strip()
+            if code == "ModelNotOpen":
+                return {"state": "not_activated", "message": "账户未在方舟控制台开通该模型"}
+            if code == "InvalidEndpointOrModel.NotFound":
+                return {"state": "not_found", "message": "模型不存在或无权访问" }
+            if resp.status_code == 200:
+                return {"state": "available", "message": "可用（探测时意外创建了任务，请到控制台检查）" }
+            if "InvalidParameter" in code or "InvalidParameter" in msg or "duration" in msg.lower():
+                return {"state": "available", "message": "可用（模型已开通）" }
+            return {"state": "unknown", "message": f"HTTP {resp.status_code} {msg[:80]}" }
+        except Exception as exc:
+            return {"state": "unknown", "message": str(exc)[:80]}
 
     def test_connection(self) -> tuple[bool, str]:
         try:

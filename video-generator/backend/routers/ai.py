@@ -5,6 +5,7 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from backend.services import llm_client
 from backend.services.storyboard_local import build_storyboard
 
 router = APIRouter()
@@ -30,44 +31,16 @@ class PolishRequest(BaseModel):
 
 class StoryboardRequest(BaseModel):
     script: str  # 剧本/故事文本
+    llm_model: str = ""
     scene_count: int = 5  # 目标镜头数
     style: str = ""  # 风格偏好
     tags: list[str] = []  # 已选标签（融入分镜描述）
 
 
-async def _call_llm(system: str, user: str) -> str:
-    """Call MiMo LLM."""
-    api_key = _llm_api_key()
-    if not api_key:
-        # Try reading from config file
-        try:
-            cfg_path = os.path.join(os.path.dirname(__file__), '..', '..', '..', 'config', 'mimo_key.txt')
-            if os.path.exists(cfg_path):
-                api_key = open(cfg_path).read().strip()
-        except Exception:
-            pass
-
-    if not api_key:
-        raise HTTPException(status_code=500, detail="MiMo API Key 未配置 (环境变量 MIMO_API_KEY)")
-
-    async with httpx.AsyncClient(timeout=120) as client:
-        resp = await client.post(
-            f"{MIMO_BASE_URL}/chat/completions",
-            headers={"Authorization": f"Bearer {api_key}"},
-            json={
-                "model": MIMO_MODEL,
-                "messages": [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": user},
-                ],
-                "temperature": 0.7,
-                "max_tokens": 2000,
-            },
-        )
-        if resp.status_code != 200:
-            raise HTTPException(status_code=502, detail=f"LLM 调用失败: {resp.status_code} {resp.text[:200]}")
-        data = resp.json()
-        return data["choices"][0]["message"]["content"]
+async def _call_llm(system: str, user: str, model: str = "") -> str:
+    """多通道 LLM：火山方舟 Coding 套餐 -> 小米 MiMo。全失败抛 LLMUnavailable。"""
+    content, _used = await llm_client.chat(system, user, model=model)
+    return content
 
 
 def _parse_shots(result: str) -> list[dict]:
@@ -128,6 +101,14 @@ def _degrade_notice(exc: Exception) -> str:
     return "大模型暂不可用，已使用本地规则生成分镜"
 
 
+@router.get("/models")
+async def list_models():
+    """可用于分镜/润色的语言模型清单（这些模型不能生成视频）。"""
+    data = llm_client.available_text_models()
+    data["note"] = "语言模型仅用于 AI 润色/分镜；生成视频需 Seedance 等视频模型"
+    return data
+
+
 @router.post("/polish")
 async def polish_prompt(req: PolishRequest):
     """AI 润色提示词 — 扩写细节、优化结构、增强画面感。"""
@@ -185,7 +166,7 @@ async def generate_storyboard(req: StoryboardRequest):
     source = "local"
     notice = ""
     try:
-        result = await _call_llm(system, user)
+        result = await _call_llm(system, user, model=req.llm_model)
         shots = _parse_shots(result)
         source = "ai"
     except Exception as exc:  # Key 缺失 / 配额耗尽 / 超时 / 输出格式错

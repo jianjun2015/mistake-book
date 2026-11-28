@@ -93,6 +93,9 @@ export default function Generate() {
   const [model, setModel] = useState('')
   const [customModel, setCustomModel] = useState('')
   const [useCustomModel, setUseCustomModel] = useState(false)
+  const [modelCatalog, setModelCatalog] = useState<any[]>([])
+  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogWarn, setCatalogWarn] = useState('')
   const [resolution, setResolution] = useState('720p')
   const [duration, setDuration] = useState(5)
   const [providers, setProviders] = useState<Provider[]>([])
@@ -141,12 +144,15 @@ export default function Generate() {
       if (fallback) {
         setProvider(fallback.provider)
         setModel(fallback.default_model)
+        // 拉取该厂商真实模型目录与开通状态
+        loadModelCatalog(fallback.provider)
       }
     }).catch(() => {})
   }
 
   useEffect(() => {
     loadProviders()
+    // 初始默认厂商的模型目录（loadProviders 内部已设默认 model，这里补开通状态）
     try {
       setPromptHistory(JSON.parse(localStorage.getItem('prompt_history') || '[]'))
       const draft = localStorage.getItem('prompt_draft')
@@ -177,6 +183,34 @@ export default function Generate() {
   }, [])
 
   const currentProvider = providers.find(p => p.provider === provider)
+
+  // 拉取该厂商账户下真实可选的模型目录及开通状态
+  const loadModelCatalog = async (prov: string) => {
+    if (prov === 'mock') { setModelCatalog([{ id: 'mock-v1', label: 'Mock 测试模型', status: { state: 'available' } }]); setCatalogWarn(''); return }
+    setCatalogLoading(true)
+    setCatalogWarn('')
+    try {
+      const r = await api.get(`/config/${prov}/models`, { params: { probe: true } })
+      const list = r.data?.models || []
+      setModelCatalog(list)
+      const usable = list.filter((m: any) => m.status?.state === 'available')
+      if (usable.length > 0) {
+        setModel(usable[0].id); setUseCustomModel(false)
+      } else {
+        // 没有已开通模型：保留默认但给出醒目提示，避免用户对着报错摸不着头脑
+        setModel(r.data?.default_model || (list[0]?.id ?? ''))
+        const blocked = list.find((m: any) => ['not_activated', 'not_found'].includes(m.status?.state))
+        setCatalogWarn(blocked
+          ? `账户尚未开通任何可用视频模型（${blocked.status.message || blocked.status.state}），请到方舟控制台开通后重试`
+          : '未探测到可用模型，请检查 API Key 或模型开通状态')
+      }
+    } catch (e: any) {
+      setModelCatalog([])
+      setCatalogWarn('模型目录加载失败：' + (e?.response?.data?.detail || e.message || '未知错误'))
+    } finally {
+      setCatalogLoading(false)
+    }
+  }
   const promptQuality = scorePrompt(prompt)
 
   const toggleTag = (tag: string) => {
@@ -602,8 +636,9 @@ export default function Generate() {
                   <Select value={provider}
                     onChange={v => {
                       setProvider(v); setKeyInput('')
+                      setModelCatalog([]); setCatalogWarn('')
                       const p = providers.find(x => x.provider === v)
-                      if (p) { setModel(p.default_model); setUseCustomModel(false) }
+                      if (p) { setUseCustomModel(false); loadModelCatalog(v) }
                     }}
                     style={{ width: '100%', marginTop: 6 }}
                     options={providers.map(p => ({
@@ -670,24 +705,53 @@ export default function Generate() {
                   </Col>
                 </Row>
 
-                <Row gutter={12}>
-                  <Col span={12}>
-                    <Text strong style={{ fontSize: 13 }}>⚙️ 模型版本</Text>
-                    <Select value={useCustomModel ? 'custom' : 'default'}
-                      onChange={(v: string) => setUseCustomModel(v === 'custom')}
-                      size="small" style={{ width: '100%', marginTop: 6 }}
+                <div>
+                  <Text strong style={{ fontSize: 13 }}>⚙️ 模型版本</Text>
+                  <Space style={{ marginTop: 6, width: '100%' }} direction="vertical" size={4}>
+                    <Select
+                      value={useCustomModel ? 'custom' : model}
+                      onChange={(v: string) => {
+                        if (v === 'custom') { setUseCustomModel(true); return }
+                        setUseCustomModel(false); setModel(v)
+                      }}
+                      size="small" style={{ width: '100%' }}
+                      loading={catalogLoading}
+                      placeholder={catalogLoading ? '正在探测账户可用模型...' : '选择模型'}
                       options={[
-                        { value: 'default', label: `默认 (${model || currentProvider?.default_model || 'auto'})` },
-                        { value: 'custom', label: '+ 自定义' },
+                        ...modelCatalog.map((m: any) => {
+                          const st = m.status?.state || 'unverified'
+                          const disabled = st === 'not_activated' || st === 'not_found'
+                          const badge = st === 'available' ? '✅ 可用'
+                            : st === 'not_activated' ? '⛔ 未开通'
+                            : st === 'not_found' ? '🚫 不存在'
+                            : '❔ 未探测'
+                          return {
+                            value: m.id,
+                            disabled,
+                            label: (
+                              <span style={{ display: 'flex', justifyContent: 'space-between', opacity: disabled ? 0.55 : 1 }}>
+                                <span>{m.label || m.id}</span>
+                                <span style={{ fontSize: 11, color: disabled ? '#ff4d4f' : '#52c41a' }}>{badge}</span>
+                              </span>
+                            ),
+                          }
+                        }),
+                        { value: 'custom', label: '✏️ 自定义模型名' },
                       ]} />
-                  </Col>
-                  <Col span={12}>
                     {useCustomModel && (
-                      <Input placeholder="自定义模型名" value={customModel} size="small"
-                        onChange={e => setCustomModel(e.target.value)} style={{ marginTop: 22 }} />
+                      <Input placeholder="输入自定义模型 ID" value={customModel} size="small"
+                        onChange={e => setCustomModel(e.target.value)} />
                     )}
-                  </Col>
-                </Row>
+                    {catalogWarn && (
+                      <div style={{ fontSize: 11, color: '#fa8c16', background: '#fff7e6', border: '1px solid #ffd591', borderRadius: 6, padding: '4px 8px' }}>
+                        ⚠️ {catalogWarn}
+                      </div>
+                    )}
+                    {modelCatalog.some((m: any) => m.status?.state === 'available') && !catalogWarn && (
+                      <Text type="secondary" style={{ fontSize: 11 }}>已按账户真实开通状态过滤，灰显项无法生成</Text>
+                    )}
+                  </Space>
+                </div>
 
                 {/* 负面提示词 */}
                 <div>

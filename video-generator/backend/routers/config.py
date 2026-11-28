@@ -8,9 +8,29 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..models import ApiConfig
 from ..schemas import ConfigSaveRequest
-from ..adapters.providers import get_adapter
+import time
+
+from ..adapters.providers import get_adapter, ADAPTERS
+from ..services import llm_client
 
 router = APIRouter()
+
+# 模型可用性探测缓存：{(provider, model): (ts, result)}
+_PROBE_CACHE: dict[tuple, tuple[float, dict]] = {}
+_PROBE_TTL = 600
+
+
+def _probe_cached(adapter, provider: str, model: str) -> dict:
+    key = (provider, model)
+    now = time.time()
+    hit = _PROBE_CACHE.get(key)
+    if hit and now - hit[0] < _PROBE_TTL:
+        return hit[1]
+    result = adapter.probe_model(model)
+    if result is None:
+        return {"state": "unverified", "message": "该厂商不支持自动探测"}
+    _PROBE_CACHE[key] = (now, result)
+    return result
 
 
 @router.get("/config")
@@ -74,14 +94,48 @@ async def test_connection(provider: str, db: Session = Depends(get_db)):
     return {"provider": provider, "success": success, "message": message}
 
 
+@router.get("/config/{provider}/models")
+async def list_models(provider: str, probe: bool = False, db: Session = Depends(get_db)):
+    """返回该厂商可选模型目录；probe=true 时附带账户可用性探测。"""
+    if provider not in ADAPTERS:
+        raise HTTPException(404, f"未知厂商: {provider}")
+    config = db.query(ApiConfig).filter(ApiConfig.provider == provider).first()
+    api_key = (config.api_key if config else "") or ""
+    base_url = (config.base_url if config else "") or ""
+    adapter = get_adapter(provider, api_key, base_url)
+
+    models = []
+    for m in adapter.available_models():
+        item = dict(m)
+        if probe and api_key:
+            item["status"] = _probe_cached(adapter, provider, item["id"])
+        else:
+            item["status"] = {"state": "unverified", "message": "未探测"}
+        models.append(item)
+
+    return {
+        "provider": provider,
+        "default_model": adapter.default_model or (config.default_model if config else ""),
+        "models": models,
+        # 语言模型只能用于 AI 润色/分镜，不能生成视频
+        "text_only_models": llm_client.available_text_models(),
+    }
+
+
 @router.get("/config/{provider}/params")
 async def get_params(provider: str, db: Session = Depends(get_db)):
     """Get supported parameters for a provider."""
+    if provider not in ADAPTERS:
+        raise HTTPException(404, f"未知厂商: {provider}")
     config = db.query(ApiConfig).filter(ApiConfig.provider == provider).first()
-    if not config or not config.api_key:
-        raise HTTPException(400, f"API Key 未配置: {provider}")
-    adapter = get_adapter(provider, config.api_key, config.base_url)
-    return adapter.get_supported_params()
+    api_key = (config.api_key if config else "") or ""
+    base_url = (config.base_url if config else "") or ""
+    adapter = get_adapter(provider, api_key, base_url)
+    params = adapter.get_supported_params()
+    params.setdefault("model", {"type": "select",
+                  "options": [m["id"] for m in adapter.available_models()],
+                  "default": adapter.default_model})
+    return params
 
 
 def _mask_key(key: str) -> str:

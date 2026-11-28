@@ -48,7 +48,7 @@ def test_local_builder_empty_script():
 # ---------- 接口降级 ----------
 
 def test_storyboard_degrades_when_llm_unavailable(client, monkeypatch):
-    async def boom(system, user):
+    async def boom(system, user, model=""):
         raise RuntimeError("LLM 调用失败: 429 quota exhausted")
 
     monkeypatch.setattr(ai_router, "_call_llm", boom)
@@ -69,7 +69,7 @@ def test_storyboard_uses_llm_when_available(client, monkeypatch):
          "duration": 3, "transition": "淡出", "dialogue": "", "mood": "悲伤"},
     ]
 
-    async def fake(system, user):
+    async def fake(system, user, model=""):
         return json.dumps(payload, ensure_ascii=False)
 
     monkeypatch.setattr(ai_router, "_call_llm", fake)
@@ -84,7 +84,7 @@ def test_storyboard_uses_llm_when_available(client, monkeypatch):
 
 def test_storyboard_rejects_empty_descriptions_and_degrades(client, monkeypatch):
     """LLM 返回结构合法但描述为空 —— 等于没填充，必须降级补全。"""
-    async def empty_desc(system, user):
+    async def empty_desc(system, user, model=""):
         return json.dumps([{"shot_id": 1, "camera": "全景", "description": "  "}])
 
     monkeypatch.setattr(ai_router, "_call_llm", empty_desc)
@@ -95,7 +95,7 @@ def test_storyboard_rejects_empty_descriptions_and_degrades(client, monkeypatch)
 
 
 def test_storyboard_markdown_wrapped_json(client, monkeypatch):
-    async def wrapped(system, user):
+    async def wrapped(system, user, model=""):
         return "```json\n" + json.dumps(
             [{"shot_id": 1, "camera": "中景", "description": "雨中的街道", "duration": 4}],
             ensure_ascii=False,

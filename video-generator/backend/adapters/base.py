@@ -26,6 +26,8 @@ class BaseVideoAdapter(ABC):
     display_name: str = ""
     default_base_url: str = ""
     default_model: str = ""
+    # 该厂商可选的模型目录（只放已验证可用的 ID）
+    models: list = []
 
     def __init__(self, api_key: str, base_url: str = ""):
         self.api_key = api_key
@@ -45,6 +47,14 @@ class BaseVideoAdapter(ABC):
     def test_connection(self) -> tuple[bool, str]:
         """Test API connectivity. Returns (success, message)."""
         ...
+
+    def available_models(self) -> list:
+        """返回可选择的模型目录。"""
+        return list(self.models)
+
+    def probe_model(self, model: str):
+        """探测某模型在当前账户下是否可用。默认不支持探测。"""
+        return None
 
     def get_supported_params(self) -> dict:
         """Return supported parameters with defaults."""
