@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from .database import init_db
-from .routers import generate, tasks, config
+from .routers import generate, tasks, config, ai
 
 
 @asynccontextmanager
@@ -35,6 +35,7 @@ app.add_middleware(
 app.include_router(generate.router, prefix="/api", tags=["生成"])
 app.include_router(tasks.router, prefix="/api", tags=["任务"])
 app.include_router(config.router, prefix="/api", tags=["配置"])
+app.include_router(ai.router, prefix="/api/ai", tags=["AI辅助"])
 
 
 @app.get("/api/health")

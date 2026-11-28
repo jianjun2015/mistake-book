@@ -120,6 +120,8 @@ export default function Generate() {
   const [negativePrompt, setNegativePrompt] = useState('')
   const [genProgress, setGenProgress] = useState(0)
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>([])
+  const [scriptInput, setScriptInput] = useState('')
+  const [generatingStoryboard, setGeneratingStoryboard] = useState(false)
   const previewRef = useRef<HTMLDivElement>(null)
 
   // 悬浮按钮
@@ -185,20 +187,54 @@ export default function Generate() {
     message.success('模板已应用！请替换 { } 中的内容')
   }
 
-  const polishPrompt = () => {
+  const [polishing, setPolishing] = useState(false)
+
+  const polishPrompt = async () => {
     if (!prompt.trim()) return message.warning('请先输入提示词')
-    let parts = prompt.split(/[，,;；]/).map(s => s.trim()).filter(Boolean)
-    parts = [...new Set(parts)]
-    if (!QUALITY_TAGS.some(t => prompt.includes(t))) parts.push('超高清画质')
-    if (!STYLE_TAGS.some(t => prompt.includes(t))) parts.push('电影质感')
-    setPrompt(parts.join('，'))
-    message.success('✨ 提示词已润色！')
+    setPolishing(true)
+    try {
+      const r = await api.post('/ai/polish', { prompt })
+      if (r.data?.polished) {
+        setPrompt(r.data.polished)
+        message.success('✨ AI 润色完成！提示词已增强')
+      }
+    } catch (e: any) {
+      // 降级：本地增强
+      let parts = prompt.split(/[，,;；]/).map(s => s.trim()).filter(Boolean)
+      parts = [...new Set(parts)]
+      if (!QUALITY_TAGS.some(t => prompt.includes(t))) parts.push('超高清画质')
+      if (!STYLE_TAGS.some(t => prompt.includes(t))) parts.push('电影质感')
+      if (!CAMERA_TAGS.some(t => prompt.includes(t))) parts.push('慢动作')
+      setPrompt(parts.join('，'))
+      message.warning('AI 服务不可用，已本地增强')
+    }
+    setPolishing(false)
   }
 
   const copyPrompt = () => {
     if (!prompt.trim()) return message.warning('提示词为空')
     navigator.clipboard.writeText(prompt)
     message.success('提示词已复制！')
+  }
+
+  // 剧本→分镜脚本
+  const generateStoryboardFromScript = async () => {
+    if (!scriptInput.trim()) return message.warning('请先输入剧本/故事')
+    setGeneratingStoryboard(true)
+    try {
+      const r = await api.post('/ai/storyboard', { script: scriptInput, scene_count: 5 })
+      if (r.data?.shots?.length > 0) {
+        // 将分镜转为提示词填充到描述框
+        const prompts = r.data.shots.map((s: any, i: number) =>
+          `【镜头${s.shot_id || i+1}·${s.camera || '全景'}】${s.description}${s.mood ? '，' + s.mood : ''}`
+        )
+        setPrompt(prompts.join('\n'))
+        message.success(`🎬 已生成 ${r.data.total_shots} 个分镜！已填充到视频描述`)
+      }
+    } catch (e: any) {
+      message.error('AI 服务不可用，请稍后重试')
+    }
+    setGeneratingStoryboard(false)
   }
 
   const savePromptToHistory = () => {
@@ -373,6 +409,38 @@ export default function Generate() {
                 </Button>
               </Space>
             }>
+            {/* 剧本→分镜 */}
+            <div style={{
+              marginBottom: 12, padding: 12, borderRadius: 8,
+              background: '#fff7e6', border: '1px solid #ffd591',
+            }}>
+              <Space direction="vertical" style={{ width: '100%' }} size={8}>
+                <Space>
+                  <Text strong style={{ fontSize: 13 }}>📖 剧本/故事 → 分镜脚本</Text>
+                  <Text type="secondary" style={{ fontSize: 11 }}>粘贴剧情，一键拆分并填充到视频描述</Text>
+                </Space>
+                <Input.TextArea
+                  rows={3}
+                  value={scriptInput}
+                  onChange={e => setScriptInput(e.target.value)}
+                  placeholder="粘贴你的剧本或故事...&#10;例如：一只小猫在森林里迷路了，它遇到了一只善良的鹿，鹿带它找到了回家的路..."
+                  maxLength={5000}
+                  showCount
+                  style={{ fontSize: 12 }}
+                />
+                <Button
+                  size="small"
+                  type="primary"
+                  icon={<RocketOutlined />}
+                  loading={generatingStoryboard}
+                  onClick={generateStoryboardFromScript}
+                  style={{ background: '#fa8c16', borderColor: '#fa8c16' }}
+                >
+                  🎬 一键生成分镜并填充
+                </Button>
+              </Space>
+            </div>
+
             {/* 构建器 Tab */}
             {showBuilder && (
               <div style={{ marginBottom: 12 }}>
@@ -404,7 +472,9 @@ export default function Generate() {
                         <Divider style={{ margin: '6px 0' }} />
                         <Space>
                           <Text type="secondary" style={{ fontSize: 11 }}>已选 {selectedTags.length} 个</Text>
-                          <Button size="small" type="primary" ghost icon={<RocketOutlined />} onClick={polishPrompt}>润色</Button>
+                          <Button size="small" type="primary" ghost icon={<RocketOutlined />} onClick={polishPrompt} loading={polishing}>
+                            {polishing ? 'AI 润色中...' : '✨ AI 润色'}
+                          </Button>
                           <Button size="small" onClick={() => { setSelectedTags([]); setPrompt('') }}>清空</Button>
                         </Space>
                       </>
