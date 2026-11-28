@@ -21,6 +21,7 @@ class StoryboardRequest(BaseModel):
     script: str  # 剧本/故事文本
     scene_count: int = 5  # 目标镜头数
     style: str = ""  # 风格偏好
+    tags: list[str] = []  # 已选标签（融入分镜描述）
 
 
 async def _call_llm(system: str, user: str) -> str:
@@ -108,6 +109,8 @@ async def generate_storyboard(req: StoryboardRequest):
     user = f"剧本/故事：\n{req.script}\n\n请拆分成 {req.scene_count} 个镜头。"
     if req.style:
         user += f"\n风格要求：{req.style}"
+    if req.tags:
+        user += f"\n\n参考标签（请自然融入各镜头的 description 中，不要生硬堆砌）：{', '.join(req.tags)}"
 
     result = await _call_llm(system, user)
 

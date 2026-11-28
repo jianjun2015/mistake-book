@@ -217,19 +217,38 @@ export default function Generate() {
     message.success('提示词已复制！')
   }
 
-  // 剧本→分镜脚本
+  // 剧本→分镜脚本（关联标签体系）
   const generateStoryboardFromScript = async () => {
     if (!scriptInput.trim()) return message.warning('请先输入剧本/故事')
     setGeneratingStoryboard(true)
     try {
-      const r = await api.post('/ai/storyboard', { script: scriptInput, scene_count: 5 })
+      // 将当前已选标签传给 AI，让分镜描述中融入标签元素
+      const tagContext = selectedTags.length > 0
+        ? `\n\n已选标签（请融入分镜描述中）：${selectedTags.join('，')}`
+        : ''
+
+      const r = await api.post('/ai/storyboard', {
+        script: scriptInput + tagContext,
+        scene_count: 5,
+        tags: selectedTags,
+      })
+
       if (r.data?.shots?.length > 0) {
-        // 将分镜转为提示词填充到描述框
+        // 将分镜转为提示词
         const prompts = r.data.shots.map((s: any, i: number) =>
           `【镜头${s.shot_id || i+1}·${s.camera || '全景'}】${s.description}${s.mood ? '，' + s.mood : ''}`
         )
         setPrompt(prompts.join('\n'))
-        message.success(`🎬 已生成 ${r.data.total_shots} 个分镜！已填充到视频描述`)
+
+        // 自动关联标签：扫描分镜描述中的标签词并选中
+        const allText = r.data.shots.map((s: any) => s.description + ' ' + (s.mood || '') + ' ' + (s.camera || '')).join(' ')
+        const allTags = [...CHARACTER_TAGS, ...SCENE_TAGS, ...STYLE_TAGS, ...CAMERA_TAGS, ...MOOD_TAGS, ...QUALITY_TAGS]
+        const matchedTags = allTags.filter(tag => allText.includes(tag))
+        if (matchedTags.length > 0) {
+          setSelectedTags(prev => [...new Set([...prev, ...matchedTags])])
+        }
+
+        message.success(`🎬 已生成 ${r.data.total_shots} 个分镜！关联 ${matchedTags.length} 个标签`)
       }
     } catch (e: any) {
       message.error('AI 服务不可用，请稍后重试')
