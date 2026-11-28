@@ -5,11 +5,22 @@ import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
+from backend.services.storyboard_local import build_storyboard
+
 router = APIRouter()
 
 # MiMo LLM config
 MIMO_BASE_URL = "https://token-plan-cn.xiaomimimo.com/v1"
-MIMO_API_KEY = os.environ.get("XIAOMI_API_KEY", os.environ.get("MIMO_API_KEY", ""))
+_LLM_KEY_ENVS = ("XIAOMI_API_KEY", "MIMO_API_KEY")
+
+
+def _llm_api_key() -> str:
+    for name in _LLM_KEY_ENVS:
+        v = os.environ.get(name, "").strip()
+        if v:
+            return v
+    return ""
+
 MIMO_MODEL = "mimo-v2.6-pro"
 
 
@@ -26,7 +37,7 @@ class StoryboardRequest(BaseModel):
 
 async def _call_llm(system: str, user: str) -> str:
     """Call MiMo LLM."""
-    api_key = MIMO_API_KEY
+    api_key = _llm_api_key()
     if not api_key:
         # Try reading from config file
         try:
@@ -57,6 +68,64 @@ async def _call_llm(system: str, user: str) -> str:
             raise HTTPException(status_code=502, detail=f"LLM 调用失败: {resp.status_code} {resp.text[:200]}")
         data = resp.json()
         return data["choices"][0]["message"]["content"]
+
+
+def _parse_shots(result: str) -> list[dict]:
+    """从 LLM 输出里解析分镜 JSON 数组。"""
+    text = result.strip()
+    if text.startswith("```"):
+        text = text.split("```")[1]
+        if text.startswith("json"):
+            text = text[4:]
+    try:
+        data = json.loads(text)
+    except json.JSONDecodeError:
+        import re
+        m = re.search(r"\[.*\]", result, re.DOTALL)
+        if not m:
+            raise ValueError(f"LLM 输出格式错误: {result[:200]}")
+        data = json.loads(m.group())
+    if isinstance(data, dict):
+        data = data.get("shots", [])
+    if not isinstance(data, list) or not data:
+        raise ValueError("LLM 未返回分镜数组")
+    normalized: list[dict] = []
+    for i, item in enumerate(data):
+        if not isinstance(item, dict):
+            continue
+        desc = str(item.get("description") or "").strip()
+        if not desc:            # 描述为空的分镜等于没填充，直接判无效
+            continue
+        try:
+            dur = int(float(item.get("duration") or 3))
+        except (TypeError, ValueError):
+            dur = 3
+        normalized.append({
+            "shot_id": item.get("shot_id") or i + 1,
+            "camera": str(item.get("camera") or "中景"),
+            "description": desc,
+            "duration": max(1, min(15, dur)),
+            "transition": str(item.get("transition") or "切换"),
+            "dialogue": str(item.get("dialogue") or ""),
+            "mood": str(item.get("mood") or ""),
+        })
+    if not normalized:
+        raise ValueError("LLM 返回的分镜描述全部为空")
+    return normalized
+
+
+def _degrade_notice(exc: Exception) -> str:
+    """把降级原因翻译成用户能看懂的提示。"""
+    raw = str(exc)
+    if "429" in raw or "quota" in raw.lower():
+        return "大模型配额已耗尽，已使用本地规则生成分镜"
+    if "未配置" in raw or "API Key" in raw:
+        return "未配置大模型 API Key，已使用本地规则生成分镜"
+    if "格式" in raw or "数组" in raw:
+        return "大模型返回格式异常，已使用本地规则生成分镜"
+    if "timeout" in raw.lower() or "timed out" in raw.lower():
+        return "大模型响应超时，已使用本地规则生成分镜"
+    return "大模型暂不可用，已使用本地规则生成分镜"
 
 
 @router.post("/polish")
@@ -112,34 +181,28 @@ async def generate_storyboard(req: StoryboardRequest):
     if req.tags:
         user += f"\n\n参考标签（请自然融入各镜头的 description 中，不要生硬堆砌）：{', '.join(req.tags)}"
 
-    result = await _call_llm(system, user)
-
-    # Parse JSON from response
+    shots: list[dict] = []
+    source = "local"
+    notice = ""
     try:
-        # Try to extract JSON array from response
-        text = result.strip()
-        if text.startswith('```'):
-            text = text.split('```')[1]
-            if text.startswith('json'):
-                text = text[4:]
-        shots = json.loads(text)
-    except (json.JSONDecodeError, IndexError):
-        # Fallback: try to find JSON in text
-        import re
-        match = re.search(r'\[.*\]', result, re.DOTALL)
-        if match:
-            try:
-                shots = json.loads(match.group())
-            except json.JSONDecodeError:
-                raise HTTPException(status_code=502, detail=f"LLM 输出格式错误: {result[:200]}")
-        else:
-            raise HTTPException(status_code=502, detail=f"LLM 输出格式错误: {result[:200]}")
+        result = await _call_llm(system, user)
+        shots = _parse_shots(result)
+        source = "ai"
+    except Exception as exc:  # Key 缺失 / 配额耗尽 / 超时 / 输出格式错
+        notice = _degrade_notice(exc)
+
+    if not shots:
+        local = build_storyboard(req.script, req.scene_count, req.style, req.tags)
+        shots = local["shots"]
+        source = "local"
 
     return {
         "script": req.script,
         "shots": shots,
         "total_shots": len(shots),
-        "total_duration": sum(s.get("duration", 5) for s in shots),
+        "total_duration": sum(s.get("duration", 3) for s in shots),
+        "source": source,
+        "notice": notice,
     }
 
 

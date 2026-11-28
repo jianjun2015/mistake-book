@@ -1,72 +1,74 @@
 import { useState } from 'react'
 import {
   Card, Button, Space, Typography, Input, message, Tag, Divider,
-  Row, Col, Collapse, Select,
+  Row, Col, Collapse, Select, Alert,
 } from 'antd'
 import {
   VideoCameraOutlined, PlusOutlined, DeleteOutlined,
   ThunderboltOutlined, CopyOutlined, FileTextOutlined,
-  CameraOutlined, ClockCircleOutlined, EditOutlined,
+  CameraOutlined, EditOutlined, RocketOutlined,
 } from '@ant-design/icons'
+import api from '../services/api'
 
-const { Text, Paragraph } = Typography
-const { TextArea } = Input
+const { Text } = Typography
 
-interface Shot {
+export interface Shot {
   id: number
   camera: string
   description: string
   duration: number
   transition: string
+  mood?: string
+  dialogue?: string
 }
 
-// 分镜脚本模板
+// 分镜脚本模板（description 已带可用描述，应用模板即可直接出片）
 const SHOT_TEMPLATES = [
   {
     label: '🎬 电影开场',
     shots: [
-      { camera: '远景/航拍', description: '建立环境，展示整体场景', duration: 3, transition: '淡入' },
-      { camera: '中景', description: '主角登场，展示动作', duration: 4, transition: '切换' },
-      { camera: '特写', description: '细节描写，表情/物品', duration: 3, transition: '切换' },
+      { camera: '远景/航拍', description: '建立环境，展示整体场景，晨昏光线，电影质感', duration: 3, transition: '淡入' },
+      { camera: '中景', description: '主角登场，展示动作，自然光，浅景深', duration: 4, transition: '切换' },
+      { camera: '特写', description: '细节描写，表情与物品特写，柔和光线', duration: 3, transition: '切换' },
     ],
   },
   {
     label: '📖 叙事故事',
     shots: [
-      { camera: '全景', description: '故事背景介绍', duration: 3, transition: '淡入' },
-      { camera: '中景', description: '主角开始行动', duration: 4, transition: '切换' },
-      { camera: '近景', description: '关键动作/事件发生', duration: 4, transition: '切换' },
-      { camera: '特写', description: '高潮细节/表情变化', duration: 3, transition: '切换' },
-      { camera: '远景', description: '结局/场景收尾', duration: 3, transition: '淡出' },
+      { camera: '全景', description: '故事背景介绍，环境全貌，暖色光影', duration: 3, transition: '淡入' },
+      { camera: '中景', description: '主角开始行动，镜头缓慢跟随', duration: 4, transition: '切换' },
+      { camera: '近景', description: '关键动作或事件发生，情绪推进', duration: 4, transition: '切换' },
+      { camera: '特写', description: '高潮细节与表情变化，逆光轮廓', duration: 3, transition: '切换' },
+      { camera: '远景', description: '结局交代，场景收尾，缓慢拉远', duration: 3, transition: '淡出' },
     ],
   },
   {
     label: '🌍 风景展示',
     shots: [
-      { camera: '航拍全景', description: '俯瞰全貌', duration: 4, transition: '淡入' },
-      { camera: '推镜头', description: '缓慢推进到主体', duration: 4, transition: '切换' },
-      { camera: '环绕镜头', description: '360度展示', duration: 5, transition: '切换' },
-      { camera: '拉远镜头', description: '缓慢拉远收尾', duration: 3, transition: '淡出' },
+      { camera: '航拍全景', description: '俯瞰全貌，山川与天际线，晨昏光', duration: 4, transition: '淡入' },
+      { camera: '推镜头', description: '缓慢推进到主体，景深渐浅', duration: 4, transition: '切换' },
+      { camera: '环绕镜头', description: '360 度环绕展示空间关系', duration: 5, transition: '切换' },
+      { camera: '拉镜头', description: '缓慢拉远收尾，留白构图', duration: 3, transition: '淡出' },
     ],
   },
   {
     label: '👤 人物展示',
     shots: [
-      { camera: '中景', description: '人物全身展示', duration: 3, transition: '淡入' },
-      { camera: '近景', description: '上半身/动作展示', duration: 3, transition: '切换' },
-      { camera: '特写', description: '面部表情/眼神', duration: 3, transition: '切换' },
-      { camera: '慢动作', description: '关键动作慢放', duration: 4, transition: '切换' },
-      { camera: '全景', description: '环境中的完整形象', duration: 3, transition: '淡出' },
+      { camera: '中景', description: '人物全身展示，自然站姿，环境光', duration: 3, transition: '淡入' },
+      { camera: '近景', description: '上半身与动作细节，浅景深', duration: 3, transition: '切换' },
+      { camera: '特写', description: '面部表情与眼神，柔和面光', duration: 3, transition: '切换' },
+      { camera: '慢动作', description: '关键动作慢放，高帧质感', duration: 4, transition: '切换' },
+      { camera: '全景', description: '环境中的完整形象，收束全片', duration: 3, transition: '淡出' },
     ],
   },
   {
     label: '🐾 萌宠日常',
     shots: [
-      { camera: '中景', description: '宠物整体活动', duration: 3, transition: '淡入' },
-      { camera: '低角度', description: '宠物视角拍摄', duration: 3, transition: '切换' },
-      { camera: '特写', description: '可爱表情/小动作', duration: 3, transition: '切换' },
-      { camera: '跟拍', description: '跟随宠物移动', duration: 4, transition: '切换' },
-      { camera: '慢动作', description: '跳跃/奔跑慢放', duration: 3, transition: '淡出' },
+      { camera: '中景', description: '宠物整体活动，生活化场景', duration: 3, transition: '淡入' },
+      { camera: '低角度仰拍', description: '宠物视角低角度拍摄，趣味构图', duration: 3, transition: '切换' },
+      { camera: '特写', description: '可爱表情与小动作特写', duration: 3, transition: '切换' },
+      { camera: '跟拍', description: '跟随宠物移动，稳定运镜', duration: 4, transition: '切换' },
+      { camera: '慢动作', description: '跳跃或奔跑慢放，捕捉动作细节', duration: 3, transition: '淡出' },
     ],
   },
 ]
@@ -81,18 +83,49 @@ const CAMERA_TYPES = [
 
 const TRANSITIONS = ['淡入', '淡出', '切换', '叠化', '闪白', '缩放']
 
+const DEFAULT_SHOTS: Shot[] = [
+  { id: 1, camera: '全景', description: '', duration: 3, transition: '淡入' },
+  { id: 2, camera: '中景', description: '', duration: 4, transition: '切换' },
+  { id: 3, camera: '特写', description: '', duration: 3, transition: '淡出' },
+]
+
 interface Props {
   onApplyToPrompt?: (prompt: string) => void
+  /** 受控分镜行（由父组件维护，便于「一键生成」直接填充） */
+  shots?: Shot[]
+  onShotsChange?: (shots: Shot[]) => void
+  /** 场景描述，复用父组件的剧本输入 */
+  sceneDesc?: string
+  onSceneDescChange?: (v: string) => void
+  selectedTags?: string[]
+  onTagsMatched?: (tags: string[]) => void
 }
 
-export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
+export default function StoryboardGenerator({
+  onApplyToPrompt,
+  shots: shotsProp,
+  onShotsChange,
+  sceneDesc: sceneDescProp,
+  onSceneDescChange,
+  selectedTags = [],
+  onTagsMatched,
+}: Props) {
   const [storyboardName, setStoryboardName] = useState('')
-  const [sceneDesc, setSceneDesc] = useState('')
-  const [shots, setShots] = useState<Shot[]>([
-    { id: 1, camera: '全景', description: '', duration: 3, transition: '淡入' },
-    { id: 2, camera: '中景', description: '', duration: 4, transition: '切换' },
-    { id: 3, camera: '特写', description: '', duration: 3, transition: '淡出' },
-  ])
+  const [innerShots, setInnerShots] = useState<Shot[]>(DEFAULT_SHOTS)
+  const [innerSceneDesc, setInnerSceneDesc] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [notice, setNotice] = useState('')
+
+  const shots = shotsProp ?? innerShots
+  const sceneDesc = sceneDescProp ?? innerSceneDesc
+  const setShots = (next: Shot[]) => {
+    if (onShotsChange) onShotsChange(next)
+    else setInnerShots(next)
+  }
+  const setSceneDesc = (v: string) => {
+    if (onSceneDescChange) onSceneDescChange(v)
+    else setInnerSceneDesc(v)
+  }
 
   // 应用模板
   const applyTemplate = (template: typeof SHOT_TEMPLATES[0]) => {
@@ -117,12 +150,53 @@ export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
     setShots(shots.map(s => s.id === id ? { ...s, [field]: value } : s))
   }
 
+  // 按场景描述一键生成分镜并填充表格
+  const fillByScript = async () => {
+    if (!sceneDesc.trim()) return message.warning('请先输入场景描述/剧本')
+    setAiLoading(true)
+    setNotice('')
+    try {
+      const r = await api.post('/ai/storyboard', {
+        script: sceneDesc,
+        scene_count: Math.max(shots.length, 3),
+        tags: selectedTags,
+      })
+      const data = r.data || {}
+      const rows: Shot[] = (data.shots || []).map((s: any, i: number) => ({
+        id: i + 1,
+        camera: s.camera || '中景',
+        description: (s.description || '').trim(),
+        duration: Number(s.duration) || 3,
+        transition: s.transition || '切换',
+        mood: s.mood || '',
+        dialogue: s.dialogue || '',
+      })).filter((s: Shot) => s.description)
+
+      if (rows.length === 0) {
+        message.error('分镜生成失败：返回内容为空，请补充场景描述后重试')
+      } else {
+        setShots(rows)
+        if (data.notice) setNotice(data.notice)
+        message.success(
+          `🎬 已填充 ${rows.length} 个分镜（${data.source === 'ai' ? 'AI 生成' : '本地规则'}）`,
+        )
+        if (onTagsMatched && Array.isArray(data.matched_tags)) onTagsMatched(data.matched_tags)
+      }
+    } catch (e: any) {
+      const detail = e?.response?.data?.detail
+      message.error(detail ? `分镜生成失败：${detail}` : '分镜生成失败，请稍后重试')
+    } finally {
+      setAiLoading(false)
+    }
+  }
+
   // 计算总时长
-  const totalDuration = shots.reduce((sum, s) => sum + s.duration, 0)
+  const totalDuration = shots.reduce((sum, s) => sum + (s.duration || 0), 0)
+  const emptyCount = shots.filter(s => !s.description.trim()).length
 
   // 生成完整分镜脚本文本
   const generateScript = (): string => {
-    if (!sceneDesc.trim()) { message.warning('请先输入场景描述'); return '' }
+    if (!sceneDesc.trim()) return ''
 
     let script = `📋 分镜脚本${storyboardName ? `：${storyboardName}` : ''}\n`
     script += `📝 场景：${sceneDesc}\n`
@@ -131,53 +205,49 @@ export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
 
     shots.forEach((shot, i) => {
       script += `【镜头 ${i + 1}】${shot.camera} | ${shot.duration}s | ${shot.transition}\n`
-      script += `${shot.description || '(待补充)'}\n\n`
+      script += `${shot.description || '(待补充)'}\n`
+      if (shot.dialogue) script += `台词：${shot.dialogue}\n`
+      script += '\n'
     })
 
     return script
   }
 
-  // 生成多条提示词（每镜头一条）
+  // 生成多条提示词（每镜头一条，空描述继承场景描述而不是留空）
   const generatePrompts = (): string[] => {
-    if (!sceneDesc.trim()) { message.warning('请先输入场景描述'); return [] }
-
-    const prompts = shots.map((shot, i) => {
-      return `镜头${i + 1}(${shot.camera})：${sceneDesc}，${shot.description || '延续上一镜头'}，${shot.duration}秒，${shot.transition}`
+    if (!sceneDesc.trim()) return []
+    return shots.map((shot, i) => {
+      const base = shot.description.trim() || sceneDesc
+      return `镜头${i + 1}(${shot.camera})：${base}，${shot.duration}秒，${shot.transition}`
     })
-
-    return prompts
   }
 
   // 复制脚本
   const copyScript = () => {
-    const script: string = generateScript()
-    if (script) {
-      navigator.clipboard.writeText(script)
-      message.success('分镜脚本已复制到剪贴板！')
-    }
+    if (!sceneDesc.trim()) return message.warning('请先输入场景描述')
+    navigator.clipboard.writeText(generateScript())
+    message.success('分镜脚本已复制到剪贴板！')
   }
 
   // 应用到提示词
   const applyToPrompt = () => {
-    const prompts: string[] = generatePrompts()
+    if (!sceneDesc.trim()) return message.warning('请先输入场景描述')
+    const prompts = generatePrompts()
     if (prompts.length > 0 && onApplyToPrompt) {
       onApplyToPrompt(prompts.join('\n---\n'))
       message.success('分镜提示词已应用到视频描述！')
     }
   }
 
-  // 导出为多镜头prompt（Kling multi-shot格式）
+  // 可灵多镜头格式
   const exportMultiShot = () => {
     if (!sceneDesc.trim()) return message.warning('请先输入场景描述')
-    
-    // 可灵多镜头格式: "镜头 n, m, words; 镜头 n, m, words;"
-    const multiPrompt = shots.map((shot, i) =>
-      `镜头 ${i + 1}, ${shot.duration}, ${shot.description || sceneDesc}`
-    ).join('; ')
-
+    const multiPrompt = shots
+      .map((shot, i) => `镜头 ${i + 1}, ${shot.duration}, ${shot.description.trim() || sceneDesc}`)
+      .join('; ')
     if (onApplyToPrompt) {
       onApplyToPrompt(multiPrompt)
-      message.success('多镜头格式提示词已应用！（可灵3.0格式）')
+      message.success('多镜头格式提示词已应用！')
     }
   }
 
@@ -207,9 +277,9 @@ export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
             />
           </Col>
           <Col span={16}>
-            <Text strong>场景总体描述</Text>
+            <Text strong>场景总体描述 / 剧本</Text>
             <Input
-              placeholder="描述整个视频的核心场景和主题..."
+              placeholder="描述整个视频的核心场景和主题，或直接粘贴剧本..."
               value={sceneDesc}
               onChange={e => setSceneDesc(e.target.value)}
               size="small"
@@ -217,6 +287,29 @@ export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
             />
           </Col>
         </Row>
+
+        {/* 一键填充 */}
+        <Space wrap>
+          <Button
+            size="small"
+            type="primary"
+            icon={<RocketOutlined />}
+            loading={aiLoading}
+            onClick={fillByScript}
+            style={{ background: '#fa8c16', borderColor: '#fa8c16' }}
+          >
+            🎬 按描述生成分镜并填充
+          </Button>
+          {emptyCount > 0 && (
+            <Text type="warning" style={{ fontSize: 12 }}>
+              {emptyCount} 个镜头描述为空，将沿用场景描述
+            </Text>
+          )}
+        </Space>
+
+        {notice && (
+          <Alert type="warning" showIcon message={notice} style={{ fontSize: 12 }} banner />
+        )}
 
         {/* 快速模板 */}
         <div>
@@ -265,6 +358,7 @@ export default function StoryboardGenerator({ onApplyToPrompt }: Props) {
                   value={shot.description}
                   onChange={e => updateShot(shot.id, 'description', e.target.value)}
                   placeholder={`镜头${idx + 1}画面描述...`}
+                  status={shot.description.trim() ? undefined : 'warning'}
                 />
               </Col>
               <Col span={3}>

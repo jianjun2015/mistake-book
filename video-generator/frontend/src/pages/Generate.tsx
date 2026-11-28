@@ -12,7 +12,7 @@ import {
   CompressOutlined, ExpandOutlined,
 } from '@ant-design/icons'
 import api from '../services/api'
-import StoryboardGenerator from '../components/StoryboardGenerator'
+import StoryboardGenerator, { type Shot } from '../components/StoryboardGenerator'
 
 const { TextArea } = Input
 const { Text } = Typography
@@ -122,6 +122,11 @@ export default function Generate() {
   const [collapsedGroups, setCollapsedGroups] = useState<string[]>([])
   const [scriptInput, setScriptInput] = useState('')
   const [generatingStoryboard, setGeneratingStoryboard] = useState(false)
+  const [storyboardShots, setStoryboardShots] = useState<Shot[]>([
+    { id: 1, camera: '全景', description: '', duration: 3, transition: '淡入' },
+    { id: 2, camera: '中景', description: '', duration: 4, transition: '切换' },
+    { id: 3, camera: '特写', description: '', duration: 3, transition: '淡出' },
+  ])
   const previewRef = useRef<HTMLDivElement>(null)
 
   // 悬浮按钮
@@ -234,7 +239,25 @@ export default function Generate() {
       })
 
       if (r.data?.shots?.length > 0) {
-        // 将分镜转为提示词
+        // 1) 填充分镜表格（真正落库到分镜脚本 tab）
+        const rows: Shot[] = r.data.shots
+          .map((s: any, i: number) => ({
+            id: i + 1,
+            camera: s.camera || '全景',
+            description: (s.description || '').trim(),
+            duration: Number(s.duration) || 3,
+            transition: s.transition || '切换',
+            mood: s.mood || '',
+            dialogue: s.dialogue || '',
+          }))
+          .filter((x: Shot) => x.description)
+        if (rows.length > 0) {
+          setStoryboardShots(rows)
+          setBuilderTab('storyboard')
+          setShowBuilder(true)
+        }
+
+        // 2) 同时把分镜转成提示词
         const prompts = r.data.shots.map((s: any, i: number) =>
           `【镜头${s.shot_id || i+1}·${s.camera || '全景'}】${s.description}${s.mood ? '，' + s.mood : ''}`
         )
@@ -248,10 +271,13 @@ export default function Generate() {
           setSelectedTags(prev => [...new Set([...prev, ...matchedTags])])
         }
 
-        message.success(`🎬 已生成 ${r.data.total_shots} 个分镜！关联 ${matchedTags.length} 个标签`)
+        const src = r.data.source === 'ai' ? 'AI' : '本地规则'
+        message.success(`🎬 已填充 ${r.data.total_shots} 个分镜（${src}）！关联 ${matchedTags.length} 个标签`)
+        if (r.data.notice) message.warning(r.data.notice)
       }
     } catch (e: any) {
-      message.error('AI 服务不可用，请稍后重试')
+      const detail = e?.response?.data?.detail
+      message.error(detail ? `分镜生成失败：${detail}` : 'AI 服务不可用，请稍后重试')
     }
     setGeneratingStoryboard(false)
   }
@@ -501,7 +527,14 @@ export default function Generate() {
                   </div>
                 ) : (
                   <div style={{ borderRadius: 8, padding: 12, background: '#f8f9ff', border: '1px solid #e6f4ff', maxHeight: 360, overflow: 'auto' }}>
-                    <StoryboardGenerator onApplyToPrompt={(p) => setPrompt(p)} />
+                    <StoryboardGenerator
+                      onApplyToPrompt={(p) => setPrompt(p)}
+                      shots={storyboardShots}
+                      onShotsChange={setStoryboardShots}
+                      sceneDesc={scriptInput}
+                      onSceneDescChange={setScriptInput}
+                      selectedTags={selectedTags}
+                    />
                   </div>
                 )}
               </div>
