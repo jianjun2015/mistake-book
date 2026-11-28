@@ -13,18 +13,26 @@ import os
 
 import httpx
 
-# 火山方舟 Coding 套餐支持的语言模型（2026-11 实测全部返回 200）
+# 火山方舟 Coding 套餐语言模型（全小写规范，与开通管理页可复制名称一致）
+# 2026-11 实测全部 200；方舟同时兼容首字母大写写法，但统一小写最稳
 ARK_TEXT_MODELS = [
-    "Doubao-Seed-2.1-pro", "Doubao-Seed-Evolving", "Doubao-Seed-2.1-lite",
-    "Doubao-Seed-2.0-mini", "Kimi-K3.1-Pro", "Kimi-K3",
-    "DeepSeek-V4.1-Flash", "DeepSeek-V4.1-Flash-Economy", "DeepSeek-V4-Flash",
-    "DeepSeek-V4-Pro", "GLM-5.3", "GLM-5.3-Flash", "GLM-5.4",
+    "doubao-seed-2.1-pro", "doubao-seed-evolving", "doubao-seed-2.1-lite",
+    "doubao-seed-2.0-mini",
+    "deepseek-v4.1-flash", "deepseek-v4.1-flash-economy", "deepseek-v4-flash",
+    "deepseek-v4-pro",
+    "glm-5.4", "glm-5.3", "glm-5.3-flash",  # glm-latest 是 glm-5.3 的别名
+    "kimi-k3.1-pro", "kimi-k2.8-preview",
 ]
 
-# 即将下线，仍可用但不应作为默认
-ARK_DEPRECATING = {"Kimi-K3"}
+# 预览版模型：可用但接口/定价可能调整
+ARK_PREVIEW = {"kimi-k2.8-preview"}
 
-DEFAULT_ARK_MODEL = os.environ.get("ARK_MODEL", "Doubao-Seed-2.1-pro")
+# 模型别名 → 规范名
+ARK_ALIASES = {
+    "glm-latest": "glm-5.3",
+}
+
+DEFAULT_ARK_MODEL = os.environ.get("ARK_MODEL", "doubao-seed-2.1-pro").lower()
 DEFAULT_MIMO_MODEL = "mimo-v2.6-pro"
 
 
@@ -64,6 +72,20 @@ def _mimo_base() -> str:
     return os.environ.get("XIAOMI_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1").rstrip("/")
 
 
+def _normalize_model(model: str) -> str:
+    """把用户传入的模型名归一化到套餐规范 ID（小写 + 别名解析）。"""
+    m = (model or "").strip().lower()
+    if m in ARK_ALIASES:
+        return ARK_ALIASES[m]
+    if m in ARK_TEXT_MODELS:
+        return m
+    # 大小写不敏感匹配（兼容旧配置里的 Doubao-Seed-... 写法）
+    for canon in ARK_TEXT_MODELS:
+        if canon.lower() == m:
+            return canon
+    return m
+
+
 def channels() -> list[dict]:
     """当前可用的文本通道（不含无 Key 的）。"""
     out: list[dict] = []
@@ -89,10 +111,10 @@ def available_text_models() -> dict:
         for m in ch["models"]:
             result.append({
                 "id": m,
-                "label": m,
+                "label": m + (" (preview)" if m in ARK_PREVIEW else ""),
                 "channel": ch["channel"],
                 "channel_label": ch["label"],
-                "deprecating": m in ARK_DEPRECATING,
+                "preview": m in ARK_PREVIEW,
                 "default": m == ch["model"],
             })
     return {"channels": [{"channel": c["channel"], "label": c["label"]} for c in channels()],
@@ -104,7 +126,9 @@ async def chat(system: str, user: str, model: str = "", temperature: float = 0.7
     """依次尝试各通道，返回 (内容, 实际使用的模型)。全失败抛 LLMUnavailable。"""
     errors: list[str] = []
     for ch in channels():
-        target = model if (model and model in ch["models"]) else ch["model"]
+        target = _normalize_model(model) if model else ch["model"]
+        if target not in ch["models"]:
+            target = ch["model"]
         try:
             async with httpx.AsyncClient(timeout=90) as client:
                 resp = await client.post(

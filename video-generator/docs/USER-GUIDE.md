@@ -119,3 +119,18 @@ cd frontend && npm install && npm run dev                        # 前端 :5180
 
 当前账户 2135031164 的 Seedance 模型均未开通，需到方舟控制台
 `console.volcengine.com/ark → 开通管理` 单独开通后，下拉才会出现可选项。
+
+## v2.3 语言模型下拉选择（分镜 / 润色）
+
+分镜面板右侧新增「AI 语言模型」下拉框，数据来自 `GET /api/ai/models`：
+
+| 通道 | 说明 |
+| --- | --- |
+| 火山方舟 Coding 套餐 | 13 个全小写规范名，均已在账户实测 200 |
+| 小米 MiMo | 配额耗尽时自动降级到本地规则分镜 |
+
+- 默认选中 `doubao-seed-2.1-pro`（后端 `DEFAULT_ARK_MODEL`）。
+- 选中项作为 `llm_model` 透传给 `POST /api/ai/polish`、`POST /api/ai/storyboard`、`POST /api/ai/enhance-shot`。
+- 模型名大小写不敏感：`GLM-5.3`、`Doubao-Seed-Evolving` 会被 `_normalize_model()` 归一化为小写规范名；`glm-latest` 别名映射到 `glm-5.3`。
+- `kimi-k2.8-preview` 标注 preview；`kimi-k3` 已从清单移除（即将下线）。
+- 编码套餐仅含语言模型，视频生成需另在方舟控制台逐个开通 Seedance 模型。

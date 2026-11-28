@@ -1,7 +1,5 @@
 """AI-powered prompt polishing and script-to-storyboard generation."""
-import os
 import json
-import httpx
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
@@ -10,23 +8,10 @@ from backend.services.storyboard_local import build_storyboard
 
 router = APIRouter()
 
-# MiMo LLM config
-MIMO_BASE_URL = "https://token-plan-cn.xiaomimimo.com/v1"
-_LLM_KEY_ENVS = ("XIAOMI_API_KEY", "MIMO_API_KEY")
-
-
-def _llm_api_key() -> str:
-    for name in _LLM_KEY_ENVS:
-        v = os.environ.get(name, "").strip()
-        if v:
-            return v
-    return ""
-
-MIMO_MODEL = "mimo-v2.6-pro"
-
 
 class PolishRequest(BaseModel):
     prompt: str
+    llm_model: str = ""
 
 
 class StoryboardRequest(BaseModel):
@@ -125,7 +110,7 @@ async def polish_prompt(req: PolishRequest):
 
 直接输出润色后的提示词，不要有任何前缀、解释或引号。"""
 
-    result = await _call_llm(system, req.prompt)
+    result = await _call_llm(system, req.prompt, model=req.llm_model)
     return {"original": req.prompt, "polished": result.strip()}
 
 
@@ -201,5 +186,5 @@ async def enhance_shot(req: PolishRequest):
 
 直接输出增强后的提示词。"""
 
-    result = await _call_llm(system, req.prompt)
+    result = await _call_llm(system, req.prompt, model=req.llm_model)
     return {"original": req.prompt, "enhanced": result.strip()}

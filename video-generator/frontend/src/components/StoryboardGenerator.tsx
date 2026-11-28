@@ -99,6 +99,8 @@ interface Props {
   onSceneDescChange?: (v: string) => void
   selectedTags?: string[]
   onTagsMatched?: (tags: string[]) => void
+  /** 指定 AI 语言模型 ID（留空走后端默认） */
+  llmModel?: string
 }
 
 export default function StoryboardGenerator({
@@ -109,6 +111,7 @@ export default function StoryboardGenerator({
   onSceneDescChange,
   selectedTags = [],
   onTagsMatched,
+  llmModel = '',
 }: Props) {
   const [storyboardName, setStoryboardName] = useState('')
   const [innerShots, setInnerShots] = useState<Shot[]>(DEFAULT_SHOTS)
@@ -160,6 +163,7 @@ export default function StoryboardGenerator({
         script: sceneDesc,
         scene_count: Math.max(shots.length, 3),
         tags: selectedTags,
+        llm_model: llmModel,
       })
       const data = r.data || {}
       const rows: Shot[] = (data.shots || []).map((s: any, i: number) => ({

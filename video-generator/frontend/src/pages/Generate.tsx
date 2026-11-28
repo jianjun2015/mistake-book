@@ -96,6 +96,8 @@ export default function Generate() {
   const [modelCatalog, setModelCatalog] = useState<any[]>([])
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogWarn, setCatalogWarn] = useState('')
+  const [llmModels, setLlmModels] = useState<any[]>([])
+  const [llmModel, setLlmModel] = useState('')
   const [resolution, setResolution] = useState('720p')
   const [duration, setDuration] = useState(5)
   const [providers, setProviders] = useState<Provider[]>([])
@@ -152,7 +154,13 @@ export default function Generate() {
 
   useEffect(() => {
     loadProviders()
-    // 初始默认厂商的模型目录（loadProviders 内部已设默认 model，这里补开通状态）
+    // 语言模型清单（分镜/润色用）
+    api.get('/ai/models').then(r => {
+      const list = r.data?.models || []
+      setLlmModels(list)
+      const def = list.find((m: any) => m.default) || list[0]
+      if (def) setLlmModel(def.id)
+    }).catch(() => {})
     try {
       setPromptHistory(JSON.parse(localStorage.getItem('prompt_history') || '[]'))
       const draft = localStorage.getItem('prompt_draft')
@@ -232,7 +240,7 @@ export default function Generate() {
     if (!prompt.trim()) return message.warning('请先输入提示词')
     setPolishing(true)
     try {
-      const r = await api.post('/ai/polish', { prompt })
+      const r = await api.post('/ai/polish', { prompt, llm_model: llmModel })
       if (r.data?.polished) {
         setPrompt(r.data.polished)
         message.success('✨ AI 润色完成！提示词已增强')
@@ -270,6 +278,7 @@ export default function Generate() {
         script: scriptInput + tagContext,
         scene_count: 5,
         tags: selectedTags,
+        llm_model: llmModel,
       })
 
       if (r.data?.shots?.length > 0) {
@@ -517,6 +526,21 @@ export default function Generate() {
                 >
                   🎬 一键生成分镜并填充
                 </Button>
+                {llmModels.length > 0 && (
+                  <Select
+                    size="small"
+                    value={llmModel || undefined}
+                    onChange={setLlmModel}
+                    style={{ minWidth: 200 }}
+                    showSearch
+                    optionFilterProp="label"
+                    placeholder="选择 AI 语言模型"
+                    options={llmModels.map((m: any) => ({
+                      value: m.id,
+                      label: `${m.channel === 'ark' ? '方舟' : 'MiMo'} · ${m.id}${m.preview ? ' (preview)' : ''}`,
+                    }))}
+                  />
+                )}
               </Space>
             </div>
 
@@ -568,6 +592,7 @@ export default function Generate() {
                       sceneDesc={scriptInput}
                       onSceneDescChange={setScriptInput}
                       selectedTags={selectedTags}
+                      llmModel={llmModel}
                     />
                   </div>
                 )}
