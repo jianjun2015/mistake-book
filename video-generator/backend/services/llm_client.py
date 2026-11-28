@@ -32,7 +32,8 @@ ARK_ALIASES = {
     "glm-latest": "glm-5.3",
 }
 
-DEFAULT_ARK_MODEL = os.environ.get("ARK_MODEL", "doubao-seed-2.1-pro").lower()
+# 兜底默认值；运行期以 default_ark_model() 为准（可被配置页修改并持久化）
+DEFAULT_ARK_MODEL = "doubao-seed-2.1-pro"
 DEFAULT_MIMO_MODEL = "mimo-v2.6-pro"
 
 
@@ -86,14 +87,35 @@ def _normalize_model(model: str) -> str:
     return m
 
 
+def default_ark_model() -> str:
+    """当前默认语言模型（读 ARK_MODEL，非法值回落到 doubao-seed-2.1-pro）。"""
+    raw = (os.environ.get("ARK_MODEL") or "").strip()
+    norm = _normalize_model(raw)
+    return norm if norm in ARK_TEXT_MODELS else DEFAULT_ARK_MODEL
+
+
+# 优先通道（由配置页选择后持久化；默认方舟）
+_PREFERRED_CHANNEL = "ark"
+
+
+def set_preferred_channel(channel: str) -> None:
+    global _PREFERRED_CHANNEL
+    if channel in ("ark", "mimo"):
+        _PREFERRED_CHANNEL = channel
+
+
+def preferred_channel() -> str:
+    return _PREFERRED_CHANNEL
+
+
 def channels() -> list[dict]:
-    """当前可用的文本通道（不含无 Key 的）。"""
+    """当前可用的文本通道（不含无 Key 的），优先通道排在最前。"""
     out: list[dict] = []
     if _ark_key():
         out.append({
             "channel": "ark", "label": "火山方舟 Coding 套餐",
             "base_url": _ark_base(), "api_key": _ark_key(),
-            "model": DEFAULT_ARK_MODEL, "models": list(ARK_TEXT_MODELS),
+            "model": default_ark_model(), "models": list(ARK_TEXT_MODELS),
         })
     if _mimo_key():
         out.append({
@@ -101,6 +123,7 @@ def channels() -> list[dict]:
             "base_url": _mimo_base(), "api_key": _mimo_key(),
             "model": DEFAULT_MIMO_MODEL, "models": [DEFAULT_MIMO_MODEL],
         })
+    out.sort(key=lambda c: 0 if c["channel"] == _PREFERRED_CHANNEL else 1)
     return out
 
 
@@ -128,6 +151,10 @@ async def chat(system: str, user: str, model: str = "", temperature: float = 0.7
     for ch in channels():
         target = _normalize_model(model) if model else ch["model"]
         if target not in ch["models"]:
+            if model:
+                # 显式指定了他家模型：跳过本通道，避免用错模型
+                errors.append(f"{ch['channel']}: 已跳过（{target} 不属于该通道）")
+                continue
             target = ch["model"]
         try:
             async with httpx.AsyncClient(timeout=90) as client:
@@ -163,3 +190,34 @@ async def chat(system: str, user: str, model: str = "", temperature: float = 0.7
     if not errors:
         raise LLMUnavailable("未配置任何大模型 API Key")
     raise LLMUnavailable("；".join(errors))
+
+
+async def probe_text_model(model: str, channel: str = "ark") -> dict:
+    """用一次极小的 chat 请求验证该语言模型是否可用（成本可忽略）。"""
+    target = _normalize_model(model)
+    ch = next((c for c in channels() if c["channel"] == channel), None)
+    if ch is None:
+        return {"state": "no_key", "message": f"未配置 {channel} 通道的 API Key"}
+    try:
+        async with httpx.AsyncClient(timeout=40) as client:
+            resp = await client.post(
+                f"{ch['base_url']}/chat/completions",
+                headers={"Authorization": f"Bearer {ch['api_key']}",
+                         "Content-Type": "application/json"},
+                json={
+                    "model": target,
+                    "messages": [{"role": "user", "content": "ping"}],
+                    "max_tokens": 8,
+                },
+            )
+        if resp.status_code == 200:
+            return {"state": "available", "message": "可用"}
+        body = resp.text.replace("\n", " ")[:120]
+        low = body.lower()
+        if "unsupportedmodel" in low or "not support" in low:
+            return {"state": "unsupported", "message": "该模型不在当前套餐内"}
+        if "quota" in low:
+            return {"state": "quota", "message": "配额已耗尽"}
+        return {"state": "error", "message": f"{resp.status_code} {body}"}
+    except Exception as exc:
+        return {"state": "error", "message": str(exc)[:120]}

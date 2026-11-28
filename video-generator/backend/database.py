@@ -78,6 +78,27 @@ def init_db():
         db.close()
 
 
+def load_runtime_settings():
+    """把持久化的设置载入进程环境，供 llm_client 读取。"""
+    import os as _os
+
+    from .models import AppSetting
+    db = SessionLocal()
+    try:
+        from .services.llm_client import set_preferred_channel
+
+        channel = ""
+        for row in db.query(AppSetting).all():
+            if row.key == "ai.text_model" and row.value:
+                _os.environ["ARK_MODEL"] = row.value
+            elif row.key == "ai.text_channel" and row.value:
+                channel = row.value
+        if channel:
+            set_preferred_channel(channel)
+    finally:
+        db.close()
+
+
 def get_db():
     db = SessionLocal()
     try:

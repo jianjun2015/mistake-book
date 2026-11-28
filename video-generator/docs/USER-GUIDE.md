@@ -134,3 +134,27 @@ cd frontend && npm install && npm run dev                        # 前端 :5180
 - 模型名大小写不敏感：`GLM-5.3`、`Doubao-Seed-Evolving` 会被 `_normalize_model()` 归一化为小写规范名；`glm-latest` 别名映射到 `glm-5.3`。
 - `kimi-k2.8-preview` 标注 preview；`kimi-k3` 已从清单移除（即将下线）。
 - 编码套餐仅含语言模型，视频生成需另在方舟控制台逐个开通 Seedance 模型。
+
+## v2.4 API 配置页（新增导航 Tab）
+
+> 修复说明：`ApiConfig.tsx` 此前存在但**从未挂载到路由**，所以页面上根本看不到、也就“获取不到模型”。现在导航栏新增「⚙️ API 配置」Tab。
+
+### 视频厂商区
+- 每个厂商（Runway / 可灵 / Seedance / Mock）都有真实模型清单下拉（`GET /api/config/{provider}/models`）
+- 支持直接手动输入模型名（AutoComplete）
+- 「探测开通状态」按钮对应 `?probe=true`，实测每个模型：`✅ 可用 / ⛔ 未开通 / 🚫 不存在 / ❔ 未探测`
+- 结果缓存 10 分钟，避免重复计费探测
+
+### AI 语言模型区（方舟 Coding 套餐）
+- 列出 13 个方舟语言模型 + MiMo，标注 preview
+- 「探测可用性」实测每个模型（小请求，成本可忽略；并发执行，约 10 秒完成）
+- 「设为默认」写入 `app_settings.ai.text_model`，**立即生效且重启后保留**（启动时 `load_runtime_settings()` 载入）
+- 切换通道（方舟 / MiMo）会改变 `llm_client.channels()` 的优先级顺序
+
+### 新增接口
+| 方法 | 路径 | 用途 |
+| --- | --- | --- |
+| GET | `/api/config/ai/text-models?probe=` | 语言模型清单 + 默认值 + 探测状态 |
+| POST | `/api/config/ai/text-model` | 设置默认语言模型（入参 `model`、`channel`） |
+
+`/api/ai/storyboard` 响应新增 `model` 字段，标明这次实际使用的模型。

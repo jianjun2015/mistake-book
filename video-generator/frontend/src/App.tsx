@@ -2,13 +2,14 @@ import { useState } from 'react'
 import { Layout, Tabs, Typography, Space, Badge } from 'antd'
 import {
   VideoCameraOutlined, FolderOpenOutlined,
-  StarOutlined, RocketOutlined, InboxOutlined,
+  StarOutlined, RocketOutlined, InboxOutlined, SettingOutlined,
 } from '@ant-design/icons'
 import Generate from './pages/Generate'
 import TaskList from './pages/TaskList'
 import Favorites from './pages/Favorites'
 import ComingSoon from './pages/ComingSoon'
 import MaterialLibrary from './pages/MaterialLibrary'
+import ApiConfig from './pages/ApiConfig'
 
 const { Header, Content } = Layout
 
@@ -64,6 +65,16 @@ export default function App() {
               children: null,
             },
             {
+              key: 'config',
+              label: (
+                <Space size={8}>
+                  <SettingOutlined style={{ fontSize: 18, color: '#52c41a' }} />
+                  <span style={{ fontSize: 16 }}>API 配置</span>
+                </Space>
+              ),
+              children: null,
+            },
+            {
               key: 'videos',
               label: (
                 <Space size={8}>
@@ -111,6 +122,7 @@ export default function App() {
       {/* 内容区域 */}
       <Content style={{ padding: 24, maxWidth: 1200, margin: '0 auto', width: '100%' }}>
         {activeTab === 'generate' && <Generate />}
+        {activeTab === 'config' && <ApiConfig />}
         {activeTab === 'videos' && <TaskList />}
         {activeTab === 'favorites' && <Favorites />}
         {activeTab === 'materials' && <MaterialLibrary />}

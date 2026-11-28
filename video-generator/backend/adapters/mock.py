@@ -19,6 +19,8 @@ class MockAdapter(BaseVideoAdapter):
     """Mock adapter that simulates video generation instantly."""
     provider = "mock"
     display_name = "Mock 测试模式"
+    default_model = "mock-v1"
+    models = [{"id": "mock-v1", "label": "内置示例视频", "kind": "mock"}]
 
     def __init__(self, api_key: str = "mock", base_url: str = ""):
         super().__init__(api_key=api_key or "mock", base_url=base_url)

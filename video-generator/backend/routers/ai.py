@@ -22,10 +22,12 @@ class StoryboardRequest(BaseModel):
     tags: list[str] = []  # 已选标签（融入分镜描述）
 
 
-async def _call_llm(system: str, user: str, model: str = "") -> str:
-    """多通道 LLM：火山方舟 Coding 套餐 -> 小米 MiMo。全失败抛 LLMUnavailable。"""
-    content, _used = await llm_client.chat(system, user, model=model)
-    return content
+async def _call_llm(system: str, user: str, model: str = "") -> tuple[str, str]:
+    """多通道 LLM：优先通道（方舟 Coding 套餐 / MiMo）→ 另一通道。
+
+    返回 (内容, 实际使用的模型)。全失败抛 LLMUnavailable。
+    """
+    return await llm_client.chat(system, user, model=model)
 
 
 def _parse_shots(result: str) -> list[dict]:
@@ -110,7 +112,7 @@ async def polish_prompt(req: PolishRequest):
 
 直接输出润色后的提示词，不要有任何前缀、解释或引号。"""
 
-    result = await _call_llm(system, req.prompt, model=req.llm_model)
+    result, _used = await _call_llm(system, req.prompt, model=req.llm_model)
     return {"original": req.prompt, "polished": result.strip()}
 
 
@@ -150,8 +152,9 @@ async def generate_storyboard(req: StoryboardRequest):
     shots: list[dict] = []
     source = "local"
     notice = ""
+    used_model = ""
     try:
-        result = await _call_llm(system, user, model=req.llm_model)
+        result, used_model = await _call_llm(system, user, model=req.llm_model)
         shots = _parse_shots(result)
         source = "ai"
     except Exception as exc:  # Key 缺失 / 配额耗尽 / 超时 / 输出格式错
@@ -169,6 +172,7 @@ async def generate_storyboard(req: StoryboardRequest):
         "total_duration": sum(s.get("duration", 3) for s in shots),
         "source": source,
         "notice": notice,
+        "model": used_model,
     }
 
 
@@ -186,5 +190,5 @@ async def enhance_shot(req: PolishRequest):
 
 直接输出增强后的提示词。"""
 
-    result = await _call_llm(system, req.prompt, model=req.llm_model)
+    result, _used = await _call_llm(system, req.prompt, model=req.llm_model)
     return {"original": req.prompt, "enhanced": result.strip()}

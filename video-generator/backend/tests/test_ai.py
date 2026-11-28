@@ -70,7 +70,7 @@ def test_storyboard_uses_llm_when_available(client, monkeypatch):
     ]
 
     async def fake(system, user, model=""):
-        return json.dumps(payload, ensure_ascii=False)
+        return json.dumps(payload, ensure_ascii=False), "fake-model"
 
     monkeypatch.setattr(ai_router, "_call_llm", fake)
     r = client.post("/api/ai/storyboard", json={"script": SCRIPT, "scene_count": 2})
@@ -85,7 +85,7 @@ def test_storyboard_uses_llm_when_available(client, monkeypatch):
 def test_storyboard_rejects_empty_descriptions_and_degrades(client, monkeypatch):
     """LLM 返回结构合法但描述为空 —— 等于没填充，必须降级补全。"""
     async def empty_desc(system, user, model=""):
-        return json.dumps([{"shot_id": 1, "camera": "全景", "description": "  "}])
+        return json.dumps([{"shot_id": 1, "camera": "全景", "description": "  "}]), "fake-model"
 
     monkeypatch.setattr(ai_router, "_call_llm", empty_desc)
     r = client.post("/api/ai/storyboard", json={"script": SCRIPT, "scene_count": 3})
@@ -96,10 +96,10 @@ def test_storyboard_rejects_empty_descriptions_and_degrades(client, monkeypatch)
 
 def test_storyboard_markdown_wrapped_json(client, monkeypatch):
     async def wrapped(system, user, model=""):
-        return "```json\n" + json.dumps(
+        return ("```json\n" + json.dumps(
             [{"shot_id": 1, "camera": "中景", "description": "雨中的街道", "duration": 4}],
             ensure_ascii=False,
-        ) + "\n```"
+        ) + "\n```", "fake-model")
 
     monkeypatch.setattr(ai_router, "_call_llm", wrapped)
     r = client.post("/api/ai/storyboard", json={"script": SCRIPT, "scene_count": 2})

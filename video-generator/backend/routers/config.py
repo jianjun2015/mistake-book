@@ -12,6 +12,9 @@ import time
 
 from ..adapters.providers import get_adapter, ADAPTERS
 from ..services import llm_client
+from ..models import AppSetting
+import asyncio
+import os
 
 router = APIRouter()
 
@@ -136,6 +139,93 @@ async def get_params(provider: str, db: Session = Depends(get_db)):
                   "options": [m["id"] for m in adapter.available_models()],
                   "default": adapter.default_model})
     return params
+
+
+# 文本模型探测缓存
+_TEXT_PROBE_CACHE: dict[tuple, tuple[float, dict]] = {}
+
+
+def _get_setting(db: Session, key: str, default: str = "") -> str:
+    row = db.query(AppSetting).filter(AppSetting.key == key).first()
+    return row.value if row and row.value else default
+
+
+def _set_setting(db: Session, key: str, value: str) -> None:
+    row = db.query(AppSetting).filter(AppSetting.key == key).first()
+    if row:
+        row.value = value
+        row.updated_at = datetime.utcnow()
+    else:
+        db.add(AppSetting(key=key, value=value))
+
+
+@router.get("/config/ai/text-models")
+async def list_text_models(probe: bool = False, db: Session = Depends(get_db)):
+    """AI 语言模型清单（方舟 Coding 套餐 + MiMo）。probe=true 时逐个实测可用性。"""
+    data = llm_client.available_text_models()
+    current = _get_setting(db, "ai.text_model") or llm_client.default_ark_model()
+
+    now = time.time()
+    pending: list[tuple[int, str, str]] = []
+    models = []
+    for idx, m in enumerate(data["models"]):
+        item = dict(m)
+        item["selected"] = item["id"] == current
+        if not probe:
+            item["status"] = {"state": "unverified", "message": "未探测（点「探测可用性」实测）"}
+        else:
+            hit = _TEXT_PROBE_CACHE.get((item["channel"], item["id"]))
+            if hit and now - hit[0] < _PROBE_TTL:
+                item["status"] = hit[1]
+            else:
+                pending.append((idx, item["id"], item["channel"]))
+        models.append(item)
+
+    if pending:
+        # 并发探测，避免 14 个模型串行等待
+        results = await asyncio.gather(
+            *(llm_client.probe_text_model(mid, ch) for _, mid, ch in pending)
+        )
+        for (idx, mid, ch), st in zip(pending, results):
+            _TEXT_PROBE_CACHE[(ch, mid)] = (now, st)
+            models[idx]["status"] = st
+
+    return {
+        "channels": data["channels"],
+        "models": models,
+        "current": current,
+        "preferred_channel": llm_client.preferred_channel(),
+        "note": "以上均为语言模型，只用于 AI 润色/分镜，不能生成视频。",
+    }
+
+
+@router.post("/config/ai/text-model")
+async def set_text_model(payload: dict, db: Session = Depends(get_db)):
+    """保存默认语言模型，并立即生效（写入进程环境，无需重启）。"""
+    raw = str((payload or {}).get("model") or "").strip()
+    channel = str((payload or {}).get("channel") or "ark").strip()
+    if not raw:
+        raise HTTPException(400, "model 不能为空")
+
+    if channel == "ark":
+        norm = llm_client._normalize_model(raw)
+        if norm not in llm_client.ARK_TEXT_MODELS:
+            raise HTTPException(
+                400,
+                f"模型 {raw} 不在方舟 Coding 套餐清单内，可选：{', '.join(llm_client.ARK_TEXT_MODELS)}",
+            )
+        os.environ["ARK_MODEL"] = norm
+        saved = norm
+    elif channel == "mimo":
+        saved = llm_client.DEFAULT_MIMO_MODEL
+    else:
+        raise HTTPException(400, f"未知通道: {channel}")
+
+    llm_client.set_preferred_channel(channel)
+    _set_setting(db, "ai.text_model", saved)
+    _set_setting(db, "ai.text_channel", channel)
+    db.commit()
+    return {"saved": True, "channel": channel, "model": saved}
 
 
 def _mask_key(key: str) -> str:

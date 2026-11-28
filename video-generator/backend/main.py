@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .database import init_db
+from .database import init_db, load_runtime_settings
 from .routers import generate, tasks, config, ai
 
 
@@ -13,6 +13,7 @@ from .routers import generate, tasks, config, ai
 async def lifespan(app: FastAPI):
     """Initialize database on startup."""
     init_db()
+    load_runtime_settings()
     yield
 
 
