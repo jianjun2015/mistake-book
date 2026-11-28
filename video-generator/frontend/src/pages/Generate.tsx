@@ -115,7 +115,7 @@ export default function Generate() {
   const [promptHistory, setPromptHistory] = useState<string[]>([])
 
   // Mock
-  const [mockMode, setMockMode] = useState(true)
+  const [mockMode, setMockMode] = useState(false)
   const [aspectRatio, setAspectRatio] = useState('16:9')
   const [negativePrompt, setNegativePrompt] = useState('')
   const [genProgress, setGenProgress] = useState(0)
@@ -128,9 +128,13 @@ export default function Generate() {
   const loadProviders = () => {
     api.get('/config').then(r => {
       setProviders(r.data)
-      const mock = r.data.find((p: Provider) => p.provider === 'mock')
-      const active = mock || r.data.find((p: Provider) => p.api_key_masked)
-      if (active) { setProvider(active.provider); setModel(active.default_model) }
+      // 优先选有 API Key 的真实厂商
+      const realActive = r.data.find((p: Provider) => p.provider !== 'mock' && p.api_key_masked)
+      const fallback = realActive || r.data.find((p: Provider) => p.provider === 'mock')
+      if (fallback) {
+        setProvider(fallback.provider)
+        setModel(fallback.default_model)
+      }
     }).catch(() => {})
   }
 
