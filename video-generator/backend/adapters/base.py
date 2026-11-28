@@ -24,10 +24,12 @@ class BaseVideoAdapter(ABC):
 
     provider: str = ""
     display_name: str = ""
+    default_base_url: str = ""
+    default_model: str = ""
 
     def __init__(self, api_key: str, base_url: str = ""):
         self.api_key = api_key
-        self.base_url = base_url.rstrip("/")
+        self.base_url = (base_url or self.default_base_url).rstrip("/")
 
     @abstractmethod
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:

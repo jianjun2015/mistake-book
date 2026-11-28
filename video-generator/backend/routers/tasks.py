@@ -3,12 +3,13 @@
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Task, ApiConfig
 from ..adapters.providers import get_adapter
+from ..services.video_service import download_video, is_remote_url, local_video_path
 
 router = APIRouter()
 
@@ -41,12 +42,23 @@ async def get_task(task_id: str, db: Session = Depends(get_db)):
                 result = adapter.query(provider_task_id)
                 if result.status == "completed":
                     task.status = "completed"
-                    task.video_url = result.video_url
                     task.completed_at = datetime.utcnow()
+                    task.duration = _elapsed(task)
+                    video_url = result.video_url
+                    # 厂商 URL 短时效 —— 完成后立即转存本地，前端走稳定的服务端点
+                    if is_remote_url(video_url):
+                        local = download_video(video_url, task.id)
+                        if local:
+                            params = dict(task.params or {})
+                            params["source_url"] = video_url
+                            task.params = params
+                            video_url = f"/video-api/videos/{task.id}"
+                    task.video_url = video_url
                 elif result.status == "failed":
                     task.status = "failed"
                     task.error_message = result.error
                     task.completed_at = datetime.utcnow()
+                    task.duration = _elapsed(task)
                 db.commit()
                 db.refresh(task)
 
@@ -59,6 +71,9 @@ async def delete_task(task_id: str, db: Session = Depends(get_db)):
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(404, "task not found")
+    local = local_video_path(task_id)
+    if local.exists():
+        local.unlink()
     db.delete(task)
     db.commit()
     return {"deleted": True}
@@ -66,16 +81,29 @@ async def delete_task(task_id: str, db: Session = Depends(get_db)):
 
 @router.get("/videos/{task_id}")
 async def get_video(task_id: str, db: Session = Depends(get_db)):
-    """Serve video file."""
+    """Serve video file (local persisted copy first, remote fallback)."""
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task or not task.video_url:
         raise HTTPException(404, "video not found")
 
-    # If it's a local file path
+    local = local_video_path(task_id)
+    if local.exists():
+        return FileResponse(local, media_type="video/mp4", filename=f"{task_id}.mp4")
+    params = task.params or {}
+    source = params.get("source_url", "")
+    if is_remote_url(source):
+        return RedirectResponse(source)
+    if is_remote_url(task.video_url):
+        return RedirectResponse(task.video_url)
     if task.video_url.startswith("/"):
-        return FileResponse(task.video_url)
-    # If it's a remote URL, return it as-is for the frontend
-    return {"video_url": task.video_url}
+        return FileResponse(task.video_url, media_type="video/mp4")
+    raise HTTPException(404, "video not found")
+
+
+def _elapsed(task: Task) -> float:
+    if task.created_at and task.completed_at:
+        return round((task.completed_at - task.created_at).total_seconds(), 1)
+    return 0.0
 
 
 def _to_dict(task: Task) -> dict:

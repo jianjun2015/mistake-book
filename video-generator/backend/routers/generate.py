@@ -1,12 +1,12 @@
 """Generate endpoint."""
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..database import get_db
 from ..models import Task, ApiConfig
 from ..schemas import GenerateRequest, TaskResponse
-from ..adapters.providers import get_adapter
+from ..adapters.providers import ADAPTERS, get_adapter
 
 router = APIRouter()
 
@@ -14,6 +14,9 @@ router = APIRouter()
 @router.post("/generate", response_model=TaskResponse)
 async def generate_video(req: GenerateRequest, db: Session = Depends(get_db)):
     """Submit a video generation task."""
+    if req.provider not in ADAPTERS:
+        raise HTTPException(400, f"未知厂商: {req.provider}")
+
     # Get API config (mock mode bypasses key check)
     is_mock = req.provider == "mock"
     config = None

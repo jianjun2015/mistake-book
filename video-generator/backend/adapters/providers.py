@@ -10,6 +10,23 @@ import httpx
 from .base import BaseVideoAdapter, VideoGenerationResult
 from .mock import MockAdapter
 
+# 已下线/已失效的模型标识 —— 直接拒绝，不再请求厂商 API
+# (Runway gen3a_turbo 2026-07-30 下线; Seedance 1.0 lite/旧 ID 厂商侧已不存在)
+RETIRED_MODELS = {
+    "runway": ("gen3a_turbo", "gen4_aleph", "gen3a", "gen2"),
+    "seedance": (
+        "seedance-1-0", "doubao-seedance-1-0-lite-t2v-250428",
+        "doubao-seedance-1-0-lite-i2v-250428",
+    ),
+}
+
+
+def _check_retired(provider: str, model: str, replacement: str) -> str:
+    """Return an error string when the model is retired, else empty string."""
+    if model in RETIRED_MODELS.get(provider, ()):
+        return f"模型 {model} 已下线/不可用，请改用 {replacement}"
+    return ""
+
 
 class RunwayAdapter(BaseVideoAdapter):
     """Runway API adapter (Gen-4 / multi-model platform).
@@ -20,6 +37,7 @@ class RunwayAdapter(BaseVideoAdapter):
     """
     provider = "runway"
     display_name = "Runway"
+    default_base_url = "https://api.dev.runwayml.com/v1"
     default_model = "gen4.5"
     API_VERSION = "2024-11-06"
 
@@ -33,13 +51,16 @@ class RunwayAdapter(BaseVideoAdapter):
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
         model = model or self.default_model
+        retired = _check_retired("runway", model, self.default_model)
+        if retired:
+            return VideoGenerationResult(task_id="", status="failed", error=retired)
 
-        # ratio is required for Runway (not resolution)
-        ratio_map = {"480p": "1280:720", "720p": "1280:720", "1080p": "1280:720"}
+        # ratio is required for Runway (not resolution); T2V gen4.5 supports 1280:720 / 720:1280
+        ratio_map = {"16:9": "1280:720", "9:16": "720:1280", "1:1": "1280:720", "4:3": "1280:720"}
         payload = {
             "model": model,
             "promptText": prompt[:1000],  # max 1000 chars
-            "ratio": params.get("ratio", ratio_map.get(params.get("resolution", "720p"), "1280:720")),
+            "ratio": params.get("ratio") or ratio_map.get(params.get("aspect_ratio", "16:9"), "1280:720"),
             "duration": int(params.get("duration", 5)),
         }
         try:
@@ -105,12 +126,13 @@ class KlingAdapter(BaseVideoAdapter):
     """可灵 Kling API adapter (Kuaishou).
 
     Auth: Bearer token (JWT signed with API Key/Secret).
-    Models: kling-v1-6, kling-v2-master, kling-v2-1, etc.
+    Models: kling-v2-master / kling-v2-1 (kling-v1-6 等旧版已下线)
     Endpoint: POST /v1/videos/text2video
     """
     provider = "kling"
     display_name = "可灵 Kling"
-    default_model = "kling-v1-6"
+    default_base_url = "https://api.klingai.com/v1"
+    default_model = "kling-v2-master"
 
     def _headers(self):
         return {
@@ -195,12 +217,14 @@ class SeedanceAdapter(BaseVideoAdapter):
     """字节跳动 Seedance API adapter (Volcengine Ark).
 
     Auth: Bearer API Key (from ark.volcengine.com).
-    Models: doubao-seedance-1-0-pro-250528, doubao-seedance-1-0-lite-t2v-250428, etc.
+    Models (current): doubao-seedance-2-5-260628 / 2-0-260128 / 1-5-pro-251215 / 1-0-pro-250528.
+    1.0 lite 与旧 seedance-1-0 标识已下线/不可用。
     Endpoint: POST /contents/generations/tasks
     """
     provider = "seedance"
     display_name = "Seedance (字节)"
-    default_model = "doubao-seedance-1-0-lite-t2v-250428"
+    default_base_url = "https://ark.cn-beijing.volces.com/api/v3"
+    default_model = "doubao-seedance-2-0-260128"
 
     def _headers(self):
         return {
@@ -211,6 +235,9 @@ class SeedanceAdapter(BaseVideoAdapter):
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
         model = model or self.default_model
+        retired = _check_retired("seedance", model, self.default_model)
+        if retired:
+            return VideoGenerationResult(task_id="", status="failed", error=retired)
         payload = {
             "model": model,
             "content": [{"type": "text", "text": prompt}],

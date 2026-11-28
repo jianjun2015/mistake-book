@@ -1,6 +1,6 @@
 # 文生视频平台 — PRD & 技术方案
 
-> 版本: v1.0 | 日期: 2026-11-08 | 状态: 待开发
+> 版本: v2.0 | 日期: 2026-11-28 | 状态: 已上线（架构与版本链详见 ARCHITECTURE.md）
 
 ---
 
@@ -54,9 +54,9 @@
 
 | 厂商 | 模型 | API 地址 | 特点 |
 |------|------|----------|------|
-| **Runway** | Gen-3 Alpha | api.dev.runwayml.com | 质量高，英文效果好 |
-| **可灵 Kling** | v1.6 | api.klingai.com | 中文理解强，性价比高 |
-| **Seedance** | 1.0 | api.seedance.com (字节) | 动态效果好，速度快 |
+| **Runway** | gen4.5（Gen-3 Alpha 已下线） | api.dev.runwayml.com | 质量高，英文效果好 |
+| **可灵 Kling** | kling-v2-master | api.klingai.com | 中文理解强，性价比高 |
+| **Seedance** | doubao-seedance-2.0/2.5 | ark.cn-beijing.volces.com (字节·火山方舟) | 动态效果好，速度快 |
 
 ### API 调用流程（统一抽象）
 
@@ -222,7 +222,7 @@ GET /api/videos/{task_id}     -- 获取视频文件
 │                                       │
 │  🟢 Runway                             │
 │  API Key: [sk-••••••••••]  [测试连接] │
-│  默认模型: [Gen-3 Alpha ▼]            │
+│  默认模型: [gen4.5 ▼]                 │
 │                                       │
 │  🟢 可灵 Kling                         │
 │  API Key: [••••••••••]    [测试连接]  │
@@ -250,7 +250,7 @@ video-generator/
 │   ├── schemas.py           # 请求/响应 Schema
 │   ├── adapters/
 │   │   ├── base.py          # 基础适配器接口
-│   │   ├── runway.py        # Runway Gen-3
+│   │   └── providers.py     # Runway/Kling/Seedance 适配器
 │   │   ├── kling.py         # 可灵 Kling
 │   │   └── seedance.py      # 字节 Seedance
 │   ├── routers/
