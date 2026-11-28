@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Table, Tag, Button, Space, Popconfirm, message, Card, Modal } from 'antd'
 import { PlayCircleOutlined, DownloadOutlined, DeleteOutlined, ReloadOutlined } from '@ant-design/icons'
-import api from '../services/api'
+import api, { videoSrc } from '../services/api'
 
 interface Task {
   id: string
@@ -66,8 +66,8 @@ export default function TaskList() {
         <Space>
           {row.video_url && (
             <>
-              <Button size="small" icon={<PlayCircleOutlined />} onClick={() => setPreviewUrl(row.video_url)}>预览</Button>
-              <Button size="small" icon={<DownloadOutlined />} href={row.video_url} target="_blank">下载</Button>
+              <Button size="small" icon={<PlayCircleOutlined />} onClick={() => setPreviewUrl(videoSrc(row.video_url))}>预览</Button>
+              <Button size="small" icon={<DownloadOutlined />} href={videoSrc(row.video_url)} target="_blank">下载</Button>
             </>
           )}
           <Popconfirm title="确定删除？" onConfirm={() => handleDelete(row.id)}>

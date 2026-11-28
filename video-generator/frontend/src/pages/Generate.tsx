@@ -11,7 +11,7 @@ import {
   CopyOutlined, StarOutlined, HistoryOutlined,
   CompressOutlined, ExpandOutlined,
 } from '@ant-design/icons'
-import api from '../services/api'
+import api, { videoSrc } from '../services/api'
 import StoryboardGenerator, { type Shot } from '../components/StoryboardGenerator'
 
 const { TextArea } = Input
@@ -362,7 +362,7 @@ export default function Generate() {
         const r = await api.get(`/tasks/${taskId}`)
         setTask(r.data)
         if (r.data.status === 'completed') {
-          setVideoUrl(r.data.video_url)
+          setVideoUrl(videoSrc(r.data.video_url))
           setLoading(false)
           setGenProgress(100)
           clearInterval(pollRef.current)
@@ -407,7 +407,7 @@ export default function Generate() {
         message.error(r.data.error_message)
         setLoading(false)
       } else if (r.data.status === 'completed') {
-        setVideoUrl(r.data.video_url)
+        setVideoUrl(videoSrc(r.data.video_url))
         setLoading(false)
         setGenProgress(100)
         message.success('🎉 视频生成完成！')
@@ -845,7 +845,22 @@ export default function Generate() {
 
             {task?.status === 'failed' && (
               <Card size="small" style={{ borderRadius: 12, borderColor: '#ff4d4f' }}>
-                <Text type="danger">❌ {task.error_message}</Text>
+                <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                  <Text type="danger">❌ {task.error_message}</Text>
+                  {(task.error_message || '').includes('console.volcengine.com') && (
+                    <Space>
+                      <Button size="small" type="primary"
+                        href="https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement"
+                        target="_blank">去方舟控制台开通</Button>
+                      <Text type="secondary" style={{ fontSize: 12 }}>开通后回到此页点「探测开通状态」即可</Text>
+                    </Space>
+                  )}
+                  {(task.error_message || '').includes('API Key') && (
+                    <Text type="secondary" style={{ fontSize: 12 }}>
+                      提示：也可切到「测试模式」（Mock）验证完整流程，Mock 无需任何 Key。
+                    </Text>
+                  )}
+                </Space>
               </Card>
             )}
           </Space>

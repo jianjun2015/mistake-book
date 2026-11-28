@@ -28,6 +28,31 @@ def _check_retired(provider: str, model: str, replacement: str) -> str:
     return ""
 
 
+ARK_CONSOLE_URL = "https://console.volcengine.com/ark/region:ark+cn-beijing/openManagement"
+
+
+def _translate_ark_error(message: str, model: str = "") -> str:
+    """把方舟视频接口的英文错误翻译成可操作的中文提示。"""
+    raw = message or ""
+    low = raw.lower()
+    if "modelnotopen" in low or "has not activated" in low:
+        return (
+            f"模型 {model} 未在当前账户开通（ModelNotOpen）。"
+            f"请到火山方舟控制台「开通管理」开通该视频模型：{ARK_CONSOLE_URL}"
+        )
+    if "invalidendpointormodel" in low:
+        return (
+            f"模型 {model} 不存在或无权访问（InvalidEndpointOrModel.NotFound）。"
+            "请从账户真实清单中选择模型（配置页点「探测开通状态」可查）。"
+        )
+    if "does not support the coding plan" in low:
+        return (
+            f"模型 {model} 属于 Coding 套餐的语言模型，不能生成视频。"
+            "视频生成必须走 /api/v3 并单独开通 Seedance 视频模型。"
+        )
+    return raw
+
+
 class RunwayAdapter(BaseVideoAdapter):
     """Runway API adapter (Gen-4 / multi-model platform).
 
@@ -50,6 +75,28 @@ class RunwayAdapter(BaseVideoAdapter):
             "X-Runway-Version": self.API_VERSION,
             "Content-Type": "application/json",
         }
+
+    def preflight(self) -> str:
+        msg = super().preflight()
+        if msg:
+            return msg
+        if not self.api_key.startswith("key_"):
+            return (
+                f"Runway API Key 格式不对：必须以 key_ 开头（当前为 "
+                f"{self._mask_key()}）。请到 runwayml.com → Settings → API Keys 重新生成。"
+            )
+        return ""
+
+    def _translate_error(self, text: str) -> str:
+        low = (text or "").lower()
+        if "did not start with 'key_'" in low or "invalid api key" in low:
+            return (
+                "Runway 拒绝了该 API Key（提示未以 key_ 开头或无效）。"
+                "请在 runwayml.com → Settings → API Keys 生成新 Key 后填入配置页。"
+            )
+        if "insufficient" in low or "credit" in low:
+            return f"Runway 账户额度不足：{text}"
+        return text or ""
 
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
@@ -76,9 +123,12 @@ class RunwayAdapter(BaseVideoAdapter):
             data = resp.json()
             if resp.status_code in (200, 201):
                 return VideoGenerationResult(task_id=data.get("id", ""), status="processing", raw_response=data)
+            raw_err = data.get("error", data.get("failure", f"HTTP {resp.status_code}"))
+            if isinstance(raw_err, dict):
+                raw_err = raw_err.get("message", str(raw_err))
             return VideoGenerationResult(
                 task_id="", status="failed",
-                error=data.get("error", data.get("failure", f"HTTP {resp.status_code}")),
+                error=self._translate_error(str(raw_err)),
             )
         except Exception as e:
             return VideoGenerationResult(task_id="", status="failed", error=str(e))
@@ -145,6 +195,26 @@ class KlingAdapter(BaseVideoAdapter):
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+
+    def preflight(self) -> str:
+        msg = super().preflight()
+        if msg:
+            return msg
+        # 可灵用 AK:SK 换取 JWT；单独一个 Key 无法签发
+        if ":" not in self.api_key:
+            return (
+                "可灵需要 AccessKey 与 SecretKey 一对（格式 AK:SK）。"
+                "请到 app.klingai.com → API 密钥 获取后按 AK:SK 填入配置页。"
+            )
+        return ""
+
+    def _translate_error(self, text: str) -> str:
+        low = (text or "").lower()
+        if "1000" in low or "authentication" in low or "unauthorized" in low:
+            return f"可灵鉴权失败（密钥无效或 JWT 过期）：{text}"
+        if "1002" in low or "balance" in low or "quota" in low:
+            return f"可灵账户额度/并发不足：{text}"
+        return text or ""
 
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
@@ -242,6 +312,20 @@ class SeedanceAdapter(BaseVideoAdapter):
             "Content-Type": "application/json",
         }
 
+    def preflight(self) -> str:
+        msg = super().preflight()
+        if msg:
+            return msg
+        if "/api/coding/" in self.base_url:
+            return (
+                "Seedance 视频生成不能用 Coding 套餐地址（/api/coding/v3），"
+                "必须使用 https://ark.cn-beijing.volces.com/api/v3"
+            )
+        return ""
+
+    def _translate_error(self, text: str) -> str:
+        return _translate_ark_error(text, self.default_model)
+
     def generate(self, prompt: str, model: str = "", params: dict = None) -> VideoGenerationResult:
         params = params or {}
         model = model or self.default_model
@@ -272,9 +356,10 @@ class SeedanceAdapter(BaseVideoAdapter):
             if task_id:
                 return VideoGenerationResult(task_id=task_id, status="processing", raw_response=data)
             error = data.get("error", {})
+            raw = error.get("message", str(data)) if isinstance(error, dict) else str(error)
             return VideoGenerationResult(
                 task_id="", status="failed",
-                error=error.get("message", str(data)) if isinstance(error, dict) else str(error),
+                error=_translate_ark_error(raw, model),
             )
         except Exception as e:
             return VideoGenerationResult(task_id="", status="failed", error=str(e))

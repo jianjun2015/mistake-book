@@ -14,3 +14,14 @@ api.interceptors.response.use(
 )
 
 export default api
+
+/**
+ * 把后端返回的视频相对路径转换为浏览器可访问地址。
+ * 后端返回 /api/videos/{id}（直连后端可用），前端经 nginx 走 /video-api 前缀。
+ */
+export function videoSrc(url: string): string {
+  if (!url) return url
+  if (url.startsWith('/api/')) return '/video-api' + url.slice(4)
+  // 兼容历史数据里的 /video-api 前缀
+  return url
+}

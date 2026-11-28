@@ -64,6 +64,20 @@ class BaseVideoAdapter(ABC):
             "style": {"type": "select", "options": ["realistic", "cinematic", "anime"], "default": "realistic"},
         }
 
+    def preflight(self) -> str:
+        """提交前自检（Key 格式、必填项）。返回错误文案，空串表示通过。
+
+        目的：在真正消耗配额/计费前就给出可操作的中文提示，
+        而不是把厂商原始报错原样抛给用户。
+        """
+        if not self.api_key:
+            return f"{self.display_name} 未配置 API Key"
+        return ""
+
+    def _translate_error(self, text: str) -> str:
+        """把厂商原始错误翻译成可操作的中文提示。默认原样返回。"""
+        return text or ""
+
     def _mask_key(self) -> str:
         if not self.api_key:
             return "(未配置)"

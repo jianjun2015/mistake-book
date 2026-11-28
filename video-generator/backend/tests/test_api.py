@@ -45,7 +45,14 @@ def test_mock_generation_instant_complete(client):
     r = client.post("/api/generate", json={"prompt": "a cat", "provider": "mock", "params": {}})
     body = r.json()
     assert body["status"] == "completed"
-    assert body["video_url"].startswith("http")
+    url = body["video_url"]
+    # 优先转存本地并走服务端点；无网络时回落到厂商原始外链
+    assert url.startswith("/api/videos/") or url.startswith("http"), url
+    if url.startswith("/api/videos/"):
+        task_id = url.rsplit("/", 1)[-1]
+        v = client.get(f"/api/videos/{task_id}")
+        assert v.status_code == 200
+        assert v.headers["content-type"].startswith("video/")
 
 
 def test_generate_complete_flow_with_local_persist(client, monkeypatch):
@@ -71,7 +78,7 @@ def test_generate_complete_flow_with_local_persist(client, monkeypatch):
 
     done = client.get(f"/api/tasks/{task['id']}").json()
     assert done["status"] == "completed"
-    assert done["video_url"] == f"/video-api/videos/{task['id']}"
+    assert done["video_url"] == f"/api/videos/{task['id']}"
     assert done["duration"] >= 0
     assert done["params"]["source_url"].startswith("https://")
 

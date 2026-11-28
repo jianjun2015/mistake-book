@@ -4,7 +4,7 @@ import {
   StarFilled, PlayCircleOutlined, DownloadOutlined,
   DeleteOutlined, ReloadOutlined,
 } from '@ant-design/icons'
-import api from '../services/api'
+import api, { videoSrc } from '../services/api'
 
 const { Text, Title } = Typography
 
@@ -87,10 +87,10 @@ export default function Favorites() {
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     cursor: 'pointer',
                   }}
-                  onClick={() => setPreviewUrl(v.video_url)}
+                  onClick={() => setPreviewUrl(videoSrc(v.video_url))}
                 >
                   <video
-                    src={v.video_url}
+                    src={videoSrc(v.video_url)}
                     muted
                     preload="metadata"
                     style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -98,8 +98,8 @@ export default function Favorites() {
                 </div>
               }
               actions={[
-                <PlayCircleOutlined key="play" onClick={() => setPreviewUrl(v.video_url)} />,
-                <DownloadOutlined key="download" onClick={() => window.open(v.video_url)} />,
+                <PlayCircleOutlined key="play" onClick={() => setPreviewUrl(videoSrc(v.video_url))} />,
+                <DownloadOutlined key="download" onClick={() => window.open(videoSrc(v.video_url))} />,
                 <Popconfirm title="取消收藏？" onConfirm={() => removeFavorite(v.id)}>
                   <DeleteOutlined key="delete" style={{ color: '#ff4d4f' }} />
                 </Popconfirm>,

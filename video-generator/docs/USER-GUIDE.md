@@ -158,3 +158,30 @@ cd frontend && npm install && npm run dev                        # 前端 :5180
 | POST | `/api/config/ai/text-model` | 设置默认语言模型（入参 `model`、`channel`） |
 
 `/api/ai/storyboard` 响应新增 `model` 字段，标明这次实际使用的模型。
+
+## v2.5 真实链路修复（跑不通 = 说人话）
+
+### 修掉的真实 bug
+| 问题 | 影响 | 修复 |
+| --- | --- | --- |
+| 即时完成（Mock）任务不转存本地 | `video_url` 指向外链，`/api/videos` 返 307，页面可能播不出来 | 完成即 `download_video()`，失败回落外链 |
+| 存的地址带 nginx 前缀 `/video-api/videos/{id}` | 直连后端 8430 访问 404 | 后端改存 `/api/videos/{id}`，前端用 `videoSrc()` 转前缀 |
+| 下载无 UA 被 CDN 拦截 | Mock 示例视频偶发落盘失败 | 带浏览器 UA + 重试 2 次 |
+| 厂商原始英文报错直接抛出 | 用户不知道该怎么办 | `preflight()` 提交前自检 + `_translate_error()` 中文翻译 |
+
+### 现在失败会这样提示
+- Runway Key 未以 `key_` 开头 → 直接拒绝，不发起任何网络请求（省钱省时）
+- 可灵没按 `AK:SK` 填 → 提示去 app.klingai.com 取密钥对
+- Seedance 用了 `/api/coding/v3` → 提示必须用 `/api/v3`
+- 方舟 `ModelNotOpen` → 中文说明 + 控制台直属链接
+
+### 新增接口
+`GET /api/config/diagnose?probe=true` → 逐厂商 `ready / next_step / models`，配置页顶部「环境自检」卡片直接展示。
+
+### 验真脚本
+```bash
+python3 scripts/verify_real.py --provider mock      # 无需 Key，验证全链路（已验证通过）
+python3 scripts/verify_real.py --provider seedance   # 控制台开通后可一键验真
+python3 scripts/verify_real.py --provider runway --key key_xxx
+```
+退出码 0 = 真实生成成功并校验 MP4 头；2 = 无可用模型；3/4 = 提交/生成失败；5 = 非法 MP4；6 = 超时。

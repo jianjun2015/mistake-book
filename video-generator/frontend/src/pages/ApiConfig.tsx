@@ -74,6 +74,8 @@ export default function ApiConfig() {
   const [textChannel, setTextChannel] = useState('ark')
   const [textProbing, setTextProbing] = useState(false)
   const [textNote, setTextNote] = useState('')
+  const [diag, setDiag] = useState<any>(null)
+  const [diagLoading, setDiagLoading] = useState(false)
 
   const load = async () => {
     try {
@@ -97,7 +99,16 @@ export default function ApiConfig() {
     } catch { message.error('加载语言模型清单失败') }
   }
 
-  useEffect(() => { load(); loadTextModels(false) }, [])
+  const loadDiagnose = async () => {
+    setDiagLoading(true)
+    try {
+      const r = await api.get('/config/diagnose', { params: { probe: true } })
+      setDiag(r.data)
+    } catch { message.error('自检失败') }
+    setDiagLoading(false)
+  }
+
+  useEffect(() => { load(); loadTextModels(false); loadDiagnose() }, [])
 
   /** 拉取厂商模型目录（真实账户清单）；probe=true 时附带开通状态 */
   const loadCatalog = async (provider: string, probe: boolean) => {
@@ -172,6 +183,52 @@ export default function ApiConfig() {
 
   return (
     <Space direction="vertical" size="large" style={{ width: '100%' }}>
+      {/* ---------------- 环境自检 ---------------- */}
+      <Card
+        title={<><CheckCircleOutlined /> 环境自检（能否真实生成视频）</>}
+        style={{ borderRadius: 12 }}
+        extra={<Button icon={<SyncOutlined />} loading={diagLoading} onClick={loadDiagnose}>重新自检</Button>}
+      >
+        {diag ? (
+          <Space direction="vertical" size="middle" style={{ width: '100%' }}>
+            <Alert
+              type={diag.video_ready ? 'success' : 'warning'}
+              showIcon
+              message={
+                diag.video_ready
+                  ? '已有可用视频模型，可以真实生成'
+                  : '暂无已开通的真实视频模型 —— 当前只能走 Mock 测试模式'
+              }
+              description={diag.video_ready ? undefined : (
+                <span>
+                  需要到火山方舟控制台「开通管理」开通 Seedance 视频模型：
+                  <Button type="link" size="small" href={diag.ark_console} target="_blank">打开控制台</Button>
+                </span>
+              )}
+            />
+            <List
+              size="small"
+              bordered
+              dataSource={diag.providers}
+              renderItem={(p: any) => (
+                <List.Item
+                  actions={[p.ready ? <Tag color="success">✅ 可用</Tag> : <Tag color="error">❌ 不可用</Tag>]}
+                >
+                  <Space direction="vertical" size={2}>
+                    <Space>
+                      <Text strong>{providerEmoji[p.provider] || '⚙️'} {p.display_name}</Text>
+                      {p.ready_model && <Tag color="blue">{p.ready_model}</Tag>}
+                      {p.preflight_error && <Tag color="orange">配置问题</Tag>}
+                    </Space>
+                    <Text type="secondary" style={{ fontSize: 12 }}>{p.next_step}</Text>
+                  </Space>
+                </List.Item>
+              )}
+            />
+          </Space>
+        ) : <Text type="secondary">自检中...</Text>}
+      </Card>
+
       {/* ---------------- 视频厂商 ---------------- */}
       <Card
         title={<><VideoCameraOutlined /> 视频厂商配置</>}

@@ -52,7 +52,7 @@ async def get_task(task_id: str, db: Session = Depends(get_db)):
                             params = dict(task.params or {})
                             params["source_url"] = video_url
                             task.params = params
-                            video_url = f"/video-api/videos/{task.id}"
+                            video_url = f"/api/videos/{task.id}"
                     task.video_url = video_url
                 elif result.status == "failed":
                     task.status = "failed"

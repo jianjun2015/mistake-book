@@ -7,6 +7,7 @@ from ..database import get_db
 from ..models import Task, ApiConfig
 from ..schemas import GenerateRequest, TaskResponse
 from ..adapters.providers import ADAPTERS, get_adapter
+from ..services.video_service import download_video, is_remote_url
 
 router = APIRouter()
 
@@ -48,16 +49,36 @@ async def generate_video(req: GenerateRequest, db: Session = Depends(get_db)):
         "mock" if is_mock else config.api_key,
         "" if is_mock else config.base_url,
     )
+    # 提交前自检：Key 格式 / 必填项不对就直接给出可操作的中文提示
+    preflight = adapter.preflight() if hasattr(adapter, "preflight") else ""
+    if preflight:
+        task.status = "failed"
+        task.error_message = preflight
+        db.commit()
+        db.refresh(task)
+        return _task_to_response(task)
+
     result = adapter.generate(req.prompt, task.model, req.params)
 
     if result.status == "failed":
         task.status = "failed"
-        task.error_message = result.error
+        err = result.error or "生成失败"
+        if hasattr(adapter, "_translate_error"):
+            err = adapter._translate_error(str(err))
+        task.error_message = err
     elif result.status == "completed":
-        # Mock mode: instant completion
+        # 即时完成（Mock 等）：同样要转存本地，避免依赖外链时效
         task.status = "completed"
-        task.video_url = result.video_url
         task.completed_at = task.created_at
+        video_url = result.video_url
+        if is_remote_url(video_url):
+            local = download_video(video_url, task.id)
+            if local:
+                params = dict(task.params or {})
+                params["source_url"] = video_url
+                task.params = params
+                video_url = f"/api/videos/{task.id}"
+        task.video_url = video_url
     else:
         task.status = "processing"
         task.params = {**(task.params or {}), "provider_task_id": result.task_id}

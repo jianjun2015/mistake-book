@@ -10,7 +10,7 @@ from ..models import ApiConfig
 from ..schemas import ConfigSaveRequest
 import time
 
-from ..adapters.providers import get_adapter, ADAPTERS
+from ..adapters.providers import get_adapter, ADAPTERS, ARK_CONSOLE_URL
 from ..services import llm_client
 from ..models import AppSetting
 import asyncio
@@ -157,6 +157,62 @@ def _set_setting(db: Session, key: str, value: str) -> None:
         row.updated_at = datetime.utcnow()
     else:
         db.add(AppSetting(key=key, value=value))
+
+
+@router.get("/config/diagnose")
+async def diagnose(probe: bool = True, db: Session = Depends(get_db)):
+    """环境自检：逐厂商给出「能否真实生成视频」的结论与下一步操作。"""
+    providers = []
+    ready_any = False
+    for name, cls in ADAPTERS.items():
+        config = db.query(ApiConfig).filter(ApiConfig.provider == name).first()
+        api_key = (config.api_key if config else "") or ""
+        base_url = (config.base_url if config else "") or ""
+        adapter = get_adapter(name, api_key, base_url)
+
+        preflight = adapter.preflight() if hasattr(adapter, "preflight") else ""
+        items = []
+        ready_model = ""
+        if probe and api_key and not preflight:
+            for m in adapter.available_models():
+                st = _probe_cached(adapter, name, m["id"])
+                items.append({"id": m["id"], "status": st})
+                if st.get("state") == "available" and not ready_model:
+                    ready_model = m["id"]
+
+        ready = bool(ready_model) or (name == "mock" and bool(api_key or True))
+        if ready:
+            ready_any = True
+        if preflight:
+            next_step = preflight
+        elif ready_model:
+            next_step = f"可直接生成（推荐模型 {ready_model}）"
+        elif name == "mock":
+            next_step = "内置测试模式，可直接生成示例视频"
+        elif items:
+            next_step = "该账户下没有已开通的模型，请到方舟控制台「开通管理」开通后再试"
+        else:
+            next_step = "未探测（缺少 Key 或参数）"
+
+        providers.append({
+            "provider": name,
+            "display_name": adapter.display_name,
+            "configured": bool(api_key) or name == "mock",
+            "base_url": adapter.base_url,
+            "default_model": adapter.default_model,
+            "preflight_error": preflight,
+            "ready": ready,
+            "ready_model": ready_model,
+            "models": items,
+            "next_step": next_step,
+        })
+
+    return {
+        "video_ready": any(p["ready"] and p["provider"] != "mock" for p in providers),
+        "mock_ready": next((p["ready"] for p in providers if p["provider"] == "mock"), False),
+        "providers": providers,
+        "ark_console": ARK_CONSOLE_URL,
+    }
 
 
 @router.get("/config/ai/text-models")
